@@ -5,11 +5,14 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start",
+    "start": "expo start",
     "test": "jest",
     "lint": "eslint ."
   },
   "dependencies": {
+    "expo": "^45.0.6",
+    "expo-cli": "^5.4.12",
+    "expo-status-bar": "~1.3.0",
     "react": "18.0.0",
     "react-native": "0.69.0"
   },
@@ -18,7 +21,6 @@
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
     "babel-jest": "^26.6.3",
-    "eslint": "^7.32.0",
     "jest": "^26.6.3",
     "metro-react-native-babel-preset": "^0.70.3",
     "react-test-renderer": "18.0.0"

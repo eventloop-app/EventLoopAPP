@@ -1,4 +1,6 @@
 {
-  "name": "eventloop",
-  "displayName": "eventloop"
+  "expo": {
+    "name": "EventLoop",
+    "slug": "EventLoop"
+  }
 }
