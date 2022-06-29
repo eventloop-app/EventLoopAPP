@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "EventLoop",
-    "slug": "EventLoop"
+    "slug": "EventLoop",
+    "scheme": "eventloop"
   }
 }

@@ -1,111 +1,91 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-import React from 'react';
-import type {Node} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  Button, Text, Platform,
+} from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import axios from 'react-native-axios'
+import FormData from 'form-data';
+import { makeRedirectUri, useAuthRequest, useAutoDiscovery } from "expo-auth-session";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+WebBrowser.maybeCompleteAuthSession();
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+const App = () => {
+  // const discovery = useAutoDiscovery('https://eventloop.jp.auth0.com/authorize');
+  const discovery = useAutoDiscovery("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0");
+  const redirectUri = makeRedirectUri({ scheme: "exp://g6-ciw.anonymous.eventloop.exp.direct:80" });
+
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      // clientId: '1bp7lTyd3mVuC861J3dVKEWJUcC2aOEu',
+      // responseType: 'id_token',
+      // scopes: ['openid', 'profile', 'email'],
+      // redirectUri,
+      // extraParams: {
+      //   nonce: 'nonce',
+      // },
+      clientId: "4bf4a100-9aeb-42be-8649-8fd4ef42722b",
+      clientSecret: "3~68Q~sLI_5IxI1m7m8PdKEP_XGT4xWXfXCdIdfG",
+      scopes: ["openid", "profile", "email", "offline_access", "user.read"],
+      responseType: "code",
+      prompt: "login",
+      redirectUri,
+    },
+    discovery,
   );
-};
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  useEffect( () => {
+      if (response && "params" in response) {
+        if (response.params && "code" in response.params) {
+          // console.log("-----------------------");
+          // console.log(response.params.code);
+          // console.log("-----------------------");
+          // console.log(request.codeVerifier);
+          // console.log("-----------------------");
+          // const data = JSON.stringify({});
+         getToken()
+        }
+      }
+    }
+    , [response]);
+
+  const getToken = async () =>{
+    const data = new FormData()
+    data.append('grant_type', 'authorization_code');
+    data.append('client_id', '4bf4a100-9aeb-42be-8649-8fd4ef42722b');
+    data.append('redirect_uri', 'exp://g6-ciw.anonymous.eventloop.exp.direct:80');
+    data.append('code', response.params.code);
+    data.append('scope', 'https://graph.microsoft.com/.default');
+    data.append('code_verifier', request.codeVerifier);
+    axios.post(
+      'https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/oauth2/v2.0/token',
+      data,
+      { 'Content-Type': 'application/x-www-form-urlencoded'}).
+    then(result => {
+      console.log(result.data)
+    }).catch( error =>{
+      console.log("Auth Error: " + error)
+    })
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.Container}>
+      <StatusBar barStyle={"dark-content"} />
+      <Button
+        disabled={!request}
+        title="Loginnnnsdasd"
+        onPress={() => promptAsync()}
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  Container: {
+    flex: 1,
   },
 });
 
