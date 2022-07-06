@@ -1,8 +1,10 @@
 {
-  "devToolsPort": 19003,
-  "expoServerPort": 19001,
-  "packagerPort": 19001,
+  "devToolsPort": 19002,
+  "expoServerPort": 19000,
+  "packagerPort": 19000,
   "expoServerNgrokUrl": "https://fy-kbp.anonymous.eventloopapp.exp.direct",
   "packagerNgrokUrl": "https://fy-kbp.anonymous.eventloopapp.exp.direct",
-  "ngrokPid": 15674
+  "ngrokPid": 23013,
+  "packagerPid": null,
+  "webpackServerPort": null
 }
