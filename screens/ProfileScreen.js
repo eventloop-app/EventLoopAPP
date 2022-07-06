@@ -1,14 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {Button, RefreshControl, SafeAreaView, StatusBar, StyleSheet, Text} from "react-native";
+import {Button, RefreshControl, SafeAreaView, StatusBar, StyleSheet, Text, View} from "react-native";
 import {makeRedirectUri, useAuthRequest, useAutoDiscovery} from "expo-auth-session";
 import {useDispatch, useSelector} from "react-redux";
 import {SignIn, SignOut} from "../actions/auth";
 import {getUserToken} from "../actions/user";
 import jwt_decode from "jwt-decode";
 import decode from "../services/decode";
+import fonts from "../constants/Fonts";
+import fontSize from "../constants/FontSize";
+import {SignInButtons} from "../components/SignInButtons";
 
 
-const ProfileScreen = (props) => {
+const ProfileScreen = ({ route, navigation }) => {
   const [isLoad, setIsLoad] = useState(true)
   const [userData, setUserData] = useState(null)
 
@@ -37,8 +40,8 @@ const ProfileScreen = (props) => {
 
   useEffect( () => {
     if (userToken) {
-      const accessToken = JSON.parse(userToken).accessToken
-      const user = decode.jwt(accessToken)
+      const idToken = JSON.parse(userToken).idToken
+      const user = decode.jwt(idToken)
       setUserData(user)
     }
     if (userError){
@@ -51,7 +54,7 @@ const ProfileScreen = (props) => {
     {
       clientId: "4bf4a100-9aeb-42be-8649-8fd4ef42722b",
       clientSecret: "3~68Q~sLI_5IxI1m7m8PdKEP_XGT4xWXfXCdIdfG",
-      scopes: ["openid", "profile", "email", "offline_access", "user.read"],
+      scopes: ["openid", "profile", "email"],
       responseType: "code",
       prompt: "login",
       redirectUri,
@@ -62,6 +65,11 @@ const ProfileScreen = (props) => {
   useEffect(() => {
       if (response && "params" in response) {
         if (response.params && "code" in response.params) {
+          // console.log("-----------------------");
+          // console.log(response.params.code);
+          // console.log("-----------------------");
+          // console.log(request.codeVerifier);
+          // console.log("-----------------------");
           dispatch(SignIn(response.params.code, request.codeVerifier))
         }
       }
@@ -84,17 +92,18 @@ const ProfileScreen = (props) => {
               {userData.name}
             </Text>
             <Button
-              disabled={!request}
               title="Sign out"
               onPress={signOut}
             />
           </SafeAreaView>
           :
-          <Button
-            disabled={!request}
-            title="Sign in "
-            onPress={()=> promptAsync()}
-          />
+          <View>
+            <Text style={styles.CenterScreenText}>คุณยังไม่ได้เข้าสู่ระบบ</Text>
+            <Button
+              title="Sign in"
+              onPress={()=> promptAsync()}
+            />
+          </View>
       }
     </SafeAreaView>
   )
@@ -118,9 +127,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'white'
   },
   CenterScreenText: {
-    textAlign: 'center'
+    textAlign: 'center',
+    fontFamily: fonts.bold,
+    fontSize: fontSize.primary
   }
 });
+
 export default ProfileScreen;

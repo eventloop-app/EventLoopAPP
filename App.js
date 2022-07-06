@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {StyleSheet,} from "react-native";
+import {Platform, SafeAreaView, StatusBar, StyleSheet, Text,} from "react-native";
 
 
 import configureStore from './configStore';
@@ -13,76 +13,71 @@ import LikeScreen from "./screens/LikeScreen";
 import CreateEventScreen from "./screens/CreateEventScreen";
 import SearchScreen from "./screens/SearchScreen";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import * as Font from 'expo-font';
+import Colors from "./constants/Colors";
 
 const App = () => {
-
-  const RootStack = createNativeStackNavigator();
+  const [LoadFront, setLoadFront] = useState(true)
+  const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
 
+  useEffect(() => {
+    loadData()
+  }, [])
 
-
-  // const getToken = async () => {
-  //   const data = new FormData()
-  //   data.append('grant_type', 'authorization_code');
-  //   data.append('client_id', '4bf4a100-9aeb-42be-8649-8fd4ef42722b');
-  //   data.append('redirect_uri', 'exp://g6-ciw.anonymous.eventloop.exp.direct:80');
-  //   data.append('code', response.params.code);
-  //   data.append('scope', 'https://graph.microsoft.com/.default');
-  //   data.append('code_verifier', request.codeVerifier);
-  //   axios.post(
-  //     'https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/oauth2/v2.0/token',
-  //     data,
-  //     {'Content-Type': 'application/x-www-form-urlencoded'}).then(result => {
-  //     console.log(result.data)
-  //   }).catch(error => {
-  //     console.log("Auth Error: " + error)
-  //   })
-  // }
+  const loadData = async () => {
+    await Font.loadAsync({
+      SukhumvitSet: require('./assets/fonts/SukhumvitSet-Text.ttf'),
+      SukhumvitSetMedium: require('./assets/fonts/SukhumvitSet-Medium.ttf'),
+      SukhumvitSetBold: require('./assets/fonts/SukhumvitSet-Bold.ttf')
+    });
+    await setLoadFront(false)
+  }
 
   return (
     <Provider store={configureStore}>
-      <NavigationContainer>
-        <Tab.Navigator screenOptions={({route}) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            switch (route.name) {
-              case 'Feed':
-                iconName = focused ? 'home' : 'home-outline';
-                break;
-              case 'Search':
-                iconName = focused ? 'search' : 'search-outline';
-                break;
-              case 'CreateEvent':
-                iconName = focused ? 'add-circle' : 'add-circle-outline';
-                break;
-              case 'Like':
-                iconName = focused ? 'heart-sharp' : 'heart-outline';
-                break;
-              case 'Profile':
-                iconName = focused ? 'ios-person' : 'ios-person-outline';
-                break;
-            }
-            return <Ionicons name={iconName} size={size + 5} color={color} />;
-          },
-          tabBarActiveTintColor: 'tomato',
-          tabBarInactiveTintColor: 'gray',
-        })}>
-          <Tab.Screen name={'Feed'} component={FeedScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-          <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-          <Tab.Screen name={'CreateEvent'} component={CreateEventScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-          <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-          <Tab.Screen name={'Profile'} component={ProfileScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-        </Tab.Navigator>
-      </NavigationContainer>
+      {
+        LoadFront ?
+          null
+          :
+          <NavigationContainer>
+            <StatusBar hidden={Platform.OS === "android" ? true : false}/>
+            <Tab.Navigator screenOptions={({route}) => ({
+              tabBarIcon: ({focused, color, size}) => {
+                let iconName;
+                switch (route.name) {
+                  case 'Feed':
+                    iconName = focused ? 'home' : 'home-outline';
+                    break;
+                  case 'Search':
+                    iconName = focused ? 'search' : 'search-outline';
+                    break;
+                  case 'CreateEvent':
+                    iconName = focused ? 'add-circle' : 'add-circle-outline';
+                    break;
+                  case 'Like':
+                    iconName = focused ? 'heart-sharp' : 'heart-outline';
+                    break;
+                  case 'Profile':
+                    iconName = focused ? 'ios-person' : 'ios-person-outline';
+                    break;
+                }
+                return <Ionicons name={iconName} size={size + 5} color={color}/>;
+              },
+              tabBarActiveTintColor: Colors.primary,
+              tabBarInactiveTintColor: 'gray',
+            })}>
+              <Tab.Screen name={'Feed'} component={FeedScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+              <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+              <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
+                          options={{headerShown: false, tabBarShowLabel: false}}/>
+              <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+              <Tab.Screen name={'Profile'} component={ProfileScreen}
+                          options={{headerShown: false, tabBarShowLabel: false}}/>
+            </Tab.Navigator>
+          </NavigationContainer>
+      }
     </Provider>
-    // <SafeAreaView style={styles.Container}>
-    //   <StatusBar barStyle={"dark-content"} />
-    //   <Button
-    //     disabled={!request}
-    //     title="Loginnnnsdasd"
-    //     onPress={() => promptAsync()}
-    //   />
-    // </SafeAreaView>
   );
 };
 
