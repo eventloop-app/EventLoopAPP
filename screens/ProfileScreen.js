@@ -95,6 +95,7 @@ const ProfileScreen = ({ route, navigation }) => {
               title="Sign out"
               onPress={signOut}
             />
+            <SignInButtons msg={'CallAPI'}/>
           </SafeAreaView>
           :
           <View>
@@ -103,6 +104,7 @@ const ProfileScreen = ({ route, navigation }) => {
               title="Sign in"
               onPress={()=> promptAsync()}
             />
+
           </View>
       }
     </SafeAreaView>

@@ -15,7 +15,9 @@ import SearchScreen from "./screens/SearchScreen";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Font from 'expo-font';
 import Colors from "./constants/Colors";
+import setupInterceptors from "./services/interceptors";
 
+setupInterceptors(configureStore)
 const App = () => {
   const [LoadFront, setLoadFront] = useState(true)
   const Stack = createNativeStackNavigator();
