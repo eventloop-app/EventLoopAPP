@@ -16,9 +16,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Font from 'expo-font';
 import Colors from "./constants/Colors";
 import setupInterceptors from "./services/interceptors";
+import EventDetailScreen from "./screens/EventDetailScreen";
+import Fonts from "./constants/Fonts";
+import fontSize from "./constants/FontSize";
 
 setupInterceptors(configureStore)
-const App = () => {
+
+const App = ({route, navigation}) => {
   const [LoadFront, setLoadFront] = useState(true)
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
@@ -44,39 +48,22 @@ const App = () => {
           :
           <NavigationContainer>
             <StatusBar hidden={Platform.OS === "android" ? true : false}/>
-            <Tab.Navigator screenOptions={({route}) => ({
-              tabBarIcon: ({focused, color, size}) => {
-                let iconName;
-                switch (route.name) {
-                  case 'Feed':
-                    iconName = focused ? 'home' : 'home-outline';
-                    break;
-                  case 'Search':
-                    iconName = focused ? 'search' : 'search-outline';
-                    break;
-                  case 'CreateEvent':
-                    iconName = focused ? 'add-circle' : 'add-circle-outline';
-                    break;
-                  case 'Like':
-                    iconName = focused ? 'heart-sharp' : 'heart-outline';
-                    break;
-                  case 'Profile':
-                    iconName = focused ? 'ios-person' : 'ios-person-outline';
-                    break;
-                }
-                return <Ionicons name={iconName} size={size + 5} color={color}/>;
-              },
-              tabBarActiveTintColor: Colors.primary,
-              tabBarInactiveTintColor: 'gray',
-            })}>
-              <Tab.Screen name={'Feed'} component={FeedScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
-                          options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Tab.Screen name={'Profile'} component={ProfileScreen}
-                          options={{headerShown: false, tabBarShowLabel: false}}/>
-            </Tab.Navigator>
+            <Stack.Navigator>
+              <Stack.Screen name={'Home'} component={FeedScreen}
+                            options={{headerShown: false, tabBarShowLabel: false}}/>
+              <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route}) => ({
+                headerShown: true,
+                headerTransparent: true,
+                tabBarShowLabel: false,
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontFamily: Fonts.bold,
+                  fontSize: fontSize.primary,
+                  color: Colors.black,
+                },
+                title: route.params.name
+              })}/>
+            </Stack.Navigator>
           </NavigationContainer>
       }
     </Provider>

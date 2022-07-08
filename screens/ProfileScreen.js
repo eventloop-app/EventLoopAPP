@@ -24,6 +24,10 @@ const ProfileScreen = ({ route, navigation }) => {
   //ดึงข้อมูลตอน User จาก Storage
   const { userToken, userError } = useSelector(state => state.user)
 
+  useEffect(()=>{
+    console.log(route.name)
+  },[route])
+
   useEffect(() => {
     console.log("Check Token")
     dispatch(getUserToken())
