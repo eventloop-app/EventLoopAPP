@@ -27,6 +27,11 @@ const setup = (store) => {
         if (err.response.status === 401 && !originalConfig._retry) {
           originalConfig._retry = true;
           await dispatch(refreshToken())
+          await storages.getDataV2('user').then(res => {
+            originalConfig.headers.Authorization = JSON.parse(res).idToken
+          })
+          await console.log("Config")
+          await console.log(originalConfig)
           return await axiosInstance(originalConfig);
         }
       }

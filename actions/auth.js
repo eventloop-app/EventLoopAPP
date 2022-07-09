@@ -1,6 +1,5 @@
 import {SIGN_IN_SUCCESS, SIGN_IN_FAIL, SIGN_OUT, REMOVE_USER, REFRESH_TOKEN} from "./types";
 import Auth from "../services/auth";
-import jwt_decode from "jwt-decode";
 import storages from "../services/storages";
 import decode from "../services/decode";
 
@@ -42,14 +41,14 @@ export const SignOut = () => (dispatch) => {
 
 export const refreshToken = () => (dispatch) => {
   console.log("REFRESH!!")
-  Auth.onRefreshToken().then(res => {
+  Auth.onRefreshToken().then(async res => {
     const {access_token,id_token,refresh_token} = res.data
-    storages.save('user', JSON.stringify({
+    await storages.save('user', JSON.stringify({
       accessToken: access_token,
       refreshToken: refresh_token,
       idToken: id_token
     }))
-    dispatch({
+    await dispatch({
       type: REFRESH_TOKEN
     })
   })

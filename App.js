@@ -37,7 +37,52 @@ const App = ({route, navigation}) => {
       SukhumvitSetMedium: require('./assets/fonts/SukhumvitSet-Medium.ttf'),
       SukhumvitSetBold: require('./assets/fonts/SukhumvitSet-Bold.ttf')
     });
-    await setLoadFront(false)
+    setTimeout(()=>{
+      setLoadFront(false)
+    },500)
+  }
+
+  const HomeScreen = () => {
+    return(
+      <Tab.Navigator screenOptions={({route}) => ({
+        tabBarIcon: ({focused, color, size}) => {
+          let iconName;
+          switch (route.name) {
+            case 'Feed':
+              iconName = focused ? 'home' : 'home-outline';
+              break;
+            case 'Search':
+              iconName = focused ? 'search' : 'search-outline';
+              break;
+            case 'CreateEvent':
+              iconName = focused ? 'add-circle' : 'add-circle-outline';
+              break;
+            case 'Like':
+              iconName = focused ? 'heart-sharp' : 'heart-outline';
+              break;
+            case 'Profile':
+              iconName = focused ? 'ios-person' : 'ios-person-outline';
+              break;
+          }
+          return <Ionicons name={iconName} size={size + 5} color={color}/>;
+        },
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: 'gray',
+      })}>
+        <Tab.Screen
+          name={'Feed'}
+          component={FeedScreen}
+          options={{headerShown: false, tabBarShowLabel: false}}
+        />
+        <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+        <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
+                    options={{headerShown: false, tabBarShowLabel: false}}/>
+        <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+        <Tab.Screen name={'Profile'} component={ProfileScreen}
+                    options={{headerShown: false, tabBarShowLabel: false}}
+        />
+      </Tab.Navigator>
+    )
   }
 
   return (
@@ -49,7 +94,7 @@ const App = ({route, navigation}) => {
           <NavigationContainer>
             <StatusBar hidden={Platform.OS === "android" ? true : false}/>
             <Stack.Navigator>
-              <Stack.Screen name={'Home'} component={FeedScreen}
+              <Stack.Screen name={'Home'} component={HomeScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}/>
               <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route}) => ({
                 headerShown: true,

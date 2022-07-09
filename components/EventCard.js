@@ -1,6 +1,5 @@
 import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import fonts from "../constants/Fonts";
 import fontSize from "../constants/FontSize";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from "../constants/Colors";

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Button, RefreshControl, SafeAreaView, StatusBar, StyleSheet, Text, View} from "react-native";
 import {makeRedirectUri, useAuthRequest, useAutoDiscovery} from "expo-auth-session";
 import {useDispatch, useSelector} from "react-redux";
@@ -9,11 +9,24 @@ import decode from "../services/decode";
 import fonts from "../constants/Fonts";
 import fontSize from "../constants/FontSize";
 import {SignInButtons} from "../components/SignInButtons";
+import { useFocusEffect } from '@react-navigation/native'
 
 
 const ProfileScreen = ({ route, navigation }) => {
   const [isLoad, setIsLoad] = useState(true)
   const [userData, setUserData] = useState(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsVisible(true)
+      console.log('true')
+      return () => {
+        setIsVisible(false)
+        console.log('false')
+      }
+    }, [])
+  )
 
   const discovery = useAutoDiscovery("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0");
   const redirectUri = makeRedirectUri({scheme: "exp://fy-kbp.anonymous.eventloopapp.exp.direct:80"});
@@ -24,9 +37,14 @@ const ProfileScreen = ({ route, navigation }) => {
   //ดึงข้อมูลตอน User จาก Storage
   const { userToken, userError } = useSelector(state => state.user)
 
+
   useEffect(()=>{
-    console.log(route.name)
-  },[route])
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log("Profileeee")
+    });
+    return unsubscribe;
+  },[navigation])
+
 
   useEffect(() => {
     console.log("Check Token")
