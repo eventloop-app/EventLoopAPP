@@ -29,7 +29,7 @@ const ProfileScreen = ({ route, navigation }) => {
   )
 
   const discovery = useAutoDiscovery("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0");
-  const redirectUri = makeRedirectUri({scheme: "exp://fy-kbp.anonymous.eventloopapp.exp.direct:80"});
+  const redirectUri = makeRedirectUri({scheme:"exp://fy-kbp.eventloop.eventloopapp.exp.direct:80"});
   const dispatch = useDispatch();
 
   //ดึงข้อมูลตอน Login
@@ -75,7 +75,7 @@ const ProfileScreen = ({ route, navigation }) => {
     {
       clientId: "4bf4a100-9aeb-42be-8649-8fd4ef42722b",
       clientSecret: "3~68Q~sLI_5IxI1m7m8PdKEP_XGT4xWXfXCdIdfG",
-      scopes: ["openid", "profile", "email"],
+      scopes: ["openid", "profile", "email", "offline_access"],
       responseType: "code",
       prompt: "login",
       redirectUri,
@@ -86,11 +86,11 @@ const ProfileScreen = ({ route, navigation }) => {
   useEffect(() => {
       if (response && "params" in response) {
         if (response.params && "code" in response.params) {
-          // console.log("-----------------------");
-          // console.log(response.params.code);
-          // console.log("-----------------------");
-          // console.log(request.codeVerifier);
-          // console.log("-----------------------");
+          console.log("-----------------------");
+          console.log(response.params.code);
+          console.log("-----------------------");
+          console.log(request.codeVerifier);
+          console.log("-----------------------");
           dispatch(SignIn(response.params.code, request.codeVerifier))
         }
       }

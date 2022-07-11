@@ -13,7 +13,7 @@ const EventCard = ({item,onPress}) => {
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item.location ? item.location : item.platform
+  const eventLocation = item.location ? item.location.slice(0, 18) + "..." : item.platform
   const ImageCover = item.coverImageUrl
 
   const onLoadImage = () => {
@@ -42,7 +42,7 @@ const EventCard = ({item,onPress}) => {
           <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red}/>
         </View>
         <View style={styles.Title}>
-          <Text style={styles.TextTitle}>{(eventName.length >= 24 ? eventName.slice(0, 24) + "..." : eventName)}</Text>
+          <Text style={styles.TextTitle}>{(eventName.length >= 20 ? eventName.slice(0, 20) + "..." : eventName)}</Text>
         </View>
         <View style={styles.Date}>
           <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary}/>

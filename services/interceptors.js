@@ -6,7 +6,9 @@ const setup = (store) => {
   axiosInstance.interceptors.request.use(
     async (config) => {
       await storages.getDataV2('user').then( res => {
-        config.headers["Authorization"] = JSON.parse(res).idToken;
+        if(res !== undefined){
+          config.headers["Authorization"] = JSON.parse(res).idToken;
+        }
       });
       return config;
     },

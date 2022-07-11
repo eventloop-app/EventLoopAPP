@@ -9,8 +9,8 @@ class Auth {
       const {accessToken, refreshToken, idToken} = await exchangeCodeAsync({
         code: token,
         clientId: '4bf4a100-9aeb-42be-8649-8fd4ef42722b',
-        redirectUri: makeRedirectUri({}),
-        scopes: ["openid", "profile", "email", "offline_access", "user.read"],
+        redirectUri: makeRedirectUri({scheme: 'exp://fy-kbp.kangpla.eventloopapp.exp.direct:80'}),
+        scopes: ["openid", "profile", "email", "offline_access"],
         grant_type: "authorization_code",
         extraParams: {
           code_verifier: codeVerifier

@@ -69,7 +69,7 @@ const EventDetailScreen = (props) => {
           }}>
             <Ionicons name={event?.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={35} color={Colors.primary}/>
           </View>
-          <View style={{ marginLeft: 10}}>
+          <View style={{ height: 50, marginLeft: 10, justifyContent: 'center'}}>
               <Text style={styles.sub_title}>{(event?.location ? event?.location : event?.platform)}</Text>
           </View>
         </View>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   },
   sub_title: {
     fontFamily: Fonts.medium,
-    fontSize: FontSize.medium,
+    fontSize: FontSize.primary,
     textAlign: 'left'
   },
   message: {
