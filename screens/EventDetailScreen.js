@@ -57,7 +57,8 @@ const EventDetailScreen = (props) => {
         />
       </View>
       {
-        isLoading ? <View style={styles.content}>
+        isLoading ?
+          <View style={styles.content}>
             <Text style={styles.title}>{event?.eventName}</Text>
             <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
               <View style={{
@@ -105,7 +106,12 @@ const EventDetailScreen = (props) => {
             </View>
           </View>
           :
-          null
+          <View style={styles.content}>
+            <View style={{flex:0.7 , justifyContent: 'center'}}>
+              <Text style={{textAlign:'center'}}>Loading..</Text>
+            </View>
+
+          </View>
       }
 
     </View>
@@ -114,24 +120,38 @@ const EventDetailScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white
+    backgroundColor: Colors.white,
   },
   imageCover: {
+    position: 'absolute',
+    top: 0,
     width: '100%',
-    height: 200,
+    height: 250,
     overflow: 'hidden'
   },
   content: {
-    marginTop: 20,
+    position: 'relative',
+    top: 180,
     flex: 1,
     flexDirection: 'column',
-    padding: 10
+    padding: 10,
+    backgroundColor: 'white',
+    borderTopEndRadius: 30,
+    borderTopStartRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   image: {
     width: '100%',
     height: '100%'
   },
   title: {
+    marginTop: 20,
     fontFamily: Fonts.bold,
     fontSize: FontSize.medium,
     textAlign: 'left'
