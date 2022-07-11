@@ -46,7 +46,7 @@ export const refreshToken = () => (dispatch) => {
     await storages.save('user', JSON.stringify({
       accessToken: access_token,
       refreshToken: refresh_token,
-      idToken: id_token
+      idToken: "id_token"
     }))
     await dispatch({
       type: REFRESH_TOKEN

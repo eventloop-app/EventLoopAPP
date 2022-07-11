@@ -32,12 +32,11 @@ const FeedScreen = ({route, navigation}) => {
   }, [])
 
   const getEvent = async () => {
-    console.log('LoadEvent..')
     eventsService.getEventAll().then(res => {
       setEvent(res.data.content)
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
-      alert('ผิดพลาดดด')
+      alert('ผิดพลาดดด \n' + error.message)
     })
     await setIsLoading(false)
   }
