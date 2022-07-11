@@ -37,7 +37,6 @@ const ProfileScreen = ({ route, navigation }) => {
   //ดึงข้อมูลตอน User จาก Storage
   const { userToken, userError } = useSelector(state => state.user)
 
-
   useEffect(()=>{
     const unsubscribe = navigation.addListener('focus', () => {
       console.log("Profileeee")

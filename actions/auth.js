@@ -6,6 +6,7 @@ import decode from "../services/decode";
 
 export const SignIn = (token, codeverifier) => (dispatch) => {
   Auth.onSignIn(token, codeverifier).then(res => {
+    console.log(res)
     const user = decode.jwt(res.idToken)
     storages.save('user', JSON.stringify({
       accessToken: res.accessToken,
