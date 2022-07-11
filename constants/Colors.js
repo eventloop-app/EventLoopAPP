@@ -1,7 +1,8 @@
 export default {
-    primary: '#21cbe9',
+    primary: '#5dade2',
     primaryDark: '#2759ff',
     primaryLite: '#637aff99',
+    orange: '#FF5F1F',
     black: '#000',
     white: 'white',
     accent: '#112233',
@@ -9,7 +10,7 @@ export default {
     green2: '#039a83',
     light: '#EEEEEE',
     dark: '#333',
-    gray: '#CCCCCC',
+    gray: '#424949',
     red: '#ff5454',
     purple: '#8f06e4',
     skyBlue: 'skyblue',

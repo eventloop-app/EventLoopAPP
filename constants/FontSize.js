@@ -1,5 +1,6 @@
 export default {
-  small : 12,
+  vary_small : 12,
+  small : 16,
   primary : 18,
   medium : 22,
   big : 24,

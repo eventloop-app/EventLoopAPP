@@ -19,9 +19,11 @@ import setupInterceptors from "./services/interceptors";
 import EventDetailScreen from "./screens/EventDetailScreen";
 import Fonts from "./constants/Fonts";
 import fontSize from "./constants/FontSize";
-
+import EventListScreen from "./screens/EventListScreen";
 setupInterceptors(configureStore)
-
+import "moment/locale/th"
+import moment from "moment/moment";
+moment().locale('th')
 const App = ({route, navigation}) => {
   const [LoadFront, setLoadFront] = useState(true)
   const Stack = createNativeStackNavigator();
@@ -97,6 +99,21 @@ const App = ({route, navigation}) => {
               <Stack.Screen name={'Home'} component={HomeScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}/>
               <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route}) => ({
+                headerShown: true,
+                headerTransparent: true,
+                tabBarShowLabel: false,
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontFamily: Fonts.bold,
+                  fontSize: fontSize.primary,
+                  color: Colors.black,
+                },
+                title: "",
+                headerTintColor: Colors.white,
+                headerBackTitle: ''
+              })}/>
+
+              <Stack.Screen name={'EventList'} component={EventListScreen} options={ ({route}) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,

@@ -1,18 +1,27 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import fontSize from "../constants/FontSize";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
-import moment from "moment";
-import {toBuddhistYear} from "../utill/buddhist-year";
+import moment  from "moment";
+import {toBuddhistYear} from "../constants/Buddhist-year";
+
 
 const EventCard = ({item,onPress}) => {
   const eventName = item.eventName
-  const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YY")
+  const [isLoading, setIsLoading] = useState(false)
+  const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
   const eventLocation = item.location ? item.location : item.platform
   const ImageCover = item.coverImageUrl
+
+  const onLoadImage = () => {
+    setTimeout(() => {
+      setIsLoading(true)
+    }, 1000)
+  }
+
   return (
     <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
       <View style={styles.Container}>
@@ -20,13 +29,14 @@ const EventCard = ({item,onPress}) => {
           <Image
             style={styles.Image}
             source={{
-              uri: ImageCover
+              uri: (isLoading ? ImageCover : 'https://cdn.dribbble.com/users/1284666/screenshots/6321168/__3.gif')
             }}
+            onLoad={onLoadImage}
           />
         </View>
         <View style={styles.DateBox}>
-          <Text style={styles.TextDateBoxNum}>10</Text>
-          <Text style={styles.TextDateBox}>ก.ค.</Text>
+          <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("DD")}</Text>
+          <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
         </View>
         <View style={styles.BookmarkBox}>
           <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red}/>
