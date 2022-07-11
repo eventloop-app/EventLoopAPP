@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Platform, SafeAreaView, StatusBar, StyleSheet, Text,} from "react-native";
+import {Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity,} from "react-native";
 
 
 import configureStore from './configStore';
@@ -24,7 +24,8 @@ setupInterceptors(configureStore)
 import "moment/locale/th"
 import moment from "moment/moment";
 moment().locale('th')
-const App = ({route, navigation}) => {
+
+const App = () => {
   const [LoadFront, setLoadFront] = useState(true)
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
@@ -98,7 +99,7 @@ const App = ({route, navigation}) => {
             <Stack.Navigator>
               <Stack.Screen name={'Home'} component={HomeScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route}) => ({
+              <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route,navigation}) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,
@@ -110,10 +111,25 @@ const App = ({route, navigation}) => {
                 },
                 title: "",
                 headerTintColor: Colors.white,
-                headerBackTitle: ''
+                headerBackTitle: '',
+                headerLeft: () => (
+                  <TouchableOpacity
+                    style={{
+                      borderRadius: "100%",
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      width: 30,
+                      height: 30,
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                    onPress={() => navigation.goBack()}
+                  >
+                    <Ionicons name="arrow-back-outline" size={25} color="back" />
+                  </TouchableOpacity>
+                ),
               })}/>
 
-              <Stack.Screen name={'EventList'} component={EventListScreen} options={ ({route}) => ({
+              <Stack.Screen  name={'EventList'} component={EventListScreen} options={ ({route}) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,

@@ -8,6 +8,13 @@ import moment from "moment/moment";
 import monthThai from "../constants/MonthThai";
 
 import {toBuddhistYear} from "../constants/Buddhist-year";
+//
+// item.type === 'ONLINE' ? platform.map(items => {
+//   if(item.location.includes(items.toLocaleLowerCase())){
+//     return items
+//   }
+// }) : item.location.slice(0, 18)+'...'
+
 
 const EventDetailScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -24,10 +31,21 @@ const EventDetailScreen = (props) => {
   }
 
   const onLoadImage = () => {
+    checkPlatform()
     setTimeout(() => {
       setIsLoading(true)
     }, 1000)
   }
+
+  const checkPlatform = () => {
+    const platform = ['Discords', 'Zoom', 'Google', 'Microsoft']
+    platform.map(items => {
+      if (event.location.includes(items.toLocaleLowerCase())) {
+        event.location = items
+      }
+    })
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.imageCover}>
@@ -38,42 +56,58 @@ const EventDetailScreen = (props) => {
                onLoad={onLoadImage}
         />
       </View>
-      <View style={styles.content}>
-        <Text style={styles.title}>{event?.eventName}</Text>
-        <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
-          <View style={{
-            width: 50,
-            height: 50,
-            borderRadius: 10,
-            backgroundColor: 'rgba(214, 234, 248, 0.5)',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Ionicons name={'calendar-sharp'} color={Colors.primary} size={35}/>
-          </View>
-          <View style={{ marginLeft: 10}}>
-            <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
-              <Text style={styles.sub_title}>{moment(event?.startDate).add(543, 'year').format('D MMMM YYYY')}</Text>
-              <Text style={styles.message}>{moment.weekdaysShort(event?.startDate) + ', ' + moment(event?.startDate).format("HH:mm A") + ' - ' + moment(event?.endDate).format("HH:mm A")}</Text>
+      {
+        isLoading ? <View style={styles.content}>
+            <Text style={styles.title}>{event?.eventName}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
+              <View style={{
+                width: 50,
+                height: 50,
+                borderRadius: 10,
+                backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Ionicons name={'calendar-sharp'} color={Colors.primary} size={35}/>
+              </View>
+              <View style={{marginLeft: 10}}>
+                <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                  <Text style={styles.sub_title}>{moment(event.startDate).add(543, 'year').format('D MMMM YYYY')}</Text>
+                  <Text
+                    style={styles.message}>{moment.weekdaysShort(event.startDate) + ', ' + moment(event.startDate).format("HH:mm A") + ' - ' + moment(event.endDate).format("HH:mm A")}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
+              <View style={{
+                width: 50,
+                height: 50,
+                borderRadius: 10,
+                backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Ionicons name={event?.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={35}
+                          color={Colors.primary}/>
+              </View>
+              <View style={{height: 50, marginLeft: 10, justifyContent: 'center'}}>
+                <Text style={styles.sub_title}>
+                  {
+                    event.location
+                  }
+                </Text>
+                {
+                  event.type === "ONLINE" ?
+                    <Text style={styles.sub_title}>LINK</Text>
+                    : null
+                }
+              </View>
             </View>
           </View>
-        </View>
-        <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
-          <View style={{
-            width: 50,
-            height: 50,
-            borderRadius: 10,
-            backgroundColor: 'rgba(214, 234, 248, 0.5)',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Ionicons name={event?.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={35} color={Colors.primary}/>
-          </View>
-          <View style={{ height: 50, marginLeft: 10, justifyContent: 'center'}}>
-              <Text style={styles.sub_title}>{(event?.location ? event?.location : event?.platform)}</Text>
-          </View>
-        </View>
-      </View>
+          :
+          null
+      }
+
     </View>
   );
 };
@@ -85,8 +119,6 @@ const styles = StyleSheet.create({
   imageCover: {
     width: '100%',
     height: 200,
-    borderBottomStartRadius: 30,
-    borderBottomEndRadius: 30,
     overflow: 'hidden'
   },
   content: {

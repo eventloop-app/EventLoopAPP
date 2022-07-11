@@ -7,14 +7,27 @@ import Fonts from "../constants/Fonts";
 import moment  from "moment";
 import {toBuddhistYear} from "../constants/Buddhist-year";
 
+const platform =  ['Discords', 'Zoom', 'Google', 'Microsoft']
 
 const EventCard = ({item,onPress}) => {
+
   const eventName = item.eventName
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item.location ? item.location.slice(0, 18) + "..." : item.platform
+  const eventLocation = item.type === 'ONLINE' ? platform.map(items => {
+    if(item.location.includes(items.toLocaleLowerCase())){
+      return items
+    }
+  }) : item.location.slice(0, 18)+'...'
   const ImageCover = item.coverImageUrl
+
+  const checkPlatForm = (url) =>{
+    console.log(url)
+    //
+    // platform.map(item => url.includes(item))
+    // return ""
+  }
 
   const onLoadImage = () => {
     setTimeout(() => {
