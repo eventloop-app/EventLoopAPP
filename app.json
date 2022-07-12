@@ -3,6 +3,7 @@
     "name": "EventLoop",
     "slug": "EventLoop",
     "scheme": "eventloop",
+    "owner": "eventloop",
     "description": ""
   }
 }
