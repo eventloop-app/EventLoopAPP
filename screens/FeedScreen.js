@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     display: 'flex',
     width: '100%',
-    height: 150,
+    height: 100,
     backgroundColor: Colors.primary,
     borderBottomEndRadius: 30,
     borderBottomStartRadius: 30,

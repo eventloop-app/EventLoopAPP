@@ -1,4 +1,5 @@
 import {GETUSER_SUCCESS, GETUSER_FAIL, REMOVE_USER} from '../actions/types'
+import storages from "../services/storages";
 
 const initialState = {
   userToken: null,

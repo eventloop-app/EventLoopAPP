@@ -7,6 +7,7 @@ const setup = (store) => {
     await storages.getDataV2('user').then(res => {
       if (res !== undefined) {
         config.headers["Authorization"] = JSON.parse(res).idToken;
+        config.headers["content-type"] = 'application/json';
       }
     });
     return config;
@@ -28,12 +29,10 @@ const setup = (store) => {
         await storages.getDataV2('user').then(res => {
           originalConfig.headers.Authorization = JSON.parse(res).idToken
         })
-        await console.log("Config")
-        await console.log(originalConfig)
         return await axiosInstance(originalConfig);
       }
     }
-    return Promise.reject({message: 'ไม่มี Token ในการเข้าใช้งาน'});
+    return Promise.reject({message: 'มีบางอย่างผิดพลาด'});
   });
 };
 export default setup;
