@@ -23,6 +23,7 @@ import EventListScreen from "./screens/EventListScreen";
 setupInterceptors(configureStore)
 import "moment/locale/th"
 import moment from "moment/moment";
+import EditProfileScreen from "./screens/EditProfileScreen";
 moment().locale('th')
 
 const App = () => {
@@ -140,6 +141,19 @@ const App = () => {
                   color: Colors.black,
                 },
                 title: route.params.name
+              })}/>
+
+              <Stack.Screen  name={'EditProfile'} component={EditProfileScreen} options={ ({route}) => ({
+                headerShown: true,
+                headerTransparent: true,
+                tabBarShowLabel: false,
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontFamily: Fonts.bold,
+                  fontSize: fontSize.primary,
+                  color: Colors.black,
+                },
+                title: 'ตั้งต่าโปรไฟล์'
               })}/>
             </Stack.Navigator>
           </NavigationContainer>

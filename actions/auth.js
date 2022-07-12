@@ -17,7 +17,7 @@ export const SignIn = (token, codeverifier) => (dispatch) => {
         }))
         dispatch({
           type: SIGN_IN_SUCCESS,
-          payload: user
+          payload: {user: user, hasMember: res.data.hasMember},
         })
       }
     }).catch(e => {
