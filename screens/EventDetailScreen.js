@@ -1,31 +1,37 @@
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, StyleSheet, Text, View} from "react-native";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View} from "react-native";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import moment from "moment/moment";
-import monthThai from "../constants/MonthThai";
-
-import {toBuddhistYear} from "../constants/Buddhist-year";
-//
-// item.type === 'ONLINE' ? platform.map(items => {
-//   if(item.location.includes(items.toLocaleLowerCase())){
-//     return items
-//   }
-// }) : item.location.slice(0, 18)+'...'
-
+import {useDispatch, useSelector} from "react-redux";
+import decode from "../services/decode";
+import {getUserToken} from "../actions/user";
+import fontSize from "../constants/FontSize";
 
 const EventDetailScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [event, setEvent] = useState(null)
+  const [isLogin, setIsLogin] = useState(false)
+  const [userData, setUserData] = useState(null)
+  const { userToken, userError } = useSelector(state => state.user)
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(getUserToken())
     getEvent()
   }, [])
 
+  useEffect(()=> {
+    if(userToken !== null){
+      console.log(decode.jwt(JSON.parse(userToken).idToken))
+      setUserData(decode.jwt(JSON.parse(userToken).idToken))
+      setIsLogin(true)
+    }
+  }, [userToken])
+
   const getEvent = async () => {
-    console.log(props.route.params.item)
     await setEvent(props.route.params.item)
     await setIsLoading(false)
   }
@@ -38,7 +44,7 @@ const EventDetailScreen = (props) => {
   }
 
   const checkPlatform = () => {
-    const platform = ['Discords', 'Zoom', 'Google', 'Microsoft']
+    const platform = ['Discord', 'Zoom', 'Google', 'Microsoft']
     platform.map(items => {
       if (event.location.includes(items.toLocaleLowerCase())) {
         event.location = items
@@ -56,11 +62,11 @@ const EventDetailScreen = (props) => {
                onLoad={onLoadImage}
         />
       </View>
-      {
-        isLoading ?
-          <View style={styles.content}>
+      <View style={styles.content}>
+        <ScrollView  showsVerticalScrollIndicator={false} style={{ flex: 1, paddingLeft: 10, paddingRight: 10}}>
+          <View style={{paddingBottom: 200}}>
             <Text style={styles.title}>{event?.eventName}</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 10}}>
               <View style={{
                 width: 50,
                 height: 50,
@@ -73,13 +79,13 @@ const EventDetailScreen = (props) => {
               </View>
               <View style={{marginLeft: 10}}>
                 <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
-                  <Text style={styles.sub_title}>{moment(event.startDate).add(543, 'year').format('D MMMM YYYY')}</Text>
+                  <Text style={styles.sub_title}>{moment(event?.startDate).add(543, 'year').format('D MMMM YYYY')}</Text>
                   <Text
-                    style={styles.message}>{moment.weekdaysShort(event.startDate) + ', ' + moment(event.startDate).format("HH:mm A") + ' - ' + moment(event.endDate).format("HH:mm A")}</Text>
+                    style={styles.message}>{moment.weekdaysShort(event?.startDate) + ', ' + moment(event?.startDate).format("HH:mm A") + ' - ' + moment(event?.endDate).format("HH:mm A")}</Text>
                 </View>
               </View>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 20}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 10}}>
               <View style={{
                 width: 50,
                 height: 50,
@@ -94,29 +100,79 @@ const EventDetailScreen = (props) => {
               <View style={{height: 50, marginLeft: 10, justifyContent: 'center'}}>
                 <Text style={styles.sub_title}>
                   {
-                    event.location
+                    event?.location
                   }
                 </Text>
                 {
-                  event.type === "ONLINE" ?
+                  event?.type === "ONLINE" ?
                     <Text style={styles.sub_title}>LINK</Text>
                     : null
                 }
               </View>
             </View>
-          </View>
-          :
-          <View style={styles.content}>
-            <View style={{flex:0.7 , justifyContent: 'center'}}>
-              <Text style={{textAlign:'center'}}>Loading..</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 10}}>
+              <View style={{
+                width: 50,
+                height: 50,
+                borderRadius: 10,
+                backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Ionicons name={'mail-open-outline'} color={Colors.primary} size={35}/>
+              </View>
+              <View style={{marginLeft: 10}}>
+                <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                  <Text style={styles.sub_title}>{event?.email}</Text>
+                </View>
+              </View>
             </View>
-
+            <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 10}}>
+              <View style={{
+                width: 50,
+                height: 50,
+                borderRadius: 10,
+                backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                overflow: 'hidden'
+              }}>
+                <Image style={styles.image}
+                       source={{
+                         uri: event?.profileUrl
+                       }}
+                />
+              </View>
+              <View style={{marginLeft: 10}}>
+                <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                  <Text style={styles.sub_title}>{event?.username}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={{marginTop : 20}}>
+              <Text style={styles.sub_title}>
+                รายละเอียดกิจกรรม
+              </Text>
+              <View style={{marginTop: 10}}>
+                <Text style={styles.message}>
+                  {event?.description}
+                </Text>
+              </View>
+            </View>
+            <View style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
+              <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={()=> Vibration.vibrate(10000)}>
+                <View style={{width: 340, height: 60, backgroundColor: (isLogin ? Colors.primary : Colors.gray), borderRadius: 12, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text style={{fontFamily: Fonts.bold, fontSize: fontSize.primary, color: Colors.white}}>เข้าร่วมกิจกรรม</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-      }
-
+        </ScrollView>
+      </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -126,15 +182,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     width: '100%',
-    height: 250,
+    height: 200,
     overflow: 'hidden'
   },
   content: {
-    position: 'relative',
-    top: 180,
+    top: 150,
     flex: 1,
-    flexDirection: 'column',
-    padding: 10,
     backgroundColor: 'white',
     borderTopEndRadius: 30,
     borderTopStartRadius: 30,
@@ -145,6 +198,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    overflow: 'hidden'
   },
   image: {
     width: '100%',
@@ -153,7 +207,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 20,
     fontFamily: Fonts.bold,
-    fontSize: FontSize.medium,
+    fontSize: FontSize.large,
     textAlign: 'left'
   },
   sub_title: {

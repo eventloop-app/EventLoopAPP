@@ -7,7 +7,7 @@ import Fonts from "../constants/Fonts";
 import moment  from "moment";
 import {toBuddhistYear} from "../constants/Buddhist-year";
 
-const platform =  ['Discords', 'Zoom', 'Google', 'Microsoft']
+const platform =  ['Discord', 'Zoom', 'Google', 'Microsoft']
 
 const EventCard = ({item,onPress}) => {
 

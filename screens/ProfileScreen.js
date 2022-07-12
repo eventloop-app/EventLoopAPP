@@ -16,18 +16,6 @@ const ProfileScreen = ({ route, navigation }) => {
   const [isLoad, setIsLoad] = useState(true)
   const [userData, setUserData] = useState(null)
   const [isVisible, setIsVisible] = useState(false)
-
-  useFocusEffect(
-    useCallback(() => {
-      setIsVisible(true)
-      console.log('true')
-      return () => {
-        setIsVisible(false)
-        console.log('false')
-      }
-    }, [])
-  )
-
   const discovery = useAutoDiscovery("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0");
   const redirectUri = makeRedirectUri({scheme:"exp://fy-kbp.eventloop.eventloopapp.exp.direct:80"});
   const dispatch = useDispatch();
@@ -36,6 +24,18 @@ const ProfileScreen = ({ route, navigation }) => {
   const { authData, authDataError } = useSelector(state => state.auth)
   //ดึงข้อมูลตอน User จาก Storage
   const { userToken, userError } = useSelector(state => state.user)
+
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setIsVisible(true)
+  //     console.log('true')
+  //     return () => {
+  //       setIsVisible(false)
+  //       console.log('false')
+  //     }
+  //   }, [])
+  // )
 
   useEffect(()=>{
     const unsubscribe = navigation.addListener('focus', () => {
@@ -51,8 +51,10 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [])
 
   useEffect(() => {
-      if(authData){
-        setUserData(authData)
+    console.log(authData)
+      if(authData?.hasMember){
+        navigation.navigate('EditProfile', {user: authData})
+        // setUserData(authData.user)
       }
       if(authDataError){
         console.log('Error:' + authDataError)
@@ -60,13 +62,13 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [authData])
 
   useEffect( () => {
-    if (userToken) {
+    if (userToken !== null) {
       const idToken = JSON.parse(userToken).idToken
       const user = decode.jwt(idToken)
       setUserData(user)
     }
     if (userError){
-      console.log("userTokenError : " + userError)
+      console.log("userTokenErrorr : " + userError)
     }
     setIsLoad(false)
   }, [userToken])
@@ -116,7 +118,6 @@ const ProfileScreen = ({ route, navigation }) => {
               title="Sign out"
               onPress={signOut}
             />
-            <SignInButtons msg={'CallAPI'}/>
           </SafeAreaView>
           :
           <View>
@@ -125,7 +126,6 @@ const ProfileScreen = ({ route, navigation }) => {
               title="Sign in"
               onPress={()=> promptAsync()}
             />
-
           </View>
       }
     </SafeAreaView>
