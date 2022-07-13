@@ -19,11 +19,13 @@ import setupInterceptors from "./services/interceptors";
 import EventDetailScreen from "./screens/EventDetailScreen";
 import Fonts from "./constants/Fonts";
 import fontSize from "./constants/FontSize";
-import EventListScreen from "./screens/EventListScreen";
+import RegisterEventListScreen from "./screens/RegisterEventListScreen";
 setupInterceptors(configureStore)
 import "moment/locale/th"
 import moment from "moment/moment";
 import EditProfileScreen from "./screens/EditProfileScreen";
+import CreatedEventListScreen from "./screens/CreatedEventListScreen";
+import ManageEventScreen from "./screens/ManageEventScreen";
 moment().locale('th')
 
 const App = () => {
@@ -130,7 +132,7 @@ const App = () => {
                 ),
               })}/>
 
-              <Stack.Screen  name={'EventList'} component={EventListScreen} options={ ({route}) => ({
+              <Stack.Screen name={'EventList'} component={RegisterEventListScreen} options={ ({route}) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,
@@ -155,6 +157,51 @@ const App = () => {
                 },
                 title: 'ตั้งต่าโปรไฟล์'
               })}/>
+
+              <Stack.Screen  name={'CreatedEventList'} component={CreatedEventListScreen} options={ ({route}) => ({
+                headerShown: true,
+                headerTransparent: false,
+                tabBarShowLabel: false,
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontFamily: Fonts.bold,
+                  fontSize: fontSize.primary,
+                  color: Colors.black,
+                },
+                title: 'รายการกิจกรรมที่สร้าง'
+              })}/>
+
+              <Stack.Group screenOptions={{ presentation: 'fullScreenModal'}}>
+                <Stack.Screen name={'ManageEvent'} component={ManageEventScreen} options={ ({route,navigation}) => ({
+                  headerShown: true,
+                  headerTransparent: true,
+                  tabBarShowLabel: false,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    fontFamily: Fonts.bold,
+                    fontSize: fontSize.primary,
+                    color: Colors.black,
+                  },
+                  title: "",
+                  headerTintColor: Colors.white,
+                  headerBackTitle: '',
+                  headerLeft: () => (
+                      <TouchableOpacity
+                          style={{
+                            borderRadius: 100,
+                            backgroundColor: 'rgba(255,255,255,0.8)',
+                            width: 30,
+                            height: 30,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}
+                          onPress={() => navigation.goBack()}
+                      >
+                        <Ionicons name="arrow-back-outline" size={25} color="back" />
+                      </TouchableOpacity>
+                  ),
+                })}/>
+              </Stack.Group>
             </Stack.Navigator>
           </NavigationContainer>
       }

@@ -46,6 +46,10 @@ class eventsService {
     }
     return  api.post('/events/unregisterEvent', data)
   }
+
+  async getEventByOrganizerId(memberId){
+    return api.get(`members/${memberId}/createEvent`)
+  }
 }
 
 export default new eventsService();
