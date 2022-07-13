@@ -14,6 +14,17 @@ const EditProfileScreen = (props) => {
 
       <View>
         <View  >
+          <Text style={{color:"red"}}>Username</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeText}
+            value={text}
+            editable={false}
+            placeholder={"Username"}
+
+          />
+        </View>
+        <View>
           <Text>Username</Text>
           <TextInput
             style={styles.input}
@@ -74,7 +85,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     borderColor: "gray",
-    alignSelf: "center"
+    alignSelf: "center",
+    
+    
   },
 });
 export default EditProfileScreen;
