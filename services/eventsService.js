@@ -22,6 +22,30 @@ class eventsService {
       return new Promise(reject => reject(e))
     }
   }
+
+  async registerEvent(memId, eveId){
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return api.post('/events/registerEvent', data)
+  }
+
+  async isRegisterEvent(memId, eveId){
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return  api.post('/events/isRegister', data)
+  }
+
+  async unRegisterEvent(memId, eveId){
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return  api.post('/events/unregisterEvent', data)
+  }
 }
 
 export default new eventsService();

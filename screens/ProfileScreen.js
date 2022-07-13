@@ -51,7 +51,6 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [])
 
   useEffect(() => {
-    console.log(authData)
       if(authData?.hasMember){
         navigation.navigate('EditProfile', {user: authData})
         // setUserData(authData.user)
