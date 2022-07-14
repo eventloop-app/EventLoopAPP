@@ -20,14 +20,19 @@ import EventDetailScreen from "./screens/EventDetailScreen";
 import Fonts from "./constants/Fonts";
 import fontSize from "./constants/FontSize";
 import RegisterEventListScreen from "./screens/RegisterEventListScreen";
-setupInterceptors(configureStore)
 import "moment/locale/th"
 import moment from "moment/moment";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import CreatedEventListScreen from "./screens/CreatedEventListScreen";
 import ManageEventScreen from "./screens/ManageEventScreen";
 moment().locale('th')
+import { LogBox } from 'react-native';
 
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
+
+setupInterceptors(configureStore)
 const App = () => {
   const [LoadFront, setLoadFront] = useState(true)
   const Stack = createNativeStackNavigator();
@@ -142,6 +147,7 @@ const App = () => {
                   fontSize: fontSize.primary,
                   color: Colors.black,
                 },
+                headerBackTitle: '',
                 title: route.params.name
               })}/>
 
@@ -155,6 +161,7 @@ const App = () => {
                   fontSize: fontSize.primary,
                   color: Colors.black,
                 },
+                headerBackTitle: '',
                 title: 'ตั้งต่าโปรไฟล์'
               })}/>
 
@@ -168,6 +175,7 @@ const App = () => {
                   fontSize: fontSize.primary,
                   color: Colors.black,
                 },
+                headerBackTitle: '',
                 title: 'รายการกิจกรรมที่สร้าง'
               })}/>
 
@@ -197,9 +205,24 @@ const App = () => {
                           }}
                           onPress={() => navigation.goBack()}
                       >
-                        <Ionicons name="arrow-back-outline" size={25} color="back" />
+                        <Ionicons name="md-close" size={25} color={Colors.black} />
                       </TouchableOpacity>
                   ),
+                  headerRight: () => (
+                      <TouchableOpacity
+                          style={{
+                            borderRadius: 100,
+                            backgroundColor: 'rgba(255,255,255,0.8)',
+                            width: 30,
+                            height: 30,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}
+                          onPress={() => console.log('Edit Event')}
+                      >
+                        <Ionicons name="md-create-outline" size={25} color={Colors.black} />
+                      </TouchableOpacity>
+                  )
                 })}/>
               </Stack.Group>
             </Stack.Navigator>

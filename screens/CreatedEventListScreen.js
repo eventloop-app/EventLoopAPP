@@ -13,6 +13,7 @@ const CreatedEventListScreen = ({route, navigation}) => {
     const [event, setEvent] = useState([])
     const { userToken, userError } = useSelector(state => state.user)
 
+
     useEffect(() => {
         dispatch(getUserToken())
     }, [])
@@ -44,7 +45,10 @@ const CreatedEventListScreen = ({route, navigation}) => {
 
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: Colors.white}}>
-            <FlatList data={event} renderItem={EventCardList}/>
+            <FlatList
+                data={event}
+                renderItem={(item) => <EventCardList item={item} onPress={ ()=> navigation.navigate('ManageEvent', item)}/>}
+            />
             {/*<Button title={'go to manage screen'} onPress={()=> navigation.navigate('ManageEvent')}/>*/}
         </SafeAreaView>
     );

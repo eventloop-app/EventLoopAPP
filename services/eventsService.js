@@ -48,7 +48,15 @@ class eventsService {
   }
 
   async getEventByOrganizerId(memberId){
-    return api.get(`members/${memberId}/createEvent`)
+    return api.get(`/members/${memberId}/createEvent`)
+  }
+
+  async getCodeCheckIn(memId,eveId){
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return api.post(`/events/generateCode`, data)
   }
 }
 
