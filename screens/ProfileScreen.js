@@ -65,6 +65,7 @@ const ProfileScreen = ({ route, navigation }) => {
       const idToken = JSON.parse(userToken).idToken
       const user = decode.jwt(idToken)
       setUserData(user)
+       
     }
     if (userError){
       console.log("userTokenErrorr : " + userError)

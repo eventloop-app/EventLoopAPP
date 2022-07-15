@@ -8,10 +8,14 @@ import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, CameraType } from 'expo-camera';
+import Validate from '../services/Validate';
+import eventsService from '../services/eventsService';
+import { useDispatch, useSelector } from "react-redux";
+import decode from "../services/decode";
 
 
 const EditProfileScreen = (props) => {
-
+  //declare variable
   const [username, onChangeUsername] = useState(null);
   const [firstName, onChangeFirstName] = useState("somsak");
   const [lastName, onChangeLastName] = useState("makmee");
@@ -21,19 +25,29 @@ const EditProfileScreen = (props) => {
   const [image, setImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
+  const [isValidUsername, setIsValidUsername] = useState(false)
+  const { userToken, userError } = useSelector(state => state.user)
+  const [userData, setUserData] = useState(null)
+  const [isLoad, setIsLoad] = useState(true)
 
+  //useEffect
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    if (userToken !== null) {
+      const idToken = JSON.parse(userToken).idToken
+      const user = decode.jwt(idToken)
+      setUserData(user)
+    }
+    if (userError) {
+      console.log("userTokenErrorr : " + userError)
+    }
+    setIsLoad(false)
+  }, [userToken])
 
-  if (hasPermission === null) {
-    return <View />;
-  }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+  //function
+  const getData = () => {
+    return eventsService.transferMemberData().then((res) => {
+
+    })
   }
 
   const pickImage = async () => {
@@ -55,22 +69,31 @@ const EditProfileScreen = (props) => {
   //Prevent input username
   const checkTextInput = () => {
     //Check for the Name TextInput
-    if (!username.trim()) {
-      alert('Please Enter Username');
-      return;
+    if (Validate.getValidateUsername(username)) {
+      setIsValidUsername(true)
+      alert(username)
+      return
+    } else {
+      setIsValidUsername(false)
+      alert("NOOOOOO")
     }
-    alert('Success');
+
+
+
   };
 
 
 
 
   const formStep1 = () => {
+    const firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+    const lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
     return (
       <View style={{}}>
+        {console.log(firstName)}
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
-          <TextInput style={styles.input} onChangeText={(value) => onChangeUsername(value)} value={username} placeholderTextColor={"gray"} />
+          <TextInput style={[styles.input, { borderColor: !isValidUsername ? "#CBCBCB" : "red" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
         </View>
 
         <View style={{ alignItems: "center", }}>
@@ -85,7 +108,7 @@ const EditProfileScreen = (props) => {
 
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>อีเมล</Text>
-          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeEmail} value={email} editable={false} placeholder="Email" placeholderTextColor={"gray"} />
+          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeEmail} value={userData.email} editable={false} placeholder="Email" placeholderTextColor={"gray"} />
         </View>
       </View>
     )
@@ -113,49 +136,44 @@ const EditProfileScreen = (props) => {
   const formStep3 = () => {
     return (
       <View style={styles.container}>
-        <Camera style={styles.camera} type={type}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                setType(type === CameraType.back ? CameraType.front : CameraType.back);
-              }}>
-              <Text style={styles.text}> Flip </Text>
-            </TouchableOpacity>
-          </View>
-        </Camera>
+
       </View>)
   }
 
   return (
     <SafeAreaView style={{ height: "100%", backgroundColor: "white" }}>
-      {/* <View>
-        <Text style={{ backgroundColor: "red", fontFamily: Fonts.bold, fontSize: FontSize.primary }}>ตั้งค่าโปรไฟล์</Text>
+      {
+        isLoad ?
+          <Text style={styles.CenterScreenText}>
+            Loading...
+          </Text>
+          :
+          (<View style={{ flex: 1, height: "100%", width: "100%", }}>
+            <ProgressSteps topOffset={20} marginBottom={30}>
+              <ProgressStep label="เพิ่มข้อมูล"  >
+                <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>
+                  <View style={{ width: "100%" }}>
+                    {formStep1()}
+                  </View>
+                </View>
+              </ProgressStep>
+              <ProgressStep label="ตั้งค่ารูปโปรไฟล์">
+                <View style={{ alignItems: 'center', height: "100%", }}>
+                  <View style={{ width: "100%", backgroundColor: "white" }}>
+                    {formStep2()}
+                  </View>
+                </View>
+              </ProgressStep>
+              <ProgressStep label="สิ่งที่คุณสนใจ">
+                <View>
+                  <Text>Tags</Text>
+                  {formStep3()}
+                </View>
+              </ProgressStep>
+            </ProgressSteps>
+          </View>)
+      }
 
-      </View> */}
-      <View style={{ flex: 1, height: "100%", width: "100%", }}>
-        <ProgressSteps topOffset={20} marginBottom={30}>
-          <ProgressStep label="เพิ่มข้อมูล" onNext={checkTextInput}>
-            <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>
-              <View style={{ width: "100%" }}>
-                {formStep1()}
-              </View>
-            </View>
-          </ProgressStep>
-          <ProgressStep label="ตั้งค่ารูปโปรไฟล์">
-            <View style={{ alignItems: 'center', height: "100%", }}>
-              <View style={{ width: "100%", backgroundColor: "white" }}>
-                {formStep2()}
-              </View>
-            </View>
-          </ProgressStep>
-          <ProgressStep label="เสร็จสิ้น">
-            <View>
-              {formStep3()}
-            </View>
-          </ProgressStep>
-        </ProgressSteps>
-      </View>
     </SafeAreaView>
   )
 }
