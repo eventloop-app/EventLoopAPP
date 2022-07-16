@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text, View, TextInput, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { SafeAreaView, Text, View, TextInput, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native";
 import { Surface, Button } from 'react-native-paper';
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import Color from "../constants/Colors";
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons, Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, CameraType } from 'expo-camera';
 import Validate from '../services/Validate';
 import eventsService from '../services/eventsService';
 import { useDispatch, useSelector } from "react-redux";
 import decode from "../services/decode";
-
+import BubbleSelect, { Bubble } from 'react-native-bubble-select';
+import Colors from '../constants/Colors';
 
 const EditProfileScreen = (props) => {
   //declare variable
@@ -29,6 +30,24 @@ const EditProfileScreen = (props) => {
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
+  // const [isSelect, setIsSelect] = useState(false)
+
+  const [tags, setTags] = useState([
+    { title: "Music", icon: "music", source: "Feather", isSelect: false },
+    { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
+    { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
+    { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
+    { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
+    { title: "Music", icon: "music", source: "Feather", isSelect: false },
+    { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
+    { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
+    { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
+    { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
+
+
+  ])
+
+
 
   //useEffect
   useEffect(() => {
@@ -78,11 +97,24 @@ const EditProfileScreen = (props) => {
       alert("NOOOOOO")
     }
 
-
-
   };
 
+  // const selectTags = (index, item) => {
+  //   console.log(index)
+  //   console.log(item)
+  //   // setIsSelect(!isSelect)
+  // }
 
+  const handleOnSelectTags = (indexToSelect) => {
+    const newState = tags.map((item, idx) => {
+      return {
+        ...item,
+        isSelect: (indexToSelect === idx ? !item.isSelect : item.isSelect)
+      };
+    });
+
+    setTags(newState);
+  };
 
 
   const formStep1 = () => {
@@ -90,7 +122,7 @@ const EditProfileScreen = (props) => {
     const lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
     return (
       <View style={{}}>
-        {console.log(firstName)}
+
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
           <TextInput style={[styles.input, { borderColor: !isValidUsername ? "#CBCBCB" : "red" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
@@ -120,7 +152,7 @@ const EditProfileScreen = (props) => {
           <Image source={{ uri: image }} style={{ width: 200, height: 200, borderRadius: 150 }} />
         </View>
         <View style={{ paddingTop: 8 }}>
-          <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20 }}>
+          <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20, }}>
             Upload
           </Button>
         </View>
@@ -135,8 +167,51 @@ const EditProfileScreen = (props) => {
 
   const formStep3 = () => {
     return (
-      <View style={styles.container}>
+      <View style={{ width: "90%", height: "100%", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
 
+        {tags.map((item, index) => {
+          if (item.source == "Feather") {
+            return (
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+                <View style={{ height: "100%", justifyContent: 'center', }}>
+                  <Feather style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
+                  <Text style={{}} >{item.title}</Text>
+                </View>
+              </Button>)
+          } else if (item.source == "Ionicons") {
+            return (
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+                <View style={{ height: "100%", justifyContent: 'center' }}>
+                  <Ionicons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
+                  <Text>{item.title}</Text>
+                </View>
+              </Button>)
+          } else if (item.source == "MaterialIcons") {
+            return (
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+                <View style={{ height: "100%", justifyContent: 'center' }}>
+                  <MaterialIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
+                  <Text>{item.title}</Text>
+                </View>
+              </Button>)
+          } else if (item.source == "MaterialCommunityIcons") {
+            return (
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+                <View style={{ height: "100%", justifyContent: 'center' }}>
+                  <MaterialCommunityIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
+                  <Text>{item.title}</Text>
+                </View>
+              </Button>)
+          }
+
+        })}
+
+        {/* <Button style={{ height: 100, width: 90, margin: 2, }} color='pink' mode="contained" onPress={() => console.log('Pressed')}>
+          <Feather name="music" size={24} color="black" />
+        </Button>
+        <Button style={{ height: 100, width: 90, margin: 2, }} color='pink' mode="contained" onPress={() => console.log('Pressed')}>
+          <Feather name="music" size={24} color="black" />
+        </Button> */}
       </View>)
   }
 
@@ -158,14 +233,14 @@ const EditProfileScreen = (props) => {
                 </View>
               </ProgressStep>
               <ProgressStep label="ตั้งค่ารูปโปรไฟล์">
-                <View style={{ alignItems: 'center', height: "100%", }}>
+                <View style={{ flex: 1, height: "100%", width: "100%", }}>
                   <View style={{ width: "100%", backgroundColor: "white" }}>
                     {formStep2()}
                   </View>
                 </View>
               </ProgressStep>
               <ProgressStep label="สิ่งที่คุณสนใจ">
-                <View>
+                <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
                   <Text>Tags</Text>
                   {formStep3()}
                 </View>
@@ -215,6 +290,10 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    backgroundColor: "grey",
+    borderWidth: 5,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   camera: {
     flex: 1,
@@ -234,6 +313,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'white',
   },
+  buttonFormStep3: {
+    backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: "red"
+  }
 
 });
 export default EditProfileScreen;
