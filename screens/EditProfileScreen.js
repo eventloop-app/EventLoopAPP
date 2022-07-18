@@ -22,8 +22,7 @@ const EditProfileScreen = (props) => {
   const [lastName, onChangeLastName] = useState("makmee");
   const [email, onChangeEmail] = useState("Somsak@mail.kmutt.ac.th");
   const [number, onChangeNumber] = useState(null);
-  const [imageUri, setImageUri] = useState("https://ichef.bbci.co.uk/news/976/cpsprodpb/17638/production/_124800859_gettyimages-817514614.jpg");
-  const [image, setImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [isValidUsername, setIsValidUsername] = useState(false)
@@ -31,7 +30,8 @@ const EditProfileScreen = (props) => {
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
   // const [isSelect, setIsSelect] = useState(false)
-
+  const [selectedTag, setSelectedTag] = useState([])
+  const [userInfo, setUserInfo] = useState({})
   const [tags, setTags] = useState([
     { title: "Music", icon: "music", source: "Feather", isSelect: false },
     { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -70,7 +70,6 @@ const EditProfileScreen = (props) => {
   }
 
   const pickImage = async () => {
-
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -81,7 +80,7 @@ const EditProfileScreen = (props) => {
     console.log(result);
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      setProfileImage(result.uri);
     }
   };
 
@@ -105,17 +104,37 @@ const EditProfileScreen = (props) => {
   //   // setIsSelect(!isSelect)
   // }
 
-  const handleOnSelectTags = (indexToSelect) => {
-    const newState = tags.map((item, idx) => {
+  const handleOnSelectTags = (indexToSelect, itemSelected) => {
+
+    const newState = tags.map((item, index) => {
+
       return {
         ...item,
-        isSelect: (indexToSelect === idx ? !item.isSelect : item.isSelect)
+        isSelect: (indexToSelect === index ? !item.isSelect : item.isSelect),
+
       };
+
     });
 
     setTags(newState);
   };
 
+
+  const handleSubmitForm = () => {
+    tags.map((item, index) => {
+      if (item.isSelect === true) {
+        return selectedTag.push(item.title)
+      }
+    })
+
+    console.log(selectedTag)
+    setUserInfo({ username, imageProfile, selectedTag, })
+    console.log(userInfo)
+  }
+
+  const test = () => {
+    console.log(userInfo)
+  }
 
   const formStep1 = () => {
     const firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
@@ -149,7 +168,7 @@ const EditProfileScreen = (props) => {
     return (
       <View style={{ alignItems: 'center', }}>
         <View style={{ borderRadius: 150, borderColor: "lightgray", borderWidth: 4 }}>
-          <Image source={{ uri: image }} style={{ width: 200, height: 200, borderRadius: 150 }} />
+          <Image source={{ uri: imageProfile }} style={{ width: 200, height: 200, borderRadius: 150 }} />
         </View>
         <View style={{ paddingTop: 8 }}>
           <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20, }}>
@@ -168,11 +187,11 @@ const EditProfileScreen = (props) => {
   const formStep3 = () => {
     return (
       <View style={{ width: "90%", height: "100%", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
-
+        <Button style={{ backgroundColor: "pink", height: 100, width: 90, }} onPress={test}><Text>sss</Text></Button>
         {tags.map((item, index) => {
           if (item.source == "Feather") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center', }}>
                   <Feather style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text style={{}} >{item.title}</Text>
@@ -180,7 +199,7 @@ const EditProfileScreen = (props) => {
               </Button>)
           } else if (item.source == "Ionicons") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center' }}>
                   <Ionicons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
@@ -188,7 +207,7 @@ const EditProfileScreen = (props) => {
               </Button>)
           } else if (item.source == "MaterialIcons") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center' }}>
                   <MaterialIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
@@ -196,7 +215,7 @@ const EditProfileScreen = (props) => {
               </Button>)
           } else if (item.source == "MaterialCommunityIcons") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index)}>
+              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center' }}>
                   <MaterialCommunityIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
@@ -239,7 +258,7 @@ const EditProfileScreen = (props) => {
                   </View>
                 </View>
               </ProgressStep>
-              <ProgressStep label="สิ่งที่คุณสนใจ">
+              <ProgressStep label="สิ่งที่คุณสนใจ" onSubmit={handleSubmitForm}>
                 <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
                   <Text>Tags</Text>
                   {formStep3()}
