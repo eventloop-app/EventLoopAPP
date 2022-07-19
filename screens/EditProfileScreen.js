@@ -47,8 +47,6 @@ const EditProfileScreen = (props) => {
 
   ])
 
-
-
   //useEffect
   useEffect(() => {
     if (userToken !== null) {
@@ -65,7 +63,6 @@ const EditProfileScreen = (props) => {
   //function
   const getData = () => {
     return eventsService.transferMemberData().then((res) => {
-
     })
   }
 
@@ -78,7 +75,6 @@ const EditProfileScreen = (props) => {
       quality: 1,
     });
     console.log(result);
-
     if (!result.cancelled) {
       setProfileImage(result.uri);
     }
@@ -95,27 +91,15 @@ const EditProfileScreen = (props) => {
       setIsValidUsername(false)
       alert("NOOOOOO")
     }
-
   };
 
-  // const selectTags = (index, item) => {
-  //   console.log(index)
-  //   console.log(item)
-  //   // setIsSelect(!isSelect)
-  // }
-
   const handleOnSelectTags = (indexToSelect, itemSelected) => {
-
     const newState = tags.map((item, index) => {
-
       return {
         ...item,
         isSelect: (indexToSelect === index ? !item.isSelect : item.isSelect),
-
       };
-
     });
-
     setTags(newState);
   };
 
@@ -126,14 +110,7 @@ const EditProfileScreen = (props) => {
         return selectedTag.push(item.title)
       }
     })
-
-    console.log(selectedTag)
     setUserInfo({ username, imageProfile, selectedTag, })
-    console.log(userInfo)
-  }
-
-  const test = () => {
-    console.log(userInfo)
   }
 
   const formStep1 = () => {
@@ -187,7 +164,7 @@ const EditProfileScreen = (props) => {
   const formStep3 = () => {
     return (
       <View style={{ width: "90%", height: "100%", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
-        <Button style={{ backgroundColor: "pink", height: 100, width: 90, }} onPress={test}><Text>sss</Text></Button>
+
         {tags.map((item, index) => {
           if (item.source == "Feather") {
             return (
