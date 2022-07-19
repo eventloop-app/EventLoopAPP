@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View} from "react-native";
+import {Button, Image, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View} from "react-native";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
@@ -22,6 +22,12 @@ const EventDetailScreen = (props) => {
   const [isRegister, setIsRegister] = useState(null)
   const dispatch = useDispatch();
   const { userToken, userError } = useSelector(state => state.user)
+
+  useEffect(()=>{
+    if(props.route.params.QRcode){
+      console.log(props)
+    }
+  },[props])
 
   useEffect(() => {
     dispatch(getUserToken())
@@ -222,6 +228,13 @@ const EventDetailScreen = (props) => {
               {
                 checkButton()
               }
+            </View>
+            <View style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
+              <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={()=> console.log(props.navigation.navigate('Scanner', {event: event}))}>
+                <View style={{width: 340, height: 60, backgroundColor: (isLogin ? Colors.yellow : Colors.gray), borderRadius: 12, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text style={{fontFamily: Fonts.bold, fontSize: fontSize.primary, color: Colors.white}}>เช็คอิน</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>

@@ -27,6 +27,7 @@ import CreatedEventListScreen from "./screens/CreatedEventListScreen";
 import ManageEventScreen from "./screens/ManageEventScreen";
 moment().locale('th')
 import { LogBox } from 'react-native';
+import ScannerScreen from "./screens/ScannerScreen";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -178,6 +179,8 @@ const App = () => {
                 headerBackTitle: '',
                 title: 'รายการกิจกรรมที่สร้าง'
               })}/>
+
+              <Stack.Screen name={'Scanner'} component={ScannerScreen} options={{ headerShown:false}}/>
 
               <Stack.Group screenOptions={{ presentation: 'fullScreenModal'}}>
                 <Stack.Screen name={'ManageEvent'} component={ManageEventScreen} options={ ({route,navigation}) => ({
