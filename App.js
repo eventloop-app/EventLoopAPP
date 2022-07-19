@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity,} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, } from "react-native";
 
 
 import configureStore from './configStore';
-import {Provider} from "react-redux";
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
+import { Provider } from "react-redux";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import FeedScreen from "./screens/FeedScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import LikeScreen from "./screens/LikeScreen";
@@ -41,15 +41,15 @@ const App = () => {
       SukhumvitSetMedium: require('./assets/fonts/SukhumvitSet-Medium.ttf'),
       SukhumvitSetBold: require('./assets/fonts/SukhumvitSet-Bold.ttf')
     });
-    setTimeout(()=>{
+    setTimeout(() => {
       setLoadFront(false)
-    },500)
+    }, 500)
   }
 
   const HomeScreen = () => {
-    return(
-      <Tab.Navigator screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
+    return (
+      <Tab.Navigator screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           switch (route.name) {
             case 'Feed':
@@ -68,7 +68,7 @@ const App = () => {
               iconName = focused ? 'ios-person' : 'ios-person-outline';
               break;
           }
-          return <Ionicons name={iconName} size={size + 5} color={color}/>;
+          return <Ionicons name={iconName} size={size + 5} color={color} />;
         },
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: 'gray',
@@ -76,14 +76,14 @@ const App = () => {
         <Tab.Screen
           name={'Feed'}
           component={FeedScreen}
-          options={{headerShown: false, tabBarShowLabel: false}}
+          options={{ headerShown: false, tabBarShowLabel: false }}
         />
-        <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+        <Tab.Screen name={'Search'} component={SearchScreen} options={{ headerShown: false, tabBarShowLabel: false }} />
         <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
-                    options={{headerShown: false, tabBarShowLabel: false}}/>
-        <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+          options={{ headerShown: false, tabBarShowLabel: false }} />
+        <Tab.Screen name={'Like'} component={LikeScreen} options={{ headerShown: false, tabBarShowLabel: false }} />
         <Tab.Screen name={'Profile'} component={ProfileScreen}
-                    options={{headerShown: false, tabBarShowLabel: false}}
+          options={{ headerShown: false, tabBarShowLabel: false }}
         />
       </Tab.Navigator>
     )
@@ -96,11 +96,11 @@ const App = () => {
           null
           :
           <NavigationContainer>
-            <StatusBar hidden={Platform.OS === "android" ? true : false}/>
+            <StatusBar hidden={Platform.OS === "android" ? true : false} />
             <Stack.Navigator>
               <Stack.Screen name={'Home'} component={HomeScreen}
-                            options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route,navigation}) => ({
+                options={{ headerShown: false, tabBarShowLabel: false }} />
+              <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={({ route, navigation }) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,
@@ -128,9 +128,9 @@ const App = () => {
                     <Ionicons name="arrow-back-outline" size={25} color="back" />
                   </TouchableOpacity>
                 ),
-              })}/>
+              })} />
 
-              <Stack.Screen  name={'EventList'} component={EventListScreen} options={ ({route}) => ({
+              <Stack.Screen name={'EventList'} component={EventListScreen} options={({ route }) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,
@@ -141,9 +141,9 @@ const App = () => {
                   color: Colors.black,
                 },
                 title: route.params.name
-              })}/>
+              })} />
 
-              <Stack.Screen  name={'EditProfile'} component={EditProfileScreen} options={ ({route}) => ({
+              <Stack.Screen name={'EditProfile'} component={EditProfileScreen} options={({ route }) => ({
                 headerShown: true,
                 headerTransparent: true,
                 tabBarShowLabel: false,
@@ -153,8 +153,8 @@ const App = () => {
                   fontSize: fontSize.primary,
                   color: Colors.black,
                 },
-                title: 'ตั้งต่าโปรไฟล์'
-              })}/>
+                title: 'ตั้งค่าโปรไฟล์'
+              })} />
             </Stack.Navigator>
           </NavigationContainer>
       }
