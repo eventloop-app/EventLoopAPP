@@ -51,9 +51,11 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [])
 
   useEffect(() => {
+ 
       if(authData?.hasMember){
         navigation.navigate('EditProfile', {user: authData})
         // setUserData(authData.user)
+ 
       }
       if(authDataError){
         console.log('Error:' + authDataError)
@@ -65,6 +67,7 @@ const ProfileScreen = ({ route, navigation }) => {
       const idToken = JSON.parse(userToken).idToken
       const user = decode.jwt(idToken)
       setUserData(user)
+       console.log(user)
     }
     if (userError){
       console.log("userTokenErrorr : " + userError)
@@ -116,6 +119,10 @@ const ProfileScreen = ({ route, navigation }) => {
             <Button
               title="Sign out"
               onPress={signOut}
+            />
+            <Button
+                title="Go to setting"
+                onPress={() => navigation.navigate('EditProfile', {user: authData})}
             />
           </SafeAreaView>
           :
