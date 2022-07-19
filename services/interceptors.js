@@ -32,7 +32,7 @@ const setup = (store) => {
         return await axiosInstance(originalConfig);
       }
     }
-    return Promise.reject({message: 'มีบางอย่างผิดพลาด'});
+    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status});
   });
 };
 export default setup;
