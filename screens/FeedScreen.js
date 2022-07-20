@@ -62,10 +62,7 @@ const FeedScreen = ({ route, navigation }) => {
             </View>
             <FlatList
               data={events}
-              renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
-                item: item,
-                name: item.eventName
-              })} />)}
+              renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', { item: item, name: item.eventName })} />)}
               keyExtractor={(item) => item.id}
               extraData={eventId}
               showsHorizontalScrollIndicator={false}

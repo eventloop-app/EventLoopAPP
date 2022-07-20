@@ -15,14 +15,15 @@ const EventCard = ({ item, onPress }) => {
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
+  const eventLocation = item.location
   // const eventLocation = item.type === 'ONLINE' ? platform.map(items => {
   //   if (item.location.includes(items.toLocaleLowerCase())) {
   //     return items
   //   }
   // }) : item.location.slice(0, 18) + '...'
 
-  const eventLocation =  item.location
-  
+
+
 
   const ImageCover = item.coverImageUrl
   const checkPlatForm = (url) => {
