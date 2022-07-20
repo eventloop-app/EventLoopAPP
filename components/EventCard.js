@@ -1,28 +1,31 @@
-import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import fontSize from "../constants/FontSize";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
-import moment  from "moment";
-import {toBuddhistYear} from "../constants/Buddhist-year";
+import moment from "moment";
+import { toBuddhistYear } from "../constants/Buddhist-year";
 
-const platform =  ['Discord', 'Zoom', 'Google', 'Microsoft']
+const platform = ['Discord', 'Zoom', 'Google', 'Microsoft']
 
-const EventCard = ({item,onPress}) => {
+const EventCard = ({ item, onPress }) => {
 
   const eventName = item.eventName
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item.type === 'ONLINE' ? platform.map(items => {
-    if(item.location.includes(items.toLocaleLowerCase())){
-      return items
-    }
-  }) : item.location.slice(0, 18)+'...'
-  const ImageCover = item.coverImageUrl
+  // const eventLocation = item.type === 'ONLINE' ? platform.map(items => {
+  //   if (item.location.includes(items.toLocaleLowerCase())) {
+  //     return items
+  //   }
+  // }) : item.location.slice(0, 18) + '...'
 
-  const checkPlatForm = (url) =>{
+  const eventLocation =  item.location
+  
+
+  const ImageCover = item.coverImageUrl
+  const checkPlatForm = (url) => {
     console.log(url)
     //
     // platform.map(item => url.includes(item))
@@ -52,22 +55,22 @@ const EventCard = ({item,onPress}) => {
           <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
         </View>
         <View style={styles.BookmarkBox}>
-          <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red}/>
+          <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red} />
         </View>
         <View style={styles.Title}>
-          <Text style={styles.TextTitle}>{(eventName.length >= 20 ? eventName.slice(0, 20) + "..." : eventName)}</Text>
+          <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
         </View>
         <View style={styles.Date}>
-          <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary}/>
+          <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary} />
           <Text style={styles.TextDate}>{eventDate}</Text>
         </View>
         <View style={styles.Time}>
-          <Ionicons name={'ios-time-outline'} size={25} color={Colors.primary}/>
+          <Ionicons name={'ios-time-outline'} size={25} color={Colors.primary} />
           <Text style={styles.TextDate}>{eventTime}</Text>
         </View>
         <View style={styles.Location}>
-          <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary}/>
-          <Text style={styles.TextLocation}>{eventLocation}</Text>
+          <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
+          <Text numberOfLines={1} style={styles.TextLocation}>{eventLocation}</Text>
         </View>
       </View>
     </TouchableOpacity>)
@@ -90,7 +93,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 160
   },
-  Image:{
+  Image: {
     borderRadius: 15,
     width: '100%',
     height: '100%',

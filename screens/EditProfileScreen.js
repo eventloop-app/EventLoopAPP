@@ -164,7 +164,7 @@ const EditProfileScreen = (props) => {
   const formStep3 = () => {
     return (
       <View style={{ width: "90%", height: "100%", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
-
+        
         {tags.map((item, index) => {
           if (item.source == "Feather") {
             return (
