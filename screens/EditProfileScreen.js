@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import decode from "../services/decode";
 import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
+import FormData from 'form-data';
+import axios from "react-native-axios";
 
 const EditProfileScreen = (props) => {
   //declare variable
@@ -104,21 +106,53 @@ const EditProfileScreen = (props) => {
   };
 
 
+
   const handleSubmitForm = () => {
     tags.map((item, index) => {
       if (item.isSelect === true) {
         return selectedTag.push(item.title)
       }
     })
-    setUserInfo({ username, imageProfile, selectedTag, })
+    // setUserInfo({ memberId: `${userData.memberId}`, username, imageProfile, selectedTag, })
+
+    handleUploadData()
+
   }
+
+  const handleUploadData = () => {
+    let localUri = imageProfile;
+    let filename = imageProfile.split('/').pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+    let memberId = userData.memberId
+    let email = userData.email
+
+
+    const formData = new FormData();
+    formData.append('profile', { uri: localUri, name: filename, type: type });
+    formData.append('memberInfo', { memberId: memberId, name: username, email: email, tags: selectedTag });
+    console.log(formData)
+
+    return axios({
+      url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
+      method: 'POST',
+      data: formData,
+      headers: {
+        'Content-Type': `multipart/form-data`,
+      },
+    }).then(res => {
+      console.log(res)
+      console.log(res)
+    })
+  }
+
+
 
   const formStep1 = () => {
     const firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
     const lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
     return (
       <View style={{}}>
-
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
           <TextInput style={[styles.input, { borderColor: !isValidUsername ? "#CBCBCB" : "red" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
