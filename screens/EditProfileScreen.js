@@ -14,22 +14,25 @@ import { useDispatch, useSelector } from "react-redux";
 import decode from "../services/decode";
 import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
+import FormData from 'form-data';
+import axios from "react-native-axios";
+
 
 const EditProfileScreen = (props) => {
   //declare variable
-  const [username, onChangeUsername] = useState(null);
+  const [username, onChangeUsername] = useState("");
   const [firstName, onChangeFirstName] = useState("somsak");
   const [lastName, onChangeLastName] = useState("makmee");
   const [email, onChangeEmail] = useState("Somsak@mail.kmutt.ac.th");
-  const [number, onChangeNumber] = useState(null);
+  const [number, onChangeNumber] = useState("");
   const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
-  const [isValidUsername, setIsValidUsername] = useState(false)
+  const [isError, setIsError] = useState(false)
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
-  // const [isSelect, setIsSelect] = useState(false)
+  const [toolTipVisible, setToolTipVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
   const [tags, setTags] = useState([
@@ -45,7 +48,9 @@ const EditProfileScreen = (props) => {
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
 
 
+
   ])
+
 
   //useEffect
   useEffect(() => {
@@ -83,14 +88,14 @@ const EditProfileScreen = (props) => {
   //Prevent input username
   const checkTextInput = () => {
     //Check for the Name TextInput
+
     if (Validate.getValidateUsername(username)) {
-      setIsValidUsername(true)
-      alert(username)
-      return
+      setIsError(false)
     } else {
-      setIsValidUsername(false)
-      alert("NOOOOOO")
+      setIsError(true)
+      setToolTipVisible(true)
     }
+
   };
 
   const handleOnSelectTags = (indexToSelect, itemSelected) => {
@@ -104,26 +109,60 @@ const EditProfileScreen = (props) => {
   };
 
 
+
   const handleSubmitForm = () => {
+    handlePushTag()
+    handleUploadData()
+  }
+
+  const handlePushTag = () => {
+    setSelectedTag([])
     tags.map((item, index) => {
       if (item.isSelect === true) {
         return selectedTag.push(item.title)
       }
     })
-    setUserInfo({ username, imageProfile, selectedTag, })
+  }
+
+  const handleUploadData = () => {
+    let localUri = imageProfile;
+    let filename = imageProfile.split('/').pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+    let memberId = userData.memberId
+    let email = userData.email
+
+    const formData = new FormData();
+    formData.append('profile', { uri: localUri, name: filename, type: type });
+    formData.append('memberInfo', { memberId: memberId, name: username, email: email, tags: selectedTag });
+    console.log(formData)
+    return axios({
+      url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
+      method: 'POST',
+      data: formData,
+      headers: {
+        'Content-Type': `multipart/form-data`,
+      },
+    }).then(res => {
+      console.log(res)
+
+    })
+
   }
 
   const formStep1 = () => {
     const firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
     const lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
+
     return (
       <View style={{}}>
 
-        <View style={{ alignItems: "center", }}>
+        <View style={{ alignItems: "center" }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
-          <TextInput style={[styles.input, { borderColor: !isValidUsername ? "#CBCBCB" : "red" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
-        </View>
+          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isError ? "flex" : "none" }}>Username must be between 3-15 characters long and contain only letter or number.</Text>
+          <TextInput style={[styles.input, { borderColor: isError ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
 
+        </View>
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อ</Text>
           <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeFirstName} value={firstName} editable={false} placeholderTextColor={"gray"} placeholder="Last name" />
@@ -144,19 +183,16 @@ const EditProfileScreen = (props) => {
   const formStep2 = () => {
     return (
       <View style={{ alignItems: 'center', }}>
-        <View style={{ borderRadius: 150, borderColor: "lightgray", borderWidth: 4 }}>
+
+        <TouchableOpacity style={{ borderRadius: 150, borderColor: "lightgray", borderWidth: 4 }} onPress={pickImage}>
           <Image source={{ uri: imageProfile }} style={{ width: 200, height: 200, borderRadius: 150 }} />
-        </View>
+        </TouchableOpacity>
         <View style={{ paddingTop: 8 }}>
           <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20, }}>
             Upload
           </Button>
         </View>
 
-        {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Button title="Pick an image from camera roll" onPress={pickImage} />
-          {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-        </View> */}
       </View>
     )
   }
@@ -164,7 +200,6 @@ const EditProfileScreen = (props) => {
   const formStep3 = () => {
     return (
       <View style={{ width: "90%", height: "100%", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
-
         {tags.map((item, index) => {
           if (item.source == "Feather") {
             return (
@@ -202,12 +237,6 @@ const EditProfileScreen = (props) => {
 
         })}
 
-        {/* <Button style={{ height: 100, width: 90, margin: 2, }} color='pink' mode="contained" onPress={() => console.log('Pressed')}>
-          <Feather name="music" size={24} color="black" />
-        </Button>
-        <Button style={{ height: 100, width: 90, margin: 2, }} color='pink' mode="contained" onPress={() => console.log('Pressed')}>
-          <Feather name="music" size={24} color="black" />
-        </Button> */}
       </View>)
   }
 
@@ -220,8 +249,8 @@ const EditProfileScreen = (props) => {
           </Text>
           :
           (<View style={{ flex: 1, height: "100%", width: "100%", }}>
-            <ProgressSteps topOffset={20} marginBottom={30}>
-              <ProgressStep label="เพิ่มข้อมูล"  >
+            <ProgressSteps topOffset={20} marginBottom={30} >
+              <ProgressStep label="เพิ่มข้อมูล" onNext={checkTextInput} errors={isError} >
                 <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>
                   <View style={{ width: "100%" }}>
                     {formStep1()}
@@ -237,8 +266,8 @@ const EditProfileScreen = (props) => {
               </ProgressStep>
               <ProgressStep label="สิ่งที่คุณสนใจ" onSubmit={handleSubmitForm}>
                 <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
-                  <Text>Tags</Text>
                   {formStep3()}
+                  <Text style={{ color: "green" }}>[สามารถกลับมาเลือกภายหลังได้]</Text>
                 </View>
               </ProgressStep>
             </ProgressSteps>
