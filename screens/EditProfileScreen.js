@@ -16,7 +16,7 @@ import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
 import axios from "react-native-axios";
-import Tooltip from "react-native-walkthrough-tooltip";
+
 
 const EditProfileScreen = (props) => {
   //declare variable
@@ -136,7 +136,6 @@ const EditProfileScreen = (props) => {
     formData.append('profile', { uri: localUri, name: filename, type: type });
     formData.append('memberInfo', { memberId: memberId, name: username, email: email, tags: selectedTag });
     console.log(formData)
-
     return axios({
       url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
       method: 'POST',
@@ -148,6 +147,7 @@ const EditProfileScreen = (props) => {
       console.log(res)
 
     })
+
   }
 
   const formStep1 = () => {
@@ -193,10 +193,6 @@ const EditProfileScreen = (props) => {
           </Button>
         </View>
 
-        {/* <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Button title="Pick an image from camera roll" onPress={pickImage} />
-          {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
-        </View> */}
       </View>
     )
   }
@@ -241,12 +237,6 @@ const EditProfileScreen = (props) => {
 
         })}
 
-        {/* <Button style={{ height: 100, width: 90, margin: 2, }} color='pink' mode="contained" onPress={() => console.log('Pressed')}>
-          <Feather name="music" size={24} color="black" />
-        </Button>
-        <Button style={{ height: 100, width: 90, margin: 2, }} color='pink' mode="contained" onPress={() => console.log('Pressed')}>
-          <Feather name="music" size={24} color="black" />
-        </Button> */}
       </View>)
   }
 
@@ -277,6 +267,7 @@ const EditProfileScreen = (props) => {
               <ProgressStep label="สิ่งที่คุณสนใจ" onSubmit={handleSubmitForm}>
                 <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
                   {formStep3()}
+                  <Text style={{ color: "green" }}>[สามารถกลับมาเลือกภายหลังได้]</Text>
                 </View>
               </ProgressStep>
             </ProgressSteps>
