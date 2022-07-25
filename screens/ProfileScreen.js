@@ -51,11 +51,11 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [])
 
   useEffect(() => {
- 
+
       if(authData?.hasMember){
         navigation.navigate('EditProfile', {user: authData})
         // setUserData(authData.user)
- 
+
       }
       if(authDataError){
         console.log('Error:' + authDataError)
@@ -120,6 +120,7 @@ const ProfileScreen = ({ route, navigation }) => {
               title="Sign out"
               onPress={signOut}
             />
+            <Button title={'จัดการกิจกรรมที่สร้าง'} onPress={()=> navigation.navigate('CreatedEventList')}/>
             <Button
                 title="Go to setting"
                 onPress={() => navigation.navigate('EditProfile', {user: authData})}
