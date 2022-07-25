@@ -19,7 +19,9 @@ const ScannerScreen = (props) => {
 
     const handleBarCodeScanned = ({type, data}) => {
         setScanned(true);
-        // props.navigation.navigate('EventDetail', {QRcode: data})
+        setTimeout(() => {
+            props.navigation.navigate('EventDetail', {QRcode: data})
+        }, 500)
         // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     };
 
@@ -30,15 +32,22 @@ const ScannerScreen = (props) => {
         return <Text>No access to camera</Text>;
     }
 
-    const test =() =>{
-        setTimeout(()=> {
+    const test = () => {
+        setTimeout(() => {
             setScanned(false)
-        },3000)
+        }, 3000)
     }
 
     return (
         <View style={styles.container}>
-            <View style={{ height: 300, width: '90%', borderRadius: 15, overflow: 'hidden', borderWidth: 3, borderColor: scanned ? 'green' : 'red'}}>
+            <View style={{
+                height: 300,
+                width: '90%',
+                borderRadius: 15,
+                overflow: 'hidden',
+                borderWidth: 3,
+                borderColor: scanned ? 'green' : 'red'
+            }}>
                 <BarCodeScanner
                     onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
                     style={{flex: 1, width: '100%'}}

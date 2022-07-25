@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity,} from "react-native";
-
-
 import configureStore from './configStore';
 import {Provider} from "react-redux";
 import {createNativeStackNavigator} from '@react-navigation/native-stack';

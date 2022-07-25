@@ -113,10 +113,10 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.CenterScreenText}>
               {userData.name}
             </Text>
-            {/*<Button*/}
-            {/*  title="Sign out"*/}
-            {/*  onPress={signOut}*/}
-            {/*/>*/}
+            <Button
+              title="Sign out"
+              onPress={signOut}
+            />
             <Button title={'จัดการกิจกรรมที่สร้าง'} onPress={()=> navigation.navigate('CreatedEventList')}/>
           </SafeAreaView>
           :

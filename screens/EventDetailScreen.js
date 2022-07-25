@@ -22,14 +22,19 @@ const EventDetailScreen = (props) => {
   const [isRegister, setIsRegister] = useState(null)
   const dispatch = useDispatch();
   const { userToken, userError } = useSelector(state => state.user)
+  const [isCheckIn, setIsCheckIn] = useState(false)
+  const [CheckInCode, setCheckInCode] = useState(null)
 
   useEffect(()=>{
     if(props.route.params.QRcode){
-      console.log(props)
+      setTimeout(async ()=>{
+        await CheckInByQrCode()
+      }, 500)
     }
   },[props])
 
   useEffect(() => {
+    console.log('EventDetail')
     dispatch(getUserToken())
     getEvent()
   }, [])
@@ -39,6 +44,7 @@ const EventDetailScreen = (props) => {
       eventsService.isRegisterEvent(userData.memberId, event.id).then(res => {
         setIsRegister(res.data.isRegister)
       })
+      CheckUserCheckIn()
     }
   },[userData])
 
@@ -48,6 +54,30 @@ const EventDetailScreen = (props) => {
       setIsLogin(true)
     }
   }, [userToken])
+
+  const CheckUserCheckIn = () =>{
+    eventsService.isCheckIn(userData.memberId, event.id).then( async res =>{
+      if(res.status === 200 && res.data.isCheckIn === true){
+        setIsCheckIn(true)
+        await console.log('User is Checked in !')
+        console.log(res)
+      }else {
+        await console.log('User not Check in !')
+      }
+    }).catch(e => {
+      console.log(e)
+    })
+  }
+
+  const CheckInByQrCode = () =>{
+    eventsService.checkInByCode(userData.memberId, props.route.params.QRcode, event.id).then(res => {
+      if(res.status === 200){
+        console.log('Pass')
+        alert(`ยืนยันการเช็คอินเรียบร้อยแล้ว`)
+        setIsCheckIn(true)
+      }
+    })
+  }
 
   const getEvent = async () => {
     await setEvent(props.route.params.item)
@@ -98,7 +128,7 @@ const EventDetailScreen = (props) => {
   }
 
   const checkButton =()=>{
-    if(isRegister && isLogin){
+    if(isRegister && isLogin && !isCheckIn){
       return(
           <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={()=> setShowConfirmCancelEvent(true)}>
             <View style={{width: 340, height: 60, backgroundColor: (isLogin ? Colors.yellow : Colors.gray), borderRadius: 12, justifyContent: 'center', alignItems: 'center'}}>
@@ -106,6 +136,14 @@ const EventDetailScreen = (props) => {
             </View>
           </TouchableOpacity>
       )
+    }else if(isRegister && isLogin && isCheckIn){
+      return(
+          <TouchableOpacity activeOpacity={0.8} disabled={!isLogin}>
+            <View style={{width: 340, height: 60, backgroundColor: (isLogin ? Colors.primary : Colors.gray), borderRadius: 12, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={{fontFamily: Fonts.bold, fontSize: fontSize.primary, color: Colors.white}}>รีวิวกิจกรรม</Text>
+            </View>
+          </TouchableOpacity>
+          )
     }else{
       return(
           <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={()=> setShowRegisterEvent(true)}>
@@ -229,13 +267,18 @@ const EventDetailScreen = (props) => {
                 checkButton()
               }
             </View>
-            <View style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
-              <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={()=> console.log(props.navigation.navigate('Scanner', {event: event}))}>
-                <View style={{width: 340, height: 60, backgroundColor: (isLogin ? Colors.yellow : Colors.gray), borderRadius: 12, justifyContent: 'center', alignItems: 'center'}}>
-                  <Text style={{fontFamily: Fonts.bold, fontSize: fontSize.primary, color: Colors.white}}>เช็คอิน</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+            {
+              (isRegister && !isCheckIn) ?
+              <View style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
+                <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={()=> console.log(props.navigation.navigate('Scanner', {event: event}))}>
+                  <View style={{width: 340, height: 60, backgroundColor: (isLogin ? Colors.green : Colors.gray), borderRadius: 12, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={{fontFamily: Fonts.bold, fontSize: fontSize.primary, color: Colors.white}}>เช็คอิน</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+                  :
+                  null
+            }
           </View>
         </ScrollView>
       </View>

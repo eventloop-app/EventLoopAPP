@@ -19,6 +19,7 @@ const setup = (store) => {
   axiosInstance.interceptors.response.use((res) => {
     return res;
   }, async (err) => {
+    console.log(err.response)
     const originalConfig = err.config;
     if (originalConfig.url !== "login" && err.response) {
       // Access Token was expired
@@ -32,7 +33,7 @@ const setup = (store) => {
         return await axiosInstance(originalConfig);
       }
     }
-    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status});
+    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response.reason});
   });
 };
 export default setup;
