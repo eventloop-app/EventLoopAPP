@@ -32,7 +32,7 @@ const EditProfileScreen = (props) => {
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
-  const [toolTipVisible, setToolTipVisible] = useState(false);
+  const [hasUsername, setHasUsername] = useState(null)
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
   const [tags, setTags] = useState([
@@ -86,17 +86,25 @@ const EditProfileScreen = (props) => {
   };
 
   //Prevent input username
-  const checkTextInput = () => {
+  const checkTextInput = async () => {
     //Check for the Name TextInput
+    await checkHasUsername()
+    await console.log(hasUsername)
+    if (await Validate.getValidateUsername(username)) {
 
-    if (Validate.getValidateUsername(username)) {
       setIsError(false)
     } else {
       setIsError(true)
-      setToolTipVisible(true)
     }
 
   };
+
+  const checkHasUsername = () => {
+    eventsService.hasUsername(username).then((res) => {
+      setHasUsername(res.data.hasUsername)
+    })
+  }
+
 
   const handleOnSelectTags = (indexToSelect, itemSelected) => {
     const newState = tags.map((item, index) => {
@@ -123,6 +131,7 @@ const EditProfileScreen = (props) => {
       }
     })
   }
+
 
   const handleUploadData = () => {
     let localUri = imageProfile;
