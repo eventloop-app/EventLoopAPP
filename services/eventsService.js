@@ -76,7 +76,6 @@ class eventsService {
       memberId : memId,
       eventId : eveId
     }
-    console.log(data)
     return api.post(`events/isCheckIn`, data)
   }
 

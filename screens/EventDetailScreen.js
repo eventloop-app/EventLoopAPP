@@ -24,6 +24,7 @@ const EventDetailScreen = (props) => {
   const { userToken, userError } = useSelector(state => state.user)
   const [isCheckIn, setIsCheckIn] = useState(false)
   const [CheckInCode, setCheckInCode] = useState(null)
+  const [isOwner, setIsOwner] = useState(false)
 
   useEffect(()=>{
     if(props.route.params.QRcode){
@@ -44,6 +45,10 @@ const EventDetailScreen = (props) => {
       eventsService.isRegisterEvent(userData.memberId, event.id).then(res => {
         setIsRegister(res.data.isRegister)
       })
+      if(userData.email === event.email){
+        console.log('Is owner event')
+        setIsOwner(true)
+      }
       CheckUserCheckIn()
     }
   },[userData])
@@ -60,7 +65,6 @@ const EventDetailScreen = (props) => {
       if(res.status === 200 && res.data.isCheckIn === true){
         setIsCheckIn(true)
         await console.log('User is Checked in !')
-        console.log(res)
       }else {
         await console.log('User not Check in !')
       }
@@ -264,7 +268,7 @@ const EventDetailScreen = (props) => {
             </View>
             <View style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
               {
-                checkButton()
+                isOwner ? null : checkButton()
               }
             </View>
             {
@@ -417,6 +421,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    overflow: 'hidden'
   },
   image: {
     width: '100%',
