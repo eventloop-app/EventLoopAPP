@@ -1,9 +1,10 @@
 import api from "./api"
+import {re} from "@babel/core/lib/vendor/import-meta-resolve";
 
 class eventsService {
   async getEventAll(){
     try {
-      return api.get('/events')
+      return api.get('events?pageSize=20')
     }catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -17,7 +18,7 @@ class eventsService {
       memberId: mem.memberId
     }
     try {
-      return api.post('/members/transferMemberData', data)
+      return api.post('members/transferMemberData', data)
     }catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -28,7 +29,7 @@ class eventsService {
       memberId : memId,
       eventId : eveId
     }
-    return api.post('/events/registerEvent', data)
+    return api.post('events/registerEvent', data)
   }
 
   async isRegisterEvent(memId, eveId){
@@ -36,7 +37,7 @@ class eventsService {
       memberId : memId,
       eventId : eveId
     }
-    return  api.post('/events/isRegister', data)
+    return  api.post('events/isRegister', data)
   }
 
   async unRegisterEvent(memId, eveId){
@@ -44,7 +45,46 @@ class eventsService {
       memberId : memId,
       eventId : eveId
     }
-    return  api.post('/events/unregisterEvent', data)
+    return  api.post('events/unregisterEvent', data)
+  }
+
+  async getEventByOrganizerId(memberId){
+    return api.get(`members/${memberId}/createEvent`)
+  }
+
+  async getCodeCheckIn(memId,eveId){
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return api.post(`events/generateCode`, data)
+  }
+
+  async checkInByCode(memId, checkCode, eveId){
+
+    const data = {
+      memberId : memId,
+      checkInCode : checkCode,
+      eventId : eveId
+    }
+    console.log(data)
+    return api.post(`events/checkIn`, data)
+  }
+
+  async isCheckIn(memId, eveId){
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return api.post(`events/isCheckIn`, data)
+  }
+
+  async checkRegisterEvent (memId,eveId) {
+    const data = {
+      memberId : memId,
+      eventId : eveId
+    }
+    return api.post(`events/isRegister`, data)
   }
 }
 

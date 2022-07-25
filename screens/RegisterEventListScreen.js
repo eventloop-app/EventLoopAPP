@@ -1,7 +1,7 @@
 import React from 'react';
 import {SafeAreaView, Text, View} from "react-native";
 
-const EventListScreen = () => {
+const RegisterEventListScreen = () => {
   return (
     <SafeAreaView>
       <Text>EventList</Text>
@@ -9,4 +9,4 @@ const EventListScreen = () => {
   );
 };
 
-export default EventListScreen;
+export default RegisterEventListScreen;
