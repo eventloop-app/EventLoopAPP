@@ -32,9 +32,10 @@ const EditProfileScreen = (props) => {
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
-  const [hasUsername, setHasUsername] = useState(null)
+  const [toolTipVisible, setToolTipVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
+  const [hasUser, setHasUser] = useState(false)
   const [tags, setTags] = useState([
     { title: "Music", icon: "music", source: "Feather", isSelect: false },
     { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -46,9 +47,6 @@ const EditProfileScreen = (props) => {
     { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
     { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
-
-
-
   ])
 
 
@@ -85,26 +83,37 @@ const EditProfileScreen = (props) => {
     }
   };
 
-  //Prevent input username
-  const checkTextInput = async () => {
-    //Check for the Name TextInput
-    await checkHasUsername()
-    await console.log(hasUsername)
-    if (await Validate.getValidateUsername(username)) {
-
+  const checkHasUserName = (value) =>{
+    console.log(value.nativeEvent.text)
+    const username = value.nativeEvent.text
+    onChangeUsername(username)
+    if(Validate.getValidateUsername(username)){
       setIsError(false)
-    } else {
+      eventsService.hasUsername(username).then(res => {
+        if(res.status === 200 && res.data.hasUsername){
+          console.log(res.data.hasUsername)
+          setHasUser(true)
+        }else{
+          setHasUser(false)
+        }
+      })
+    }else{
       setIsError(true)
     }
-
-  };
-
-  const checkHasUsername = () => {
-    eventsService.hasUsername(username).then((res) => {
-      setHasUsername(res.data.hasUsername)
-    })
   }
 
+  //Prevent input username
+  const checkTextInput = (value) => {
+    //Check for the Name TextInput
+    //
+    // if (Validate.getValidateUsername(username)) {
+    //   setIsError(false)
+    // } else {
+    //   setIsError(true)
+    //   setToolTipVisible(true)
+    // }
+
+  };
 
   const handleOnSelectTags = (indexToSelect, itemSelected) => {
     const newState = tags.map((item, index) => {
@@ -131,7 +140,6 @@ const EditProfileScreen = (props) => {
       }
     })
   }
-
 
   const handleUploadData = () => {
     let localUri = imageProfile;
@@ -169,8 +177,8 @@ const EditProfileScreen = (props) => {
         <View style={{ alignItems: "center" }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
           <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isError ? "flex" : "none" }}>Username must be between 3-15 characters long and contain only letter or number.</Text>
-          <TextInput style={[styles.input, { borderColor: isError ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
-
+          <TextInput style={[styles.input, { borderColor: (isError || hasUser) ? "red" : "#CBCBCB" }]} onEndEditing={(value) => checkHasUserName(value)}  placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
+          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: hasUser ? "flex" : "none" }}>{`${username} is used !`}</Text>
         </View>
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อ</Text>
@@ -301,7 +309,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     fontSize: FontSize.primary,
     color: Color.black,
-    borderWidth: 2
   },
   surface: {
     padding: 8,
