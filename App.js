@@ -28,6 +28,7 @@ import ManageEventScreen from "./screens/ManageEventScreen";
 moment().locale('th')
 import { LogBox } from 'react-native';
 import ScannerScreen from "./screens/ScannerScreen";
+import ReviewEventScreen from "./screens/ReviewEventScreen";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -224,6 +225,36 @@ const App = () => {
                           onPress={() => console.log('Edit Event')}
                       >
                         <Ionicons name="md-create-outline" size={25} color={Colors.black} />
+                      </TouchableOpacity>
+                  )
+                })}/>
+
+                <Stack.Screen name={'ReviewEvent'} component={ReviewEventScreen} options={ ({route,navigation}) => ({
+                  headerShown: true,
+                  headerTransparent: true,
+                  tabBarShowLabel: false,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    fontFamily: Fonts.bold,
+                    fontSize: fontSize.primary,
+                    color: Colors.black,
+                  },
+                  title: "รีวิวกิจกรรม",
+                  headerTintColor: Colors.white,
+                  headerBackTitle: '',
+                  headerLeft: () => (
+                      <TouchableOpacity
+                          style={{
+                            borderRadius: 100,
+                            backgroundColor: 'rgba(255,255,255,0.8)',
+                            width: 30,
+                            height: 30,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}
+                          onPress={() => navigation.goBack()}
+                      >
+                        <Ionicons name="md-close" size={25} color={Colors.black} />
                       </TouchableOpacity>
                   )
                 })}/>

@@ -292,7 +292,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.medium,
     fontSize: FontSize.primary,
     color: Color.black,
-    borderWidth: 2
   },
   surface: {
     padding: 8,
