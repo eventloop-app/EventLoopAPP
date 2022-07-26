@@ -273,7 +273,6 @@ const EditProfileScreen = (props) => {
             </ProgressSteps>
           </View>)
       }
-
     </SafeAreaView>
   )
 }
