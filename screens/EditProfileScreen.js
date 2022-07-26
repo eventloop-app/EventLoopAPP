@@ -16,16 +16,18 @@ import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
 import axios from "react-native-axios";
+import demoImageProfile from '../assets/images/profileImage.jpg'
 
 
 const EditProfileScreen = (props) => {
   //declare variable
   const [username, onChangeUsername] = useState("");
-  const [firstName, onChangeFirstName] = useState("somsak");
-  const [lastName, onChangeLastName] = useState("makmee");
-  const [email, onChangeEmail] = useState("Somsak@mail.kmutt.ac.th");
+  const [firstName, onChangeFirstName] = useState("");
+  const [lastName, onChangeLastName] = useState("");
+  const [email, onChangeEmail] = useState("");
   const [number, onChangeNumber] = useState("");
-  const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  // const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  const [imageProfile, setProfileImage] = useState("");
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [isError, setIsError] = useState(false)
@@ -64,10 +66,7 @@ const EditProfileScreen = (props) => {
   }, [userToken])
 
   //function
-  const getData = () => {
-    return eventsService.transferMemberData().then((res) => {
-    })
-  }
+
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -83,21 +82,35 @@ const EditProfileScreen = (props) => {
     }
   };
 
-  const checkHasUserName = (value) =>{
+  const checkHasUserName = (value) => {
     console.log(value.nativeEvent.text)
     const username = value.nativeEvent.text
-    onChangeUsername(username)
-    if(Validate.getValidateUsername(username)){
-      setIsError(false)
+
+    //Validate Username
+    if (Validate.getValidateUsername(username)) {
+      // setIsError(false)
       eventsService.hasUsername(username).then(res => {
-        if(res.status === 200 && res.data.hasUsername){
-          console.log(res.data.hasUsername)
-          setHasUser(true)
-        }else{
-          setHasUser(false)
+        console.log(res)
+        //Check response status.
+        if (res.status === 200) {
+
+          //check has current username in database. 
+          if (res.data.hasUsername) {
+            console.log(res.data.hasUsername)
+            setHasUser(true)
+            setIsError(true)
+          } else {
+            setHasUser(false)
+            setIsError(false)
+          }
+
+        } else {
+          console.log(res.status)
+          alert("server error : " + res.status)
         }
       })
-    }else{
+
+    } else {
       setIsError(true)
     }
   }
@@ -105,13 +118,13 @@ const EditProfileScreen = (props) => {
   //Prevent input username
   const checkTextInput = (value) => {
     //Check for the Name TextInput
-    //
-    // if (Validate.getValidateUsername(username)) {
-    //   setIsError(false)
-    // } else {
-    //   setIsError(true)
-    //   setToolTipVisible(true)
-    // }
+    if (Validate.getValidateUsername(username) && !hasUser) {
+
+      setIsError(false)
+
+    } else {
+      setIsError(true)
+    }
 
   };
 
@@ -148,10 +161,12 @@ const EditProfileScreen = (props) => {
     let type = match ? `image/${match[1]}` : `image`;
     let memberId = userData.memberId
     let email = userData.email
+    let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+    let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
 
     const formData = new FormData();
-    formData.append('profile', { uri: localUri, name: filename, type: type });
-    formData.append('memberInfo', { memberId: memberId, name: username, email: email, tags: selectedTag });
+    formData.append('profileImage', { uri: localUri, name: filename, type: type });
+    formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
     console.log(formData)
     return axios({
       url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
@@ -177,7 +192,7 @@ const EditProfileScreen = (props) => {
         <View style={{ alignItems: "center" }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
           <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isError ? "flex" : "none" }}>Username must be between 3-15 characters long and contain only letter or number.</Text>
-          <TextInput style={[styles.input, { borderColor: (isError || hasUser) ? "red" : "#CBCBCB" }]} onEndEditing={(value) => checkHasUserName(value)}  placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
+          <TextInput style={[styles.input, { borderColor: (isError || hasUser) ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
           <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: hasUser ? "flex" : "none" }}>{`${username} is used !`}</Text>
         </View>
         <View style={{ alignItems: "center", }}>
@@ -202,7 +217,7 @@ const EditProfileScreen = (props) => {
       <View style={{ alignItems: 'center', }}>
 
         <TouchableOpacity style={{ borderRadius: 150, borderColor: "lightgray", borderWidth: 4 }} onPress={pickImage}>
-          <Image source={{ uri: imageProfile }} style={{ width: 200, height: 200, borderRadius: 150 }} />
+          <Image source={imageProfile ? { uri: imageProfile } : require('../assets/images/profileImage.jpg')} style={{ width: 200, height: 200, borderRadius: 150 }} />
         </TouchableOpacity>
         <View style={{ paddingTop: 8 }}>
           <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20, }}>
@@ -274,7 +289,7 @@ const EditProfileScreen = (props) => {
                   </View>
                 </View>
               </ProgressStep>
-              <ProgressStep label="ตั้งค่ารูปโปรไฟล์">
+              <ProgressStep label="ตั้งค่ารูปโปรไฟล์" >
                 <View style={{ flex: 1, height: "100%", width: "100%", }}>
                   <View style={{ width: "100%", backgroundColor: "white" }}>
                     {formStep2()}
@@ -291,7 +306,7 @@ const EditProfileScreen = (props) => {
           </View>)
       }
 
-    </SafeAreaView>
+    </SafeAreaView >
   )
 }
 const styles = StyleSheet.create({
