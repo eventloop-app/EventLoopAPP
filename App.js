@@ -29,6 +29,7 @@ moment().locale('th')
 import { LogBox } from 'react-native';
 import ScannerScreen from "./screens/ScannerScreen";
 import ReviewEventScreen from "./screens/ReviewEventScreen";
+import MapScreen from "./screens/MapScreen";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -90,7 +91,7 @@ const App = () => {
         <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
         <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
                     options={{headerShown: false, tabBarShowLabel: false}}/>
-        <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+        <Tab.Screen name={'Like'} component={MapScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
         <Tab.Screen name={'Profile'} component={ProfileScreen}
                     options={{headerShown: false, tabBarShowLabel: false}}
         />
@@ -240,6 +241,36 @@ const App = () => {
                     color: Colors.black,
                   },
                   title: "รีวิวกิจกรรม",
+                  headerTintColor: Colors.white,
+                  headerBackTitle: '',
+                  headerLeft: () => (
+                      <TouchableOpacity
+                          style={{
+                            borderRadius: 100,
+                            backgroundColor: 'rgba(255,255,255,0.8)',
+                            width: 30,
+                            height: 30,
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                          }}
+                          onPress={() => navigation.goBack()}
+                      >
+                        <Ionicons name="md-close" size={25} color={Colors.black} />
+                      </TouchableOpacity>
+                  )
+                })}/>
+
+                <Stack.Screen name={'Map'} component={MapScreen} options={ ({route,navigation}) => ({
+                  headerShown: true,
+                  headerTransparent: true,
+                  tabBarShowLabel: false,
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: {
+                    fontFamily: Fonts.bold,
+                    fontSize: fontSize.primary,
+                    color: Colors.black,
+                  },
+                  title: "",
                   headerTintColor: Colors.white,
                   headerBackTitle: '',
                   headerLeft: () => (
