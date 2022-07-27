@@ -19,7 +19,7 @@ import axios from "react-native-axios";
 import demoImageProfile from '../assets/images/profileImage.jpg'
 
 
-const EditProfileScreen = (props) => {
+const EditProfileScreen = ({ props, navigation }) => {
   //declare variable
   const [username, onChangeUsername] = useState("");
   const [firstName, onChangeFirstName] = useState("");
@@ -183,6 +183,9 @@ const EditProfileScreen = (props) => {
       },
     }).then(res => {
       console.log(res)
+      if (res.status === 200) {
+        navigation.navigate('ProfileDetail')
+      } else { alert(res.status) }
 
     })
 

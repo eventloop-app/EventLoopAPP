@@ -1,14 +1,14 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Button, RefreshControl, SafeAreaView, StatusBar, StyleSheet, Text, View} from "react-native";
-import {makeRedirectUri, useAuthRequest, useAutoDiscovery} from "expo-auth-session";
-import {useDispatch, useSelector} from "react-redux";
-import {SignIn, SignOut} from "../actions/auth";
-import {getUserToken} from "../actions/user";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, RefreshControl, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { makeRedirectUri, useAuthRequest, useAutoDiscovery } from "expo-auth-session";
+import { useDispatch, useSelector } from "react-redux";
+import { SignIn, SignOut } from "../actions/auth";
+import { getUserToken } from "../actions/user";
 import jwt_decode from "jwt-decode";
 import decode from "../services/decode";
 import fonts from "../constants/Fonts";
 import fontSize from "../constants/FontSize";
-import {SignInButtons} from "../components/SignInButtons";
+import { SignInButtons } from "../components/SignInButtons";
 import { useFocusEffect } from '@react-navigation/native'
 
 
@@ -17,7 +17,7 @@ const ProfileScreen = ({ route, navigation }) => {
   const [userData, setUserData] = useState(null)
   const [isVisible, setIsVisible] = useState(false)
   const discovery = useAutoDiscovery("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0");
-  const redirectUri = makeRedirectUri({scheme:"exp://fy-kbp.eventloop.eventloopapp.exp.direct:80"});
+  const redirectUri = makeRedirectUri({ scheme: "exp://fy-kbp.eventloop.eventloopapp.exp.direct:80" });
   const dispatch = useDispatch();
 
   //ดึงข้อมูลตอน Login
@@ -37,12 +37,12 @@ const ProfileScreen = ({ route, navigation }) => {
   //   }, [])
   // )
 
-  useEffect(()=>{
+  useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       console.log("Profileeee")
     });
     return unsubscribe;
-  },[navigation])
+  }, [navigation])
 
 
   useEffect(() => {
@@ -52,24 +52,24 @@ const ProfileScreen = ({ route, navigation }) => {
 
   useEffect(() => {
 
-      if(authData?.hasMember){
-        navigation.navigate('EditProfile', {user: authData})
-        // setUserData(authData.user)
+    if (authData?.hasMember) {
+      navigation.navigate('EditProfile', { user: authData })
+      // setUserData(authData.user)
 
-      }
-      if(authDataError){
-        console.log('Error:' + authDataError)
-      }
+    }
+    if (authDataError) {
+      console.log('Error:' + authDataError)
+    }
   }, [authData])
 
-  useEffect( () => {
+  useEffect(() => {
     if (userToken !== null) {
       const idToken = JSON.parse(userToken).idToken
       const user = decode.jwt(idToken)
       setUserData(user)
-       console.log(user)
+      console.log(user)
     }
-    if (userError){
+    if (userError) {
       console.log("userTokenErrorr : " + userError)
     }
     setIsLoad(false)
@@ -88,17 +88,17 @@ const ProfileScreen = ({ route, navigation }) => {
   );
 
   useEffect(() => {
-      if (response && "params" in response) {
-        if (response.params && "code" in response.params) {
-          console.log("-----------------------");
-          console.log(response.params.code);
-          console.log("-----------------------");
-          console.log(request.codeVerifier);
-          console.log("-----------------------");
-          dispatch(SignIn(response.params.code, request.codeVerifier))
-        }
+    if (response && "params" in response) {
+      if (response.params && "code" in response.params) {
+        console.log("-----------------------");
+        console.log(response.params.code);
+        console.log("-----------------------");
+        console.log(request.codeVerifier);
+        console.log("-----------------------");
+        dispatch(SignIn(response.params.code, request.codeVerifier))
       }
-    }, [response]);
+    }
+  }, [response]);
 
   const signOut = () => {
     dispatch(SignOut())
@@ -120,10 +120,14 @@ const ProfileScreen = ({ route, navigation }) => {
               title="Sign out"
               onPress={signOut}
             />
-            <Button title={'จัดการกิจกรรมที่สร้าง'} onPress={()=> navigation.navigate('CreatedEventList')}/>
+            <Button title={'จัดการกิจกรรมที่สร้าง'} onPress={() => navigation.navigate('CreatedEventList')} />
             <Button
-                title="Go to setting"
-                onPress={() => navigation.navigate('EditProfile', {user: authData})}
+              title="Go to setting"
+              onPress={() => navigation.navigate('EditProfile', { user: authData })}
+            />
+            <Button
+              title="Go to ProfileDetail"
+              onPress={() => navigation.navigate('ProfileDetail')}
             />
           </SafeAreaView>
           :
@@ -131,7 +135,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.CenterScreenText}>คุณยังไม่ได้เข้าสู่ระบบ</Text>
             <Button
               title="Sign in"
-              onPress={()=> promptAsync()}
+              onPress={() => promptAsync()}
             />
           </View>
       }
