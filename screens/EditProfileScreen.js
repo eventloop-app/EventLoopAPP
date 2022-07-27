@@ -31,6 +31,7 @@ const EditProfileScreen = (props) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [isError, setIsError] = useState(false)
+  const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
@@ -97,11 +98,13 @@ const EditProfileScreen = (props) => {
           //check has current username in database. 
           if (res.data.hasUsername) {
             console.log(res.data.hasUsername)
-            setHasUser(true)
+            // setHasUser(true)
             setIsError(true)
+            SetIsShowValidateMessage("Username " + username + " is used!")
           } else {
-            setHasUser(false)
+            // setHasUser(false)
             setIsError(false)
+            SetIsShowValidateMessage("")
           }
 
         } else {
@@ -112,18 +115,21 @@ const EditProfileScreen = (props) => {
 
     } else {
       setIsError(true)
+      SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
     }
   }
 
   //Prevent input username
   const checkTextInput = (value) => {
     //Check for the Name TextInput
-    if (Validate.getValidateUsername(username) && !hasUser) {
-
+    if (Validate.getValidateUsername(username) && !isShowValidateMessage) {
       setIsError(false)
-
+      SetIsShowValidateMessage("")
     } else {
       setIsError(true)
+      if (!isShowValidateMessage) {
+        SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+      }
     }
 
   };
@@ -191,9 +197,9 @@ const EditProfileScreen = (props) => {
 
         <View style={{ alignItems: "center" }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
-          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isError ? "flex" : "none" }}>Username must be between 3-15 characters long and contain only letter or number.</Text>
-          <TextInput style={[styles.input, { borderColor: (isError || hasUser) ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
-          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: hasUser ? "flex" : "none" }}>{`${username} is used !`}</Text>
+          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}> {isShowValidateMessage}</Text>
+          <TextInput style={[styles.input, { borderColor: isShowValidateMessage ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
+          {/* <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}>{`${username} is used !`}{isShowValidateMessage}</Text> */}
         </View>
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อ</Text>
@@ -316,7 +322,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 12,
     marginHorizontal: 12,
-    borderWidth: 1,
+    borderWidth: 2,
     padding: 10,
     borderRadius: 15,
     borderColor: "#CBCBCB",
