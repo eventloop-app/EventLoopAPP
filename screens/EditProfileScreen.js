@@ -380,6 +380,11 @@ const styles = StyleSheet.create({
   },
   buttonFormStep3: {
     backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: "red"
+  },
+  CenterScreenText: {
+    textAlign: 'center',
+    fontFamily: Fonts.bold,
+    fontSize: FontSize.primary
   }
 
 });
