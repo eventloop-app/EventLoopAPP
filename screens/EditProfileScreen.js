@@ -16,25 +16,29 @@ import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
 import axios from "react-native-axios";
+import demoImageProfile from '../assets/images/profileImage.jpg'
 
 
-const EditProfileScreen = (props) => {
+const EditProfileScreen = ({ props, navigation }) => {
   //declare variable
   const [username, onChangeUsername] = useState("");
-  const [firstName, onChangeFirstName] = useState("somsak");
-  const [lastName, onChangeLastName] = useState("makmee");
-  const [email, onChangeEmail] = useState("Somsak@mail.kmutt.ac.th");
+  const [firstName, onChangeFirstName] = useState("");
+  const [lastName, onChangeLastName] = useState("");
+  const [email, onChangeEmail] = useState("");
   const [number, onChangeNumber] = useState("");
-  const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  // const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
+  const [imageProfile, setProfileImage] = useState("");
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [isError, setIsError] = useState(false)
+  const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
   const [toolTipVisible, setToolTipVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
+  const [hasUser, setHasUser] = useState(false)
   const [tags, setTags] = useState([
     { title: "Music", icon: "music", source: "Feather", isSelect: false },
     { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -46,9 +50,6 @@ const EditProfileScreen = (props) => {
     { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
     { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
-
-
-
   ])
 
 
@@ -66,10 +67,7 @@ const EditProfileScreen = (props) => {
   }, [userToken])
 
   //function
-  const getData = () => {
-    return eventsService.transferMemberData().then((res) => {
-    })
-  }
+
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -85,15 +83,53 @@ const EditProfileScreen = (props) => {
     }
   };
 
-  //Prevent input username
-  const checkTextInput = () => {
-    //Check for the Name TextInput
+  const checkHasUserName = (value) => {
+    console.log(value.nativeEvent.text)
+    const username = value.nativeEvent.text
 
+    //Validate Username
     if (Validate.getValidateUsername(username)) {
-      setIsError(false)
+      // setIsError(false)
+      eventsService.hasUsername(username).then(res => {
+        console.log(res)
+        //Check response status.
+        if (res.status === 200) {
+
+          //check has current username in database. 
+          if (res.data.hasUsername) {
+            console.log(res.data.hasUsername)
+            // setHasUser(true)
+            setIsError(true)
+            SetIsShowValidateMessage("Username " + username + " is used!")
+          } else {
+            // setHasUser(false)
+            setIsError(false)
+            SetIsShowValidateMessage("")
+          }
+
+        } else {
+          console.log(res.status)
+          alert("server error : " + res.status)
+        }
+      })
+
     } else {
       setIsError(true)
-      setToolTipVisible(true)
+      SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+    }
+  }
+
+  //Prevent input username
+  const checkTextInput = (value) => {
+    //Check for the Name TextInput
+    if (Validate.getValidateUsername(username) && !isShowValidateMessage) {
+      setIsError(false)
+      SetIsShowValidateMessage("")
+    } else {
+      setIsError(true)
+      if (!isShowValidateMessage) {
+        SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+      }
     }
 
   };
@@ -131,10 +167,12 @@ const EditProfileScreen = (props) => {
     let type = match ? `image/${match[1]}` : `image`;
     let memberId = userData.memberId
     let email = userData.email
+    let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+    let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
 
     const formData = new FormData();
-    formData.append('profile', { uri: localUri, name: filename, type: type });
-    formData.append('memberInfo', { memberId: memberId, name: username, email: email, tags: selectedTag });
+    formData.append('profileImage', { uri: localUri, name: filename, type: type });
+    formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
     console.log(formData)
     return axios({
       url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
@@ -145,6 +183,9 @@ const EditProfileScreen = (props) => {
       },
     }).then(res => {
       console.log(res)
+      if (res.status === 200) {
+        navigation.navigate('ProfileDetail')
+      } else { alert(res.status) }
 
     })
 
@@ -159,9 +200,9 @@ const EditProfileScreen = (props) => {
 
         <View style={{ alignItems: "center" }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
-          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isError ? "flex" : "none" }}>Username must be between 3-15 characters long and contain only letter or number.</Text>
-          <TextInput style={[styles.input, { borderColor: isError ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value.trim())} value={username} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
-
+          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}> {isShowValidateMessage}</Text>
+          <TextInput style={[styles.input, { borderColor: isShowValidateMessage ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
+          {/* <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}>{`${username} is used !`}{isShowValidateMessage}</Text> */}
         </View>
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อ</Text>
@@ -185,7 +226,7 @@ const EditProfileScreen = (props) => {
       <View style={{ alignItems: 'center', }}>
 
         <TouchableOpacity style={{ borderRadius: 150, borderColor: "lightgray", borderWidth: 4 }} onPress={pickImage}>
-          <Image source={{ uri: imageProfile }} style={{ width: 200, height: 200, borderRadius: 150 }} />
+          <Image source={imageProfile ? { uri: imageProfile } : require('../assets/images/profileImage.jpg')} style={{ width: 200, height: 200, borderRadius: 150 }} />
         </TouchableOpacity>
         <View style={{ paddingTop: 8 }}>
           <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20, }}>
@@ -257,7 +298,7 @@ const EditProfileScreen = (props) => {
                   </View>
                 </View>
               </ProgressStep>
-              <ProgressStep label="ตั้งค่ารูปโปรไฟล์">
+              <ProgressStep label="ตั้งค่ารูปโปรไฟล์" >
                 <View style={{ flex: 1, height: "100%", width: "100%", }}>
                   <View style={{ width: "100%", backgroundColor: "white" }}>
                     {formStep2()}
@@ -274,7 +315,7 @@ const EditProfileScreen = (props) => {
           </View>)
       }
 
-    </SafeAreaView>
+    </SafeAreaView >
   )
 }
 const styles = StyleSheet.create({
@@ -284,7 +325,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 12,
     marginHorizontal: 12,
-    borderWidth: 1,
+    borderWidth: 2,
     padding: 10,
     borderRadius: 15,
     borderColor: "#CBCBCB",

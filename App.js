@@ -28,6 +28,7 @@ import ManageEventScreen from "./screens/ManageEventScreen";
 moment().locale('th')
 import { LogBox } from 'react-native';
 import ScannerScreen from "./screens/ScannerScreen";
+import ProfileDetailScreen from './screens/ProfileDetailScreen';
 import ReviewEventScreen from "./screens/ReviewEventScreen";
 
 LogBox.ignoreLogs([
@@ -164,8 +165,22 @@ const App = () => {
                   color: Colors.black,
                 },
                 headerBackTitle: '',
-                title: 'ตั้งต่าโปรไฟล์'
-              })}/>
+                title: 'ตั้งค่าโปรไฟล์'
+              })} />
+
+              <Stack.Screen name={'ProfileDetail'} component={ProfileDetailScreen} options={({ route }) => ({
+                headerShown: true,
+                headerTransparent: true,
+                tabBarShowLabel: false,
+                headerTitleAlign: 'center',
+                headerTitleStyle: {
+                  fontFamily: Fonts.bold,
+                  fontSize: fontSize.primary,
+                  color: Colors.black,
+                },
+                headerBackTitle: '',
+                title: 'โปรไฟล์'
+              })} />
 
               <Stack.Screen  name={'CreatedEventList'} component={CreatedEventListScreen} options={ ({route}) => ({
                 headerShown: true,
