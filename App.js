@@ -33,6 +33,7 @@ import MapScreen from "./screens/MapScreen";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
+  'EventEmitter.removeListener(\'url\', ...)'
 ]);
 
 setupInterceptors(configureStore)

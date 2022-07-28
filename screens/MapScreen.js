@@ -58,7 +58,6 @@ const MapScreen = () => {
         <View style={styles.container}>
             <View>
                 <MapView
-
                     showsMyLocationButton={true}
                     ref={mapRef}
                     moveOnMarkerPress={true}
