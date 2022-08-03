@@ -36,7 +36,7 @@ const FeedScreen = ({ route, navigation }) => {
       setEvent(res.data.content)
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
-      alert('ผิดพลาดดด \n' + error.message)
+      alert('เกิดข้อผิดพลาดดด \n' + error.message)
     })
     await setIsLoading(false)
   }

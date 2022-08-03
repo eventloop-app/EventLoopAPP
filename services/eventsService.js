@@ -1,5 +1,5 @@
 import api from "./api"
-import {re} from "@babel/core/lib/vendor/import-meta-resolve";
+
 
 class eventsService {
   async getEventAll(){
