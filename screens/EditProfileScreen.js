@@ -245,7 +245,7 @@ const EditProfileScreen = ({ props, navigation }) => {
           if (item.source == "Feather") {
             return (
               <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center', }}>
+                <View style={{ height: "100%", justifyContent: 'center', alignItems: "center" }}>
                   <Feather style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text style={{}} >{item.title}</Text>
                 </View>
@@ -253,7 +253,7 @@ const EditProfileScreen = ({ props, navigation }) => {
           } else if (item.source == "Ionicons") {
             return (
               <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center' }}>
+                <View style={{ height: "100%", justifyContent: 'center', alignItems: "center" }}>
                   <Ionicons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
                 </View>
@@ -261,7 +261,7 @@ const EditProfileScreen = ({ props, navigation }) => {
           } else if (item.source == "MaterialIcons") {
             return (
               <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center' }}>
+                <View style={{ height: "100%", justifyContent: 'center', alignItems: "center" }}>
                   <MaterialIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
                 </View>
@@ -269,7 +269,7 @@ const EditProfileScreen = ({ props, navigation }) => {
           } else if (item.source == "MaterialCommunityIcons") {
             return (
               <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center' }}>
+                <View style={{ height: "100%", justifyContent: 'center', alignItems: "center" }}>
                   <MaterialCommunityIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
                 </View>

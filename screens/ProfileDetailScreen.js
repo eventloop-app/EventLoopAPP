@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text, View, TextInput, StyleSheet, Image, TouchableOpacity, Dimensions, Keyboard } from "react-native";
+import { SafeAreaView, Text, View, TextInput, StyleSheet, Image, TouchableOpacity, Dimensions, Modal, Pressable } from "react-native";
 import { Surface, Button } from 'react-native-paper';
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import Color from "../constants/Colors";
-import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import * as ImagePicker from 'expo-image-picker';
-import { Camera, CameraType } from 'expo-camera';
-import Validate from '../services/Validate';
-import eventsService from '../services/eventsService';
 import { useDispatch, useSelector } from "react-redux";
-import decode from "../services/decode";
-import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
 import axios from "react-native-axios";
@@ -42,6 +35,7 @@ const ProfileDetailScreen = (props) => {
     { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
   ])
+  const [modalVisible, setModalVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState(["ดนตรี", "กีฬา", "เกม", "หนัง", "อนิเมะ"])
   // const [tags, setTags] = useState({ tag: '', tagsArray: [] })
   const setData = () => {
@@ -73,13 +67,93 @@ const ProfileDetailScreen = (props) => {
     setIsEdit(isEditForm)
   }
 
-
-
   const removeTags = (currentItem, currentIndex) => {
     const filteredItems = selectedTag.filter((item, index) => index !== currentIndex)
     setSelectedTag(filteredItems)
     console.log(filteredItems)
   }
+
+  const handleOnSelectTags = (indexToSelect, itemSelected) => {
+    const newState = tags.map((item, index) => {
+      return {
+        ...item,
+        isSelect: (indexToSelect === index ? !item.isSelect : item.isSelect),
+      };
+    });
+    setTags(newState);
+  };
+
+
+
+  const showIcon = (iconSource, icon) => {
+    switch (iconSource) {
+      case 'Feather':
+        return <Feather style={{ alignSelf: "center" }} name={icon} size={24} color="black" />
+      case 'Ionicons':
+        return <Ionicons style={{ alignSelf: "center" }} name={icon} size={28} color="black" />
+      case 'MaterialIcons':
+        return <MaterialIcons style={{ alignSelf: "center" }} name={icon} size={28} color="black" />
+      case 'MaterialCommunityIcons':
+        return <MaterialCommunityIcons style={{ alignSelf: "center" }} name={icon} size={28} color="black" />
+      default:
+        return null
+    }
+
+  }
+
+
+  const formStep3 = () => {
+    return (
+      <View style={{ alignSelf: "center", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
+        {tags.map((item, index) => {
+          return (
+            <Button key={index} style={{ backgroundColor: "pink", height: 70, width: 80, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }}
+              mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+              <View style={{ height: "100%", justifyContent: 'center', alignItems: "center" }}>
+                {showIcon(item.source, item.icon)}
+                <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small }} >{item.title}</Text>
+              </View>
+            </Button>
+          )
+        })}
+
+      </View>)
+  }
+
+  const popupSelectTag = () => {
+    return (
+      <View style={styles.centeredView}>
+
+        <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => {
+          Alert.alert("Modal has been closed."); setModalVisible(!modalVisible);
+        }} >
+
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              {/* <Text style={styles.modalText}>Hello World!</Text> */}
+              {formStep3()}
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.textStyle}>Hide Modal</Text>
+              </Pressable>
+            </View>
+          </View>
+
+        </Modal>
+
+
+        {/* <TouchableOpacity
+          style={[styles.button, styles.buttonOpen]}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.textStyle}>Show Modal</Text>
+        </TouchableOpacity> */}
+      </View>)
+  }
+
+
 
 
   const renderTags = () => {
@@ -89,16 +163,16 @@ const ProfileDetailScreen = (props) => {
           return (
             <View key={index} View style={{ flexDirection: "row", backgroundColor: Color.skyBlue, alignSelf: 'flex-start', borderRadius: 15, padding: 4, paddingHorizontal: 8, marginHorizontal: 2 }}>
               <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }}>{item}</Text>
-              <TouchableOpacity style={{ marginLeft: 1, alignSelf: "center", }} onPress={() => removeTags(item, index)}>
+              <TouchableOpacity style={{ marginLeft: 1, alignSelf: "center", display: isEdit ? "flex" : "none" }} onPress={() => removeTags(item, index)}>
                 <AntDesign name={"minuscircleo"} size={16} color="black" />
               </TouchableOpacity>
             </View>
           )
 
         })}
-        <View View style={{ flexDirection: "row", backgroundColor: Color.yellow, alignSelf: 'flex-start', borderRadius: 15, padding: 4, paddingHorizontal: 12, marginHorizontal: 2 }}>
-          <Text onPress={() => { formStep3() }} style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }} >เพิ่ม</Text>
-          <TouchableOpacity style={{ marginLeft: 1, alignSelf: "center", }}  >
+        <View View style={{ flexDirection: "row", backgroundColor: Color.yellow, alignSelf: 'flex-start', borderRadius: 15, padding: 4, paddingHorizontal: 12, marginHorizontal: 2, display: isEdit ? "flex" : "flex" }}>
+          <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }}>เพิ่ม</Text>
+          <TouchableOpacity style={{ marginLeft: 1, alignSelf: "center", }} onPress={() => setModalVisible(true)} >
             <AntDesign name={"pluscircleo"} size={16} color="black" />
           </TouchableOpacity>
         </View>
@@ -138,7 +212,6 @@ const ProfileDetailScreen = (props) => {
             {/* <TextInput style={[styles.input, { backgroundColor: "white", height: 100, textAlignVertical: 'top', borderWidth: isEdit ? 1 : 0 }]}
             returnKeyType={"done"} onSubmitEditing={Keyboard.dismiss}
             multiline={true} numberOfLines={1} value={aboutMeText} onChangeText={setAboutMeText} editable={isEdit} placeholderTextColor={"gray"} placeholder="เพิ่มคำอธิบายเกี่ยวกับคุณ" /> */}
-
             <View style={[styles.textAreaContainer, { borderWidth: isEdit ? 1 : 0 }]} >
               <TextInput style={[styles.textArea, { display: (isEdit ? "flex" : "none"), }]} value={aboutMeText}
                 onChangeText={setAboutMeText}
@@ -156,10 +229,9 @@ const ProfileDetailScreen = (props) => {
           <View>
             <Text style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, padding: 6, }} >สิ่งที่ฉันสนใจ</Text>
             {renderTags()}
-
+            {/* {popupSelectTag()} */}
           </View>
         </View >
-
       </View >
     );
   };
@@ -171,7 +243,6 @@ const ProfileDetailScreen = (props) => {
       ) : (
         <KeyboardAwareScrollView extraHeight={120}>
           {renderProfileScreen()}
-
         </KeyboardAwareScrollView>
       )}
     </SafeAreaView>
@@ -216,6 +287,49 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     fontFamily: Fonts.primary,
     fontSize: FontSize.small,
+  },
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+
+  },
+  modalView: {
+    margin: 10,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 6,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   }
 });
 
