@@ -36,7 +36,7 @@ const EventCard = ({ item, onPress }) => {
   }
 
   return (
-    <TouchableOpacity activeOpacity={0.7} onPress={onPress}  >
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={styles.shadowsButton} >
 
       <View style={styles.Container}>
         <View style={styles.ImageCover}>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     overflow: "hidden",
-    margin:8
+    borderRadius: 15,
   },
   ImageCover: {
     position: "absolute",
@@ -190,7 +190,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: -15
   },
- 
+  shadowsButton: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    margin: 8,
+    borderRadius: 15,
+  }
 
 });
 

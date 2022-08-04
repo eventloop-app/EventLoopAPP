@@ -229,7 +229,7 @@ const ProfileDetailScreen = (props) => {
           <View>
             <Text style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, padding: 6, }} >สิ่งที่ฉันสนใจ</Text>
             {renderTags()}
-            {/* {popupSelectTag()} */}
+            {popupSelectTag()}
           </View>
         </View >
       </View >
