@@ -155,7 +155,7 @@ const EditProfileScreen = ({ props, navigation }) => {
     setSelectedTag([])
     tags.map((item, index) => {
       if (item.isSelect === true) {
-        return selectedTag.push(item.title)
+        selectedTag.push(item.title)
       }
     })
   }
