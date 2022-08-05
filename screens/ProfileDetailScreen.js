@@ -23,6 +23,7 @@ import axios from "react-native-axios";
 import demoImageProfile from '../assets/images/profileImage.jpg'
 import ProfileImageCard from '../components/ProfileImageCard';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import {re} from "@babel/core/lib/vendor/import-meta-resolve";
 
 
 const ProfileDetailScreen = (props) => {
@@ -94,8 +95,6 @@ const ProfileDetailScreen = (props) => {
         setTags(newState);
     };
 
-
-
     const handlePopupSelectTag = () => {
         let newTags = tags
         newTags.map((tags, index) => {
@@ -110,16 +109,16 @@ const ProfileDetailScreen = (props) => {
     }
 
     const handlePushTag = () => {
-        setSelectedTag([])
-        tags.map((item, index) => {
-            if (item.isSelect === true) {
-                selectedTag.push(item.title)
+        let newSelectedTag = []
+        tags.map((item) => {
+            if(item.isSelect === true){
+                newSelectedTag = [...newSelectedTag, item.title]
             }
         })
+        setSelectedTag(newSelectedTag)
     }
 
-    const handleConfirmSelectTag = () => {
-
+    const handleConfirmSelectTag =  () => {
         handlePushTag()
         setModalVisible(!modalVisible)
     }
@@ -221,7 +220,7 @@ const ProfileDetailScreen = (props) => {
     const renderTags = () => {
         return (
             <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap", paddingLeft: 6 }}>
-                {selectedTag.map((item, index) => {
+                {selectedTag?.map((item, index) => {
                     return (
                         <View key={index} View style={{
                             flexDirection: "row",
