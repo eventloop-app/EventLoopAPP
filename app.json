@@ -1,10 +1,22 @@
 {
   "expo": {
+    "scheme": "eventloop",
     "name": "EventLoop",
     "slug": "EventLoop",
-    "scheme": "eventloop",
-    "owner": "eventloop",
-    "description": "",
+    "version": "1.0.1",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "ios": {
+      "supportsTablet": true
+    },
     "plugins": [
       [
         "expo-image-picker",
@@ -12,6 +24,14 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ]
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.eventloop"
+    },
+    "description": ""
   }
 }

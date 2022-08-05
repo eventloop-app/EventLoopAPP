@@ -19,26 +19,26 @@ import axios from "react-native-axios";
 import demoImageProfile from '../assets/images/profileImage.jpg'
 
 
-const EditProfileScreen = ({ props, navigation }) => {
+const EditProfileScreen = ({ props, route, navigation }) => {
   //declare variable
-  const [username, onChangeUsername] = useState("");
-  const [firstName, onChangeFirstName] = useState("");
-  const [lastName, onChangeLastName] = useState("");
-  const [email, onChangeEmail] = useState("");
-  const [number, onChangeNumber] = useState("");
-  // const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
-  const [imageProfile, setProfileImage] = useState("");
+  const [username, onChangeUsername] = useState(null);
+  const [firstName, onChangeFirstName] = useState(null);
+  const [lastName, onChangeLastName] = useState(null);
+  const [email, onChangeEmail] = useState(null);
+  const [number, onChangeNumber] = useState(null);
+  const [imageProfile, setProfileImage] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [isError, setIsError] = useState(false)
   const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
-  const [isLoad, setIsLoad] = useState(true)
+  const [isLoad, setIsLoad] = useState(false)
   const [toolTipVisible, setToolTipVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
   const [hasUser, setHasUser] = useState(false)
+
   const [tags, setTags] = useState([
     { title: "Music", icon: "music", source: "Feather", isSelect: false },
     { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -52,22 +52,22 @@ const EditProfileScreen = ({ props, navigation }) => {
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
   ])
 
+  // useEffect(() => {
+  //   if (userToken !== null) {
+  //     const idToken = JSON.parse(userToken).idToken
+  //     const user = decode.jwt(idToken)
+  //     setUserData(user)
+  //   }
+  //   if (userError) {
+  //     console.log("userTokenErrorr : " + userError)
+  //   }
+  //   setIsLoad(false)
+  // }, [userToken])
 
-  //useEffect
-  useEffect(() => {
-    if (userToken !== null) {
-      const idToken = JSON.parse(userToken).idToken
-      const user = decode.jwt(idToken)
-      setUserData(user)
-    }
-    if (userError) {
-      console.log("userTokenErrorr : " + userError)
-    }
-    setIsLoad(false)
-  }, [userToken])
-
-  //function
-
+  useEffect(()=>{
+    const user = route.params.user
+    setUserData(user)
+  }, [])
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -86,7 +86,6 @@ const EditProfileScreen = ({ props, navigation }) => {
   const checkHasUserName = (value) => {
     console.log(value.nativeEvent.text)
     const username = value.nativeEvent.text
-
     //Validate Username
     if (Validate.getValidateUsername(username)) {
       // setIsError(false)
@@ -115,7 +114,7 @@ const EditProfileScreen = ({ props, navigation }) => {
 
     } else {
       setIsError(true)
-      SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+      SetIsShowValidateMessage("ชื่อผู้ใช้ต้องมีความยาวระหว่าง 3-15 ตัวอักษร\nต้องประกอบด้วยตัวอักษรหรือตัวเลขเท่านั้น")
     }
   }
 
@@ -128,7 +127,7 @@ const EditProfileScreen = ({ props, navigation }) => {
     } else {
       setIsError(true)
       if (!isShowValidateMessage) {
-        SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+        SetIsShowValidateMessage("ชื่อผู้ใช้ต้องมีความยาวระหว่าง 3-15 ตัวอักษร\nต้องประกอบด้วยตัวอักษรหรือตัวเลขเท่านั้น")
       }
     }
 
@@ -144,8 +143,6 @@ const EditProfileScreen = ({ props, navigation }) => {
     setTags(newState);
   };
 
-
-
   const handleSubmitForm = () => {
     handlePushTag()
     handleUploadData()
@@ -160,80 +157,75 @@ const EditProfileScreen = ({ props, navigation }) => {
     })
   }
 
-  const handleUploadData = () => {
-    let localUri = imageProfile;
-    let filename = imageProfile.split('/').pop();
-    let match = /\.(\w+)$/.exec(filename);
-    let type = match ? `image/${match[1]}` : `image`;
-    let memberId = userData.memberId
-    let email = userData.email
-    let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
-    let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
-
-    const formData = new FormData();
-    formData.append('profileImage', { uri: localUri, name: filename, type: type });
-    formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
-    console.log(formData)
-    return axios({
-      url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
-      method: 'POST',
-      data: formData,
-      headers: {
-        'Content-Type': `multipart/form-data`,
-      },
-    }).then(res => {
-      console.log(res)
-      if (res.status === 200) {
-        navigation.navigate('ProfileDetail')
-      } else { alert(res.status) }
-
-    })
-
-  }
+  // const handleUploadData = () => {
+  //   let localUri = imageProfile;
+  //   let filename = imageProfile.split('/').pop();
+  //   let match = /\.(\w+)$/.exec(filename);
+  //   let type = match ? `image/${match[1]}` : `image`;
+  //   let memberId = userData.memberId
+  //   let email = userData.email
+  //   let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+  //   let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
+  //
+  //   const formData = new FormData();
+  //   formData.append('profileImage', { uri: localUri, name: filename, type: type });
+  //   formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
+  //
+  //   console.log(formData)
+  //   return axios({
+  //     url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
+  //     method: 'POST',
+  //     data: formData,
+  //     headers: {
+  //       'Content-Type': `multipart/form-data`,
+  //     },
+  //   }).then(res => {
+  //     console.log(res)
+  //     if (res.status === 200) {
+  //       navigation.navigate('ProfileDetail')
+  //     } else { alert(res.status) }
+  //   })
+  // }
 
   const formStep1 = () => {
-    const firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
-    const lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
+    const firstName = userData?.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+    const lastName = userData?.name.split(' ').slice(-1).join(' ').toLowerCase()
 
     return (
       <View style={{}}>
-
         <View style={{ alignItems: "center" }}>
           <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
           <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}> {isShowValidateMessage}</Text>
-          <TextInput style={[styles.input, { borderColor: isShowValidateMessage ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
+          <TextInput style={[styles.input, { borderColor: isShowValidateMessage ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ชื่อผู้ใช้ของคุณ" />
           {/* <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}>{`${username} is used !`}{isShowValidateMessage}</Text> */}
         </View>
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>ชื่อ</Text>
           <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeFirstName} value={firstName} editable={false} placeholderTextColor={"gray"} placeholder="Last name" />
         </View>
-
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>นามสกุล</Text>
           <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeLastName} value={lastName} editable={false} placeholder="First name" placeholderTextColor={"gray"} />
         </View>
-
         <View style={{ alignItems: "center", }}>
           <Text style={{ width: "83%", }}>อีเมล</Text>
-          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeEmail} value={userData.email} editable={false} placeholder="Email" placeholderTextColor={"gray"} />
+          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeEmail} value={userData?.email} editable={false} placeholder="Email" placeholderTextColor={"gray"} />
         </View>
       </View>
     )
   }
+
   const formStep2 = () => {
     return (
-      <View style={{ alignItems: 'center', }}>
-
-        <TouchableOpacity style={{ borderRadius: 150, borderColor: "lightgray", borderWidth: 4 }} onPress={pickImage}>
+      <View style={{ alignItems: 'center', marginTop: 100 }}>
+        <TouchableOpacity style={{justifyContent: 'center', borderRadius: 150, borderColor: (imageProfile ? Colors.primary : Colors.gray), borderWidth: 4 }} onPress={pickImage}>
           <Image source={imageProfile ? { uri: imageProfile } : require('../assets/images/profileImage.jpg')} style={{ width: 200, height: 200, borderRadius: 150 }} />
         </TouchableOpacity>
         <View style={{ paddingTop: 8 }}>
-          <Button mode="contained" color={Color.bag5Bg} onPress={pickImage} style={{ borderRadius: 20, }}>
+          <Button mode="contained" color={Colors.gray} onPress={pickImage} style={{ borderRadius: 20, }}>
             Upload
           </Button>
         </View>
-
       </View>
     )
   }
@@ -244,7 +236,7 @@ const EditProfileScreen = ({ props, navigation }) => {
         {tags.map((item, index) => {
           if (item.source == "Feather") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center', }}>
                   <Feather style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text style={{}} >{item.title}</Text>
@@ -252,7 +244,7 @@ const EditProfileScreen = ({ props, navigation }) => {
               </Button>)
           } else if (item.source == "Ionicons") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center' }}>
                   <Ionicons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
@@ -260,7 +252,7 @@ const EditProfileScreen = ({ props, navigation }) => {
               </Button>)
           } else if (item.source == "MaterialIcons") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center' }}>
                   <MaterialIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
@@ -268,16 +260,14 @@ const EditProfileScreen = ({ props, navigation }) => {
               </Button>)
           } else if (item.source == "MaterialCommunityIcons") {
             return (
-              <Button key={index} style={{ backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : "pink" }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
                 <View style={{ height: "100%", justifyContent: 'center' }}>
                   <MaterialCommunityIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
                   <Text>{item.title}</Text>
                 </View>
               </Button>)
           }
-
         })}
-
       </View>)
   }
 
@@ -290,31 +280,28 @@ const EditProfileScreen = ({ props, navigation }) => {
           </Text>
           :
           (<View style={{ flex: 1, height: "100%", width: "100%", }}>
-            <ProgressSteps topOffset={20} marginBottom={30} >
-              <ProgressStep label="เพิ่มข้อมูล" onNext={checkTextInput} errors={isError} >
+            <ProgressSteps labelFontFamily={Fonts.primary} topOffset={20} marginBottom={30} >
+              <ProgressStep nextBtnDisabled={(username ? false : true)} nextBtnText={'ต่อไป'} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="เพิ่มข้อมูล" onNext={checkTextInput} errors={isError} >
                 <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>
                   <View style={{ width: "100%" }}>
                     {formStep1()}
                   </View>
                 </View>
               </ProgressStep>
-              <ProgressStep label="ตั้งค่ารูปโปรไฟล์" >
-                <View style={{ flex: 1, height: "100%", width: "100%", }}>
-                  <View style={{ width: "100%", backgroundColor: "white" }}>
+              <ProgressStep previousBtnText={'ย้อนกลับ'} nextBtnText={'ต่อไป'} previousBtnTextStyle={{ fontFamily: Fonts.primary }} nextBtnTextStyle={{ fontFamily: Fonts.primary }}  label="ตั้งค่ารูปโปรไฟล์" >
+                <View style={{ flex: 1, height: "100%", width: "100%",}}>
                     {formStep2()}
-                  </View>
                 </View>
               </ProgressStep>
-              <ProgressStep label="สิ่งที่คุณสนใจ" onSubmit={handleSubmitForm}>
+              <ProgressStep previousBtnText={'ย้อนกลับ'} finishBtnText={'ยืนยัน'} previousBtnTextStyle={{ fontFamily: Fonts.primary }} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="สิ่งที่คุณสนใจ" >
                 <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
                   {formStep3()}
-                  <Text style={{ color: "green" }}>[สามารถกลับมาเลือกภายหลังได้]</Text>
+                  <Text style={{fontFamily: Fonts.primary, color: "green" }}>[สามารถกลับมาเลือกภายหลังได้]</Text>
                 </View>
               </ProgressStep>
             </ProgressSteps>
           </View>)
       }
-
     </SafeAreaView >
   )
 }
@@ -383,4 +370,5 @@ const styles = StyleSheet.create({
   }
 
 });
+
 export default EditProfileScreen;

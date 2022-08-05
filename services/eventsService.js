@@ -95,6 +95,13 @@ class eventsService {
     return api.post(`events/isRegister`, data)
   }
 
+  async checkEmail(email) {
+    const data = {
+      email: email,
+    }
+    return api.post(`members/hasEmail`, data)
+  }
+
 
 
 }

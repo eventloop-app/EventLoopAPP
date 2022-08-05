@@ -33,6 +33,7 @@ import ReviewEventScreen from "./screens/ReviewEventScreen";
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
+  'EventEmitter.removeListener'
 ]);
 
 setupInterceptors(configureStore)
