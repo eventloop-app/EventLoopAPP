@@ -23,7 +23,7 @@ import axios from "react-native-axios";
 import demoImageProfile from '../assets/images/profileImage.jpg'
 import ProfileImageCard from '../components/ProfileImageCard';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import {re} from "@babel/core/lib/vendor/import-meta-resolve";
+import { re } from "@babel/core/lib/vendor/import-meta-resolve";
 
 
 const ProfileDetailScreen = (props) => {
@@ -98,8 +98,8 @@ const ProfileDetailScreen = (props) => {
     const handlePopupSelectTag = () => {
         let newTags = tags
         newTags.map((tags, index) => {
-            selectedTag.map(tag => {
-                if (tag === tags.title) {
+            selectedTag.map(selectedTag => {
+                if (selectedTag === tags.title) {
                     newTags[index].isSelect = true
                 }
             })
@@ -111,19 +111,28 @@ const ProfileDetailScreen = (props) => {
     const handlePushTag = () => {
         let newSelectedTag = []
         tags.map((item) => {
-            if(item.isSelect === true){
+            if (item.isSelect === true) {
                 newSelectedTag = [...newSelectedTag, item.title]
             }
         })
         setSelectedTag(newSelectedTag)
     }
 
-    const handleConfirmSelectTag =  () => {
+    const handleConfirmSelectTag = () => {
         handlePushTag()
         setModalVisible(!modalVisible)
     }
 
     const handleCancelSelectTag = () => {
+        let newTags = tags
+        newTags.map((tags, index) => {
+            selectedTag.map(selectedTag => {
+                if (selectedTag !== tags.title) {
+                    newTags[index].isSelect = false
+                }
+            })
+        })
+        setTags(newTags)
         setModalVisible(!modalVisible)
     }
 
