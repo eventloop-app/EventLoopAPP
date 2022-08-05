@@ -23,25 +23,24 @@ const ProfileDetailScreen = (props) => {
   const [userData, setUserData] = useState(null)
   const [isEdit, setIsEdit] = useState(false)
   const [aboutMeText, setAboutMeText] = useState("")
+
   const [tags, setTags] = useState([
     { title: "Music", icon: "music", source: "Feather", isSelect: false },
     { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
     { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
     { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
-    { title: "Music", icon: "music", source: "Feather", isSelect: false },
-    { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
-    { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
-    { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
-    { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
+
+
   ])
+  const [selectedTag, setSelectedTag] = useState(["Music", "Sport", "Movie", "Game"])
+
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTag, setSelectedTag] = useState(["ดนตรี", "กีฬา", "เกม", "หนัง", "อนิเมะ"])
+
   // const [tags, setTags] = useState({ tag: '', tagsArray: [] })
   const setData = () => {
     setUserData(props.route.params.user)
   }
-
 
   // const updateTagState = (state) => {
   //   setTags(state)
@@ -70,11 +69,15 @@ const ProfileDetailScreen = (props) => {
   const removeTags = (currentItem, currentIndex) => {
     const filteredItems = selectedTag.filter((item, index) => index !== currentIndex)
     setSelectedTag(filteredItems)
-    console.log(filteredItems)
+
   }
 
   const handleOnSelectTags = (indexToSelect, itemSelected) => {
+    console.log("Enter")
+    console.log("itemIndex: " + indexToSelect)
+    console.log("itemTitle: " + itemSelected)
     const newState = tags.map((item, index) => {
+      console.log(item === itemSelected)
       return {
         ...item,
         isSelect: (indexToSelect === index ? !item.isSelect : item.isSelect),
@@ -83,12 +86,57 @@ const ProfileDetailScreen = (props) => {
     setTags(newState);
   };
 
+  const handlePushTag = () => {
+    setSelectedTag([])
+    tags.map((item, index) => {
+      if (item.isSelect === true) {
+        return selectedTag.push(item.title)
+      }
+    })
+    console.log()
+  }
 
+  const handlePopupSelectTag = () => {
+    selectedTag.filter((selectItem, selectIndex) => {
+
+      const newState = tags.map((tagsItem, tagsIndex) => {
+        if (selectItem === tagsItem.title) {
+          return {
+            ...tagsItem,
+            isSelect: true,
+          };
+        }
+
+      })
+      // setTags(newState)
+      console.log(newState)
+    })
+
+    setModalVisible(true)
+  }
+
+  // const handlePopupSelectTag = () => {
+  //   selectedTag.map((selectTagsItem, indexSelectTagsItem) => {
+  //     const newState = tags.map((tagItem, indexTagItem) => {
+  //       if (selectTagsItem === tagItem.title) {
+  //         // console.log(selectTagsItem === tagItem.title)
+  //         return {
+  //           ...tagItem,
+  //           isSelect: true,
+  //         };
+  //       }
+  //     })
+  //     // setTags(newState);
+  //     console.log(newState)
+  //   })
+
+  //   setModalVisible(true)
+  // }
 
   const showIcon = (iconSource, icon) => {
     switch (iconSource) {
       case 'Feather':
-        return <Feather style={{ alignSelf: "center" }} name={icon} size={24} color="black" />
+        return <Feather style={{ alignSelf: "center", }} name={icon} size={24} color="black" />
       case 'Ionicons':
         return <Ionicons style={{ alignSelf: "center" }} name={icon} size={28} color="black" />
       case 'MaterialIcons':
@@ -101,8 +149,7 @@ const ProfileDetailScreen = (props) => {
 
   }
 
-
-  const formStep3 = () => {
+  const renderTagCard = () => {
     return (
       <View style={{ alignSelf: "center", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
         {tags.map((item, index) => {
@@ -111,7 +158,7 @@ const ProfileDetailScreen = (props) => {
               mode="contained" onPress={() => handleOnSelectTags(index, item)}>
               <View style={{ height: "100%", justifyContent: 'center', alignItems: "center" }}>
                 {showIcon(item.source, item.icon)}
-                <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small }} >{item.title}</Text>
+                <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }} >{item.title}</Text>
               </View>
             </Button>
           )
@@ -120,27 +167,33 @@ const ProfileDetailScreen = (props) => {
       </View>)
   }
 
+
+
+
   const popupSelectTag = () => {
     return (
       <View style={styles.centeredView}>
-
         <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => {
           Alert.alert("Modal has been closed."); setModalVisible(!modalVisible);
         }} >
-
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {/* <Text style={styles.modalText}>Hello World!</Text> */}
-              {formStep3()}
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(!modalVisible)}
-              >
-                <Text style={styles.textStyle}>Hide Modal</Text>
-              </Pressable>
+              <Text style={styles.modalText}>เลือกสิ่งที่คุณสนใจ</Text>
+              {renderTagCard()}
+              <View style={{ flexDirection: "row", }}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>ตกลง</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => setModalVisible(!modalVisible)}>
+                  <Text style={styles.textStyle}>ยกเลิก</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-
         </Modal>
 
 
@@ -172,7 +225,7 @@ const ProfileDetailScreen = (props) => {
         })}
         <View View style={{ flexDirection: "row", backgroundColor: Color.yellow, alignSelf: 'flex-start', borderRadius: 15, padding: 4, paddingHorizontal: 12, marginHorizontal: 2, display: isEdit ? "flex" : "flex" }}>
           <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }}>เพิ่ม</Text>
-          <TouchableOpacity style={{ marginLeft: 1, alignSelf: "center", }} onPress={() => setModalVisible(true)} >
+          <TouchableOpacity style={{ marginLeft: 1, alignSelf: "center", }} onPress={() => handlePopupSelectTag()} >
             <AntDesign name={"pluscircleo"} size={16} color="black" />
           </TouchableOpacity>
         </View>
@@ -228,6 +281,7 @@ const ProfileDetailScreen = (props) => {
 
           <View>
             <Text style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, padding: 6, }} >สิ่งที่ฉันสนใจ</Text>
+            <Button onPress={() => { console.log(tags) }} >test</Button>
             {renderTags()}
             {popupSelectTag()}
           </View>
@@ -294,13 +348,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 22,
-
+    padding: 8
   },
   modalView: {
     margin: 10,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 6,
+    padding: 8,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -314,13 +368,16 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 20,
     padding: 10,
-    elevation: 2
+    elevation: 2,
+
   },
   buttonOpen: {
     backgroundColor: "#F194FF",
   },
   buttonClose: {
     backgroundColor: "#2196F3",
+    margin: 10,
+    width: 100
   },
   textStyle: {
     color: "white",
@@ -329,7 +386,9 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center"
+    textAlign: "center",
+    fontFamily: Fonts.medium,
+    fontSize: FontSize.medium
   }
 });
 
