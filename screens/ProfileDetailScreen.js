@@ -35,7 +35,7 @@ const ProfileDetailScreen = (props) => {
     const [userData, setUserData] = useState(null)
     const [isEdit, setIsEdit] = useState(false)
     const [aboutMeText, setAboutMeText] = useState("")
-
+    const [isSaveModalPopup, setIsSaveModalPopup] = useState(false)
     const [tags, setTags] = useState([
         { title: "Music", icon: "music", source: "Feather", isSelect: false },
         { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -74,9 +74,12 @@ const ProfileDetailScreen = (props) => {
         setData()
     })
 
-    const updateProfile = (isEditForm) => {
-        setIsEdit(isEditForm)
+
+    const testAlert = () => {
+        alert('This is a button5555555555555!')
     }
+
+
 
     const removeTags = (currentItem, currentIndex) => {
         const filteredItems = selectedTag.filter((item, index) => index !== currentIndex)
@@ -134,6 +137,54 @@ const ProfileDetailScreen = (props) => {
         })
         setTags(newTags)
         setModalVisible(!modalVisible)
+    }
+
+    // const updateProfile = (isEditForm) => {
+
+    //     setIsEdit(isEditForm)
+    // }
+
+    const handleCancelSavePopup = () => {
+        setIsSaveModalPopup(false)
+    }
+    const popupSaveProfileModal = () => {
+        return (
+            <View style={styles.centeredView}>
+                <Modal animationType="slide" transparent={true} visible={isSaveModalPopup} onRequestClose={() => {
+                    Alert.alert("Modal has been closed.");
+                    setIsSaveModalPopup(!isSaveModalPopup);
+                }}>
+                    <View style={[styles.centeredView,]}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>ยืนยันการเปลี่ยนแปลง</Text>
+
+                            <View style={{ flexDirection: "row", }}>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => handleConfirmSelectTag()}>
+                                    <Text style={styles.textStyle}>บันทึก</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => handleConfirmSelectTag()}>
+                                    <Text style={styles.textStyle}>ละทิ้ง</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => handleCancelSavePopup()}>
+                                    <Text style={styles.textStyle}>ยกเลิก</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>)
+    }
+
+
+    const handleUpdateProfile = (isEditForm) => {
+        // setIsSaveModalPopup(true)
+        setIsEdit(!isEdit)
     }
 
     const showIcon = (iconSource, icon) => {
@@ -260,10 +311,11 @@ const ProfileDetailScreen = (props) => {
                     padding: 4,
                     paddingHorizontal: 12,
                     marginHorizontal: 2,
-                    margin: 2
+                    margin: 2,
+                    display: isEdit ? 'flex' : "none",
                 }}>
                     <TouchableOpacity
-                        style={{ display: 'flex', flexDirection: "row", alignItems: "center", alignSelf: "center" }}
+                        style={{ flexDirection: "row", alignItems: "center", alignSelf: "center" }}
                         onPress={() => handlePopupSelectTag()}>
                         <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }}>เพิ่ม</Text>
                         <AntDesign name={"pluscircleo"} size={16} color="black" />
@@ -277,8 +329,17 @@ const ProfileDetailScreen = (props) => {
     const renderProfileScreen = () => {
         return (
             <View>
-                <Button color="red" style={{ alignSelf: "flex-end", backgroundColor: Colors.bag7Bg, margin: 4 }}
-                    onPress={() => updateProfile(!isEdit)}>{isEdit ? "save" : "edit"}</Button>
+                <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                    <Button color={Color.white} style={{ display: isEdit === true ? "flex" : "none",  alignSelf: "flex-end", backgroundColor: Colors.orange, margin: 4, marginRight: 8, borderRadius: 20 }}
+                        onPress={() => handleUpdateProfile(!isEdit)}>
+                        Discard
+                    </Button>
+                    <Button color={Color.white} style={{ alignSelf: "flex-end", backgroundColor: Colors.primaryDark, margin: 4, marginRight: 10, borderRadius: 20 }}
+                        onPress={() => handleUpdateProfile(!isEdit)}>
+                        {isEdit ? "save" : "edit"}
+                    </Button>
+                </View>
+
                 <View>
                     {/* <View style={{ position: "absolute", alignItems: "center", justifyContent: "center", borderRadius: 20, height: 40, width: 40, borderColor: "white", borderWidth: 1, backgroundColor: "lightgray", marginTop: 170, marginLeft: 230, zIndex: 1, display: isEdit ? "flex" : "none" }}>
             <Ionicons style={{ backgroundColor: "lightgray" }} name={"camera"} size={24} color="black" />
@@ -339,6 +400,7 @@ const ProfileDetailScreen = (props) => {
                         {popupSelectTag()}
                     </View>
                 </View>
+                {popupSaveProfileModal()}
             </View>
         );
     };
