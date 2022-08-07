@@ -23,7 +23,7 @@ import axios from "react-native-axios";
 import demoImageProfile from '../assets/images/profileImage.jpg'
 import ProfileImageCard from '../components/ProfileImageCard';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { re } from "@babel/core/lib/vendor/import-meta-resolve";
+
 
 
 const ProfileDetailScreen = (props) => {
@@ -46,8 +46,8 @@ const ProfileDetailScreen = (props) => {
 
     ])
     const [selectedTag, setSelectedTag] = useState(["Music", "Sport", "Movie", "Game"])
-
     const [modalVisible, setModalVisible] = useState(false);
+    const [editStatus, setEditStatus] = useState("None")
 
     // const [tags, setTags] = useState({ tag: '', tagsArray: [] })
     const setData = () => {
@@ -72,7 +72,7 @@ const ProfileDetailScreen = (props) => {
 
     useEffect(() => {
         setData()
-    })
+    }, [])
 
 
     const testAlert = () => {
@@ -147,6 +147,29 @@ const ProfileDetailScreen = (props) => {
     const handleCancelSavePopup = () => {
         setIsSaveModalPopup(false)
     }
+
+
+    const handleUpdateProfile = (status) => {
+        setIsEdit(!isEdit)
+
+
+        if (status === "EDIT") {
+
+            setEditStatus("EDIT")
+        } else if (status === "SAVE") {
+
+            setEditStatus("SAVE")
+        } else if (status === "DISCARD") {
+
+            setEditStatus("DISCARD")
+        }
+        // setIsSaveModalPopup(true)
+
+
+    }
+
+
+
     const popupSaveProfileModal = () => {
         return (
             <View style={styles.centeredView}>
@@ -182,10 +205,9 @@ const ProfileDetailScreen = (props) => {
     }
 
 
-    const handleUpdateProfile = (isEditForm) => {
-        // setIsSaveModalPopup(true)
-        setIsEdit(!isEdit)
-    }
+
+
+
 
     const showIcon = (iconSource, icon) => {
         switch (iconSource) {
@@ -330,13 +352,17 @@ const ProfileDetailScreen = (props) => {
         return (
             <View>
                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                    <Button color={Color.white} style={{ display: isEdit === true ? "flex" : "none",  alignSelf: "flex-end", backgroundColor: Colors.orange, margin: 4, marginRight: 8, borderRadius: 20 }}
-                        onPress={() => handleUpdateProfile(!isEdit)}>
+                    <Button color={Color.white} style={{ display: isEdit === true ? "flex" : "none", alignSelf: "flex-end", backgroundColor: Colors.orange, margin: 4, marginRight: 8, borderRadius: 20 }}
+                        onPress={() => handleUpdateProfile("DISCARD")}>
                         Discard
                     </Button>
-                    <Button color={Color.white} style={{ alignSelf: "flex-end", backgroundColor: Colors.primaryDark, margin: 4, marginRight: 10, borderRadius: 20 }}
-                        onPress={() => handleUpdateProfile(!isEdit)}>
-                        {isEdit ? "save" : "edit"}
+                    <Button color={Color.white} style={{ display: isEdit ? "flex" : "none", alignSelf: "flex-end", backgroundColor: Colors.primaryDark, margin: 4, marginRight: 10, borderRadius: 20 }}
+                        onPress={() => handleUpdateProfile("SAVE")}>
+                        Save
+                    </Button>
+                    <Button color={Color.white} style={{ display: isEdit ? "none" : "flex", alignSelf: "flex-end", backgroundColor: Colors.primaryDark, margin: 4, marginRight: 10, borderRadius: 20 }}
+                        onPress={() => handleUpdateProfile("EDIT")}>
+                        Edit
                     </Button>
                 </View>
 
@@ -344,7 +370,7 @@ const ProfileDetailScreen = (props) => {
                     {/* <View style={{ position: "absolute", alignItems: "center", justifyContent: "center", borderRadius: 20, height: 40, width: 40, borderColor: "white", borderWidth: 1, backgroundColor: "lightgray", marginTop: 170, marginLeft: 230, zIndex: 1, display: isEdit ? "flex" : "none" }}>
             <Ionicons style={{ backgroundColor: "lightgray" }} name={"camera"} size={24} color="black" />
           </View> */}
-                    <ProfileImageCard uploadImageBtt={false} isEdit={!isEdit} />
+                    <ProfileImageCard status={editStatus} uploadImageBtt={false} isEdit={isEdit} />
                 </View>
                 <View style={{ alignItems: "center" }}>
                     <Text style={styles.Name}>Johnyman62</Text>

@@ -16,12 +16,12 @@ import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
 import axios from "react-native-axios";
-import demoImageProfile from '../assets/images/profileImage.jpg'
+import demoprofileImage from '../assets/images/profileImage.jpg'
 
 
 const ProfileImageCard = (props) => {
   const [isLoad, setIsLoad] = useState(false);
-  const [imageProfile, setProfileImage] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
 
@@ -51,21 +51,34 @@ const ProfileImageCard = (props) => {
     setIsLoad(false);
   }, [userToken]);
 
+  useEffect(() => {
+    let setOldProfileImage = ""
+    if (props.status === "EDIT") {
+      setOldProfileImage = profileImage
+    } else if (props.status === "DISCARD") {
+      setProfileImage(setOldProfileImage)
+    } else if (props.status === "SAVE") {
+      return
+    } else {
+      setProfileImage(setOldProfileImage)
+    }
+
+  }, [props.status])
 
 
   return (
     <View style={{ alignItems: 'center' }}>
       {console.log(props.uploadImageBtt)}
-      <TouchableOpacity disabled={props.isEdit}
+      <TouchableOpacity disabled={!props.isEdit}
         style={{ borderRadius: 150, borderColor: 'lightgray', borderWidth: 4 }}
         onPress={pickImage}>
-        <View style={{ position: "absolute", alignItems: "center", justifyContent: "center", borderRadius: 20, height: 40, width: 40, borderColor: "white", borderWidth: 1, backgroundColor: "lightgray", marginTop: 166, marginLeft: 135, zIndex: 1, display: props.isEdit ? "none" : "flex" }}>
+        <View style={{ position: "absolute", alignItems: "center", justifyContent: "center", borderRadius: 20, height: 40, width: 40, borderColor: "white", borderWidth: 1, backgroundColor: "lightgray", marginTop: 166, marginLeft: 135, zIndex: 1, display: props.isEdit ? "flex" : "none" }}>
           <Ionicons style={{ backgroundColor: "lightgray" }} name={"camera"} size={24} color="black" />
         </View>
         <Image
           source={
-            imageProfile
-              ? { uri: imageProfile }
+            profileImage
+              ? { uri: profileImage }
               : require('../assets/images/profileImage.jpg')
           }
           style={{ width: 200, height: 200, borderRadius: 150 }}
