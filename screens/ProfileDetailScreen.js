@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     SafeAreaView,
     Text,
@@ -23,14 +23,14 @@ import axios from "react-native-axios";
 import demoImageProfile from '../assets/images/profileImage.jpg'
 import ProfileImageCard from '../components/ProfileImageCard';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 
 const ProfileDetailScreen = (props) => {
     //declare variable
     const [isLoad, setIsLoad] = useState(false);
     // const [imageProfile, setProfileImage] = useState("https://cdn-icons-png.flaticon.com/512/847/847969.png");
-    const [imageProfile, setProfileImage] = useState("");
+    const [profileImage, setProfileImage] = useState("");
     const { userToken, userError } = useSelector(state => state.user)
     const [userData, setUserData] = useState(null)
     const [isEdit, setIsEdit] = useState(false)
@@ -48,11 +48,13 @@ const ProfileDetailScreen = (props) => {
     const [selectedTag, setSelectedTag] = useState(["Music", "Sport", "Movie", "Game"])
     const [modalVisible, setModalVisible] = useState(false);
     const [editStatus, setEditStatus] = useState("None")
+    const [isConfirm, setIsConfirm] = useState(false)
 
     // const [tags, setTags] = useState({ tag: '', tagsArray: [] })
     const setData = () => {
         setUserData(props.route.params.user)
     }
+
 
     // const updateTagState = (state) => {
     //   setTags(state)
@@ -70,16 +72,17 @@ const ProfileDetailScreen = (props) => {
     //   setIsLoad(false)
     // }, [userToken])
 
+
     useEffect(() => {
         setData()
     }, [])
 
 
-    const testAlert = () => {
-        alert('This is a button5555555555555!')
+    const test = () => {
+        console.log(profileImage)
+        console.log(selectedTag)
+        console.log(aboutMeText)
     }
-
-
 
     const removeTags = (currentItem, currentIndex) => {
         const filteredItems = selectedTag.filter((item, index) => index !== currentIndex)
@@ -149,19 +152,26 @@ const ProfileDetailScreen = (props) => {
     }
 
 
-    const handleUpdateProfile = (status) => {
-        setIsEdit(!isEdit)
 
+
+    const getProfileImage = (profileImage) => {
+        setProfileImage(profileImage)
+    }
+
+
+
+
+    const handleUpdateProfile = (status) => {
 
         if (status === "EDIT") {
-
+            setIsEdit(!isEdit)
             setEditStatus("EDIT")
         } else if (status === "SAVE") {
-
             setEditStatus("SAVE")
+            setIsSaveModalPopup(true)
         } else if (status === "DISCARD") {
-
             setEditStatus("DISCARD")
+
         }
         // setIsSaveModalPopup(true)
 
@@ -169,43 +179,120 @@ const ProfileDetailScreen = (props) => {
     }
 
 
+    const handleConfirmUpdateProfile = (isConfirm) => {
+        if (isConfirm === true) {
+            setIsEdit(!isEdit)
+            handleUploadProfile()
+            //setIsSaveModalPopup must move to handleUploadProfile
+            setIsSaveModalPopup(false)
+        } else {
 
-    const popupSaveProfileModal = () => {
+            setIsSaveModalPopup(false)
+        }
+    }
+
+    const handleConfirmDiscardProfile = (isConfirm) => {
+        if (isConfirm === true) {
+            setIsEdit(!isEdit)
+            setEditStatus("SAVE")
+            handleUploadProfile()
+            //setIsSaveModalPopup move to handleUploadProfile
+            setIsSaveModalPopup(false)
+        } else {
+
+            setIsSaveModalPopup(false)
+        }
+    }
+
+
+    const handleUploadProfile = () => {
+        console.log("111111111111111")
+        console.log(profileImage)
+        console.log("111111111111111")
+        // let localUri = profileImage;
+        // let filename = profileImage.split('/').pop();
+        // let match = /\.(\w+)$/.exec(filename);
+        // let type = match ? `image/${match[1]}` : `image`;
+        // let memberId = userData.memberId
+        // let email = userData.email
+        // let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+        // let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
+        // let image = profileImage
+        // let username = userData.Username
+
+        // const formData = new FormData();
+        // formData.append('profileImage', { uri: localUri, name: filename, type: type });
+        // formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
+
+        // // console.log(formData)
+        // return axios({
+        //     url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
+        //     method: 'POST',
+        //     data: formData,
+        //     headers: {
+        //         'Content-Type': `multipart/form-data`,
+        //     },
+        // }).then(res => {
+        //     console.log(res)
+        //     if (res.status === 200) {
+        //         navigation.navigate('ProfileDetail')
+        //     } else { alert(res.status) }
+
+        // })
+    }
+
+
+    const popupSaveProfile = () => {
         return (
             <View style={styles.centeredView}>
-                <Modal animationType="slide" transparent={true} visible={isSaveModalPopup} onRequestClose={() => {
-                    Alert.alert("Modal has been closed.");
-                    setIsSaveModalPopup(!isSaveModalPopup);
-                }}>
+                <Modal animationType="none" transparent={true} visible={isSaveModalPopup} onRequestClose={() => { Alert.alert("Modal has been closed."); setIsSaveModalPopup(!isSaveModalPopup); }}>
                     <View style={[styles.centeredView,]}>
                         <View style={styles.modalView}>
                             <Text style={styles.modalText}>ยืนยันการเปลี่ยนแปลง</Text>
-
                             <View style={{ flexDirection: "row", }}>
                                 <TouchableOpacity
                                     style={[styles.button, styles.buttonClose]}
-                                    onPress={() => handleConfirmSelectTag()}>
+                                    onPress={() => handleConfirmUpdateProfile(true)}>
                                     <Text style={styles.textStyle}>บันทึก</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.button, styles.buttonClose]}
-                                    onPress={() => handleConfirmSelectTag()}>
-                                    <Text style={styles.textStyle}>ละทิ้ง</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[styles.button, styles.buttonClose]}
-                                    onPress={() => handleCancelSavePopup()}>
+                                    onPress={() => handleConfirmUpdateProfile(false)}>
                                     <Text style={styles.textStyle}>ยกเลิก</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     </View>
                 </Modal>
-            </View>)
+            </View>
+        )
     }
 
-
-
+    const popupDiscardProfile = () => {
+        return (
+            <View style={styles.centeredView}>
+                <Modal animationType="none" transparent={true} visible={isSaveModalPopup} onRequestClose={() => { Alert.alert("Modal has been closed."); setIsSaveModalPopup(!isSaveModalPopup); }}>
+                    <View style={[styles.centeredView,]}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>ยืนยันการเปลี่ยนแปลง</Text>
+                            <View style={{ flexDirection: "row", }}>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => handleConfirmUpdateProfile(true)}>
+                                    <Text style={styles.textStyle}>บันทึก</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.buttonClose]}
+                                    onPress={() => handleConfirmUpdateProfile(false)}>
+                                    <Text style={styles.textStyle}>ยกเลิก</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+        )
+    }
 
 
 
@@ -370,7 +457,7 @@ const ProfileDetailScreen = (props) => {
                     {/* <View style={{ position: "absolute", alignItems: "center", justifyContent: "center", borderRadius: 20, height: 40, width: 40, borderColor: "white", borderWidth: 1, backgroundColor: "lightgray", marginTop: 170, marginLeft: 230, zIndex: 1, display: isEdit ? "flex" : "none" }}>
             <Ionicons style={{ backgroundColor: "lightgray" }} name={"camera"} size={24} color="black" />
           </View> */}
-                    <ProfileImageCard status={editStatus} uploadImageBtt={false} isEdit={isEdit} />
+                    <ProfileImageCard getData={getProfileImage} status={editStatus} uploadImageBtt={false} isEdit={isEdit} />
                 </View>
                 <View style={{ alignItems: "center" }}>
                     <Text style={styles.Name}>Johnyman62</Text>
@@ -421,12 +508,12 @@ const ProfileDetailScreen = (props) => {
                             fontSize: FontSize.primary,
                             padding: 6,
                         }}>สิ่งที่ฉันสนใจ</Text>
-                        <Button onPress={() => { console.log(selectedTag) }}>test</Button>
+                        <Button onPress={() => { console.log(profileImage) }}>test</Button>
                         {renderTags()}
                         {popupSelectTag()}
                     </View>
                 </View>
-                {popupSaveProfileModal()}
+                {popupSaveProfile()}
             </View>
         );
     };

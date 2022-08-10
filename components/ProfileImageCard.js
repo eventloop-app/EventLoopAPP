@@ -25,6 +25,7 @@ const ProfileImageCard = (props) => {
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
 
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -33,7 +34,7 @@ const ProfileImageCard = (props) => {
       aspect: [1, 1],
       quality: 1,
     });
-    console.log(result);
+    // console.log(result);
     if (!result.cancelled) {
       setProfileImage(result.uri);
     }
@@ -55,16 +56,22 @@ const ProfileImageCard = (props) => {
     let setOldProfileImage = ""
     if (props.status === "EDIT") {
       setOldProfileImage = profileImage
+      // sendProfileImage(props.status, setOldProfileImage)
     } else if (props.status === "DISCARD") {
       setProfileImage(setOldProfileImage)
     } else if (props.status === "SAVE") {
-      return
+      sendProfileImage(profileImage)
     } else {
       setProfileImage(setOldProfileImage)
     }
 
   }, [props.status])
 
+
+  const sendProfileImage = ( ) => {
+    // let currentImage = status === "SAVE" ? profileImage : oldImage
+    props.getData(profileImage)
+  }
 
   return (
     <View style={{ alignItems: 'center' }}>
