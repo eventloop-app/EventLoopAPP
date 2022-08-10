@@ -24,8 +24,8 @@ const ProfileImageCard = (props) => {
   const [profileImage, setProfileImage] = useState("");
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
-
-
+  const [cashProfileImage, setCashProfileImage] = useState("")
+ 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -55,21 +55,23 @@ const ProfileImageCard = (props) => {
   useEffect(() => {
     let setOldProfileImage = ""
     if (props.status === "EDIT") {
-      setOldProfileImage = profileImage
+      setCashProfileImage(profileImage)
       // sendProfileImage(props.status, setOldProfileImage)
     } else if (props.status === "DISCARD") {
-      setProfileImage(setOldProfileImage)
+      // console.log("tesssssss")
+      setProfileImage(cashProfileImage)
     } else if (props.status === "SAVE") {
       sendProfileImage(profileImage)
     } else {
-      setProfileImage(setOldProfileImage)
+      setProfileImage(cashProfileImage)
     }
 
   }, [props.status])
 
 
-  const sendProfileImage = ( ) => {
+  const sendProfileImage = () => {
     // let currentImage = status === "SAVE" ? profileImage : oldImage
+ 
     props.getData(profileImage)
   }
 

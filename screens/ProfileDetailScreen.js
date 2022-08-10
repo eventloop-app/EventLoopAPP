@@ -24,6 +24,7 @@ import demoImageProfile from '../assets/images/profileImage.jpg'
 import ProfileImageCard from '../components/ProfileImageCard';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import Validate from '../services/Validate';
 
 
 const ProfileDetailScreen = (props) => {
@@ -34,8 +35,9 @@ const ProfileDetailScreen = (props) => {
     const { userToken, userError } = useSelector(state => state.user)
     const [userData, setUserData] = useState(null)
     const [isEdit, setIsEdit] = useState(false)
-    const [aboutMeText, setAboutMeText] = useState("")
+    const [aboutMeDescription, setAboutMeDescription] = useState("")
     const [isSaveModalPopup, setIsSaveModalPopup] = useState(false)
+    const [isDiscardModalPopup, setIsDiscardModalPopup] = useState(false)
     const [tags, setTags] = useState([
         { title: "Music", icon: "music", source: "Feather", isSelect: false },
         { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -49,7 +51,9 @@ const ProfileDetailScreen = (props) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [editStatus, setEditStatus] = useState("None")
     const [isConfirm, setIsConfirm] = useState(false)
-
+    const [username, setUsername] = useState("Johnyman62")
+    const [cashInfo, setCashInfo] = useState("")
+    const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
     // const [tags, setTags] = useState({ tag: '', tagsArray: [] })
     const setData = () => {
         setUserData(props.route.params.user)
@@ -77,11 +81,46 @@ const ProfileDetailScreen = (props) => {
         setData()
     }, [])
 
+    const checkHasUserName = (value) => {
+        console.log(value.nativeEvent.text)
+        const username = value.nativeEvent.text
+
+        //Validate Username
+        if (Validate.getValidateUsername(username)) {
+            // setIsError(false)
+            eventsService.hasUsername(username).then(res => {
+                console.log(res)
+                //Check response status.
+                if (res.status === 200) {
+
+                    //check has current username in database. 
+                    if (res.data.hasUsername) {
+                        console.log(res.data.hasUsername)
+                        // setHasUser(true)
+                        setIsError(true)
+                        SetIsShowValidateMessage("Username " + username + " is used!")
+                    } else {
+                        // setHasUser(false)
+                        setIsError(false)
+                        SetIsShowValidateMessage("")
+                    }
+
+                } else {
+                    console.log(res.status)
+                    alert("server error : " + res.status)
+                }
+            })
+
+        } else {
+            setIsError(true)
+            SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+        }
+    }
 
     const test = () => {
         console.log(profileImage)
         console.log(selectedTag)
-        console.log(aboutMeText)
+        console.log(aboutMeDescription)
     }
 
     const removeTags = (currentItem, currentIndex) => {
@@ -151,27 +190,22 @@ const ProfileDetailScreen = (props) => {
         setIsSaveModalPopup(false)
     }
 
-
-
-
     const getProfileImage = (profileImage) => {
         setProfileImage(profileImage)
     }
-
-
-
 
     const handleUpdateProfile = (status) => {
 
         if (status === "EDIT") {
             setIsEdit(!isEdit)
             setEditStatus("EDIT")
-        } else if (status === "SAVE") {
+            keepCashInfo()
+        }
+        if (status === "SAVE") {
             setEditStatus("SAVE")
             setIsSaveModalPopup(true)
         } else if (status === "DISCARD") {
-            setEditStatus("DISCARD")
-
+            setIsDiscardModalPopup(true)
         }
         // setIsSaveModalPopup(true)
 
@@ -193,16 +227,32 @@ const ProfileDetailScreen = (props) => {
 
     const handleConfirmDiscardProfile = (isConfirm) => {
         if (isConfirm === true) {
+            setEditStatus("DISCARD")
             setIsEdit(!isEdit)
-            setEditStatus("SAVE")
-            handleUploadProfile()
-            //setIsSaveModalPopup move to handleUploadProfile
-            setIsSaveModalPopup(false)
+            setUsername(cashInfo.username)
+            setAboutMeDescription(cashInfo.description)
+            setSelectedTag(cashInfo.selectedTag)
+            setIsDiscardModalPopup(false)
         } else {
 
-            setIsSaveModalPopup(false)
+            setIsDiscardModalPopup(false)
         }
     }
+
+    const handleDiscardProfile = () => {
+
+    }
+
+    const keepCashInfo = () => {
+        let oldUsername = username
+        let oldDescription = aboutMeDescription
+        let oldSelectTag = selectedTag
+        setCashInfo({
+            username: oldUsername, description: oldDescription, selectedTag: oldSelectTag
+        })
+
+    }
+
 
 
     const handleUploadProfile = () => {
@@ -271,19 +321,19 @@ const ProfileDetailScreen = (props) => {
     const popupDiscardProfile = () => {
         return (
             <View style={styles.centeredView}>
-                <Modal animationType="none" transparent={true} visible={isSaveModalPopup} onRequestClose={() => { Alert.alert("Modal has been closed."); setIsSaveModalPopup(!isSaveModalPopup); }}>
+                <Modal animationType="none" transparent={true} visible={isDiscardModalPopup} onRequestClose={() => { Alert.alert("Modal has been closed."); setIsSaveModalPopup(!isSaveModalPopup); }}>
                     <View style={[styles.centeredView,]}>
                         <View style={styles.modalView}>
-                            <Text style={styles.modalText}>ยืนยันการเปลี่ยนแปลง</Text>
+                            <Text style={styles.modalText}>ละทิ้งการเปลี่ยนแปลง</Text>
                             <View style={{ flexDirection: "row", }}>
                                 <TouchableOpacity
                                     style={[styles.button, styles.buttonClose]}
-                                    onPress={() => handleConfirmUpdateProfile(true)}>
-                                    <Text style={styles.textStyle}>บันทึก</Text>
+                                    onPress={() => handleConfirmDiscardProfile(true)}>
+                                    <Text style={styles.textStyle}>ละทิ้ง</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.button, styles.buttonClose]}
-                                    onPress={() => handleConfirmUpdateProfile(false)}>
+                                    onPress={() => handleConfirmDiscardProfile(false)}>
                                     <Text style={styles.textStyle}>ยกเลิก</Text>
                                 </TouchableOpacity>
                             </View>
@@ -392,14 +442,8 @@ const ProfileDetailScreen = (props) => {
                 {selectedTag?.map((item, index) => {
                     return (
                         <View key={index} View style={{
-                            flexDirection: "row",
-                            backgroundColor: Color.skyBlue,
-                            alignSelf: 'flex-start',
-                            borderRadius: 15,
-                            padding: 4,
-                            paddingHorizontal: 8,
-                            marginHorizontal: 2,
-                            margin: 2,
+                            flexDirection: "row", backgroundColor: Color.skyBlue, alignSelf: 'flex-start'
+                            , borderRadius: 15, padding: 4, paddingHorizontal: 8, marginHorizontal: 2, margin: 2,
                         }}>
                             <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.vary_small, }}>{item}</Text>
                             <TouchableOpacity
@@ -459,8 +503,24 @@ const ProfileDetailScreen = (props) => {
           </View> */}
                     <ProfileImageCard getData={getProfileImage} status={editStatus} uploadImageBtt={false} isEdit={isEdit} />
                 </View>
-                <View style={{ alignItems: "center" }}>
-                    <Text style={styles.Name}>Johnyman62</Text>
+                <View style={{ alignItems: "center", marginTop: 6 }}>
+                    <View style={{ flexDirection: "row" }}>
+                        <Text style={[styles.Name, { display: isEdit ? "none" : "flex", }]}>{username}</Text>
+                        <View style={{
+                            display: isEdit ? "flex" : "none",
+                            borderColor: isShowValidateMessage ? "red" : "#CBCBCB",
+                            borderWidth: 1,
+                            borderRadius: 15,
+                            padding: 5,
+                            width: "85%"
+                        }}>
+                            <TextInput textAlign={'center'} style={[styles.Name, { textDecorationLine: "underline" }]} onChangeText={(value) => setUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
+                            {/* <TextInput textAlign={'center'} label="Email" style={[styles.Name, { textDecorationLine: "underline" }]} onChangeText={(value) => setUsername(value)} value={username}></TextInput> */}
+                        </View>
+                        <AntDesign style={{ display: isEdit ? "flex" : "none", }} name={"edit"} size={24} color="black" />
+
+                    </View>
+
                     <View style={{ flexDirection: "row", marginTop: 4 }}>
                         <View style={{ alignItems: "center", width: 100 }}>
                             <Text style={styles.followText}>กำลังติดตาม</Text>
@@ -483,12 +543,12 @@ const ProfileDetailScreen = (props) => {
                         {/* <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.small, paddingLeft: 16, }} >Lorem Ipsum is simply dummy text of the printing and typesetting industry.  </Text> */}
                         {/* <TextInput style={[styles.input, { backgroundColor: "white", height: 100, textAlignVertical: 'top', borderWidth: isEdit ? 1 : 0 }]}
             returnKeyType={"done"} onSubmitEditing={Keyboard.dismiss}
-            multiline={true} numberOfLines={1} value={aboutMeText} onChangeText={setAboutMeText} editable={isEdit} placeholderTextColor={"gray"} placeholder="เพิ่มคำอธิบายเกี่ยวกับคุณ" /> */}
+            multiline={true} numberOfLines={1} value={aboutMeDescription} onChangeText={setAboutMeDescription} editable={isEdit} placeholderTextColor={"gray"} placeholder="เพิ่มคำอธิบายเกี่ยวกับคุณ" /> */}
                         <View style={[styles.textAreaContainer, { borderWidth: isEdit ? 1 : 0 }]}>
                             <TextInput style={[styles.textArea, { display: (isEdit ? "flex" : "none"), }]}
-                                value={aboutMeText}
-                                onChangeText={setAboutMeText}
-                                placeholder={aboutMeText ? "" : "เพิ่มคำอธิบายเกี่ยวกับคุณ"}
+                                value={aboutMeDescription}
+                                onChangeText={setAboutMeDescription}
+                                placeholder={aboutMeDescription ? "" : "เพิ่มคำอธิบายเกี่ยวกับคุณ"}
                                 placeholderTextColor="grey"
                                 numberOfLines={10}
                                 multiline={true}
@@ -497,8 +557,8 @@ const ProfileDetailScreen = (props) => {
                             />
                             <Text style={[styles.input, {
                                 display: isEdit ? "none" : "flex",
-                                color: aboutMeText ? Color.black : "gray",
-                            }]}>{aboutMeText ? aboutMeText.trim() : "เพิ่มคำอธิบายเกี่ยวกับคุณ"}</Text>
+                                color: aboutMeDescription ? Color.black : "gray",
+                            }]}>{aboutMeDescription ? aboutMeDescription.trim() : "เพิ่มคำอธิบายเกี่ยวกับคุณ"}</Text>
                         </View>
                     </View>
 
@@ -508,12 +568,13 @@ const ProfileDetailScreen = (props) => {
                             fontSize: FontSize.primary,
                             padding: 6,
                         }}>สิ่งที่ฉันสนใจ</Text>
-                        <Button onPress={() => { console.log(profileImage) }}>test</Button>
+                        {/* <Button onPress={() => { console.log(profileImage) }}>test</Button> */}
                         {renderTags()}
                         {popupSelectTag()}
                     </View>
                 </View>
                 {popupSaveProfile()}
+                {popupDiscardProfile()}
             </View>
         );
     };
