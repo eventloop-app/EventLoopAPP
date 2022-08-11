@@ -1,28 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import fontSize from "../constants/FontSize";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
-import moment  from "moment";
-import {toBuddhistYear} from "../constants/Buddhist-year";
+import moment from "moment";
+import { toBuddhistYear } from "../constants/Buddhist-year";
 
-const platform =  ['Discord', 'Zoom', 'Google', 'Microsoft']
+const platform = ['Discord', 'Zoom', 'Google', 'Microsoft']
 
-const EventCard = ({item,onPress}) => {
+const EventCard = ({ item, onPress }) => {
 
   const eventName = item.eventName
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
   const eventLocation = item.type === 'ONLINE' ? platform.map(items => {
-    if(item.location.includes(items.toLocaleLowerCase())){
+    if (item.location.includes(items.toLocaleLowerCase())) {
       return items
     }
-  }) : item.location.slice(0, 18)+'...'
+  }) : item.location.slice(0, 18) + '...'
   const ImageCover = item.coverImageUrl
 
-  const checkPlatForm = (url) =>{
+  const checkPlatForm = (url) => {
     console.log(url)
     //
     // platform.map(item => url.includes(item))
@@ -36,7 +36,8 @@ const EventCard = ({item,onPress}) => {
   }
 
   return (
-    <TouchableOpacity activeOpacity={0.7} onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={styles.shadowsButton} >
+
       <View style={styles.Container}>
         <View style={styles.ImageCover}>
           <Image
@@ -52,21 +53,21 @@ const EventCard = ({item,onPress}) => {
           <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
         </View>
         <View style={styles.BookmarkBox}>
-          <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red}/>
+          <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red} />
         </View>
         <View style={styles.Title}>
           <Text style={styles.TextTitle}>{(eventName.length >= 20 ? eventName.slice(0, 20) + "..." : eventName)}</Text>
         </View>
         <View style={styles.Date}>
-          <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary}/>
+          <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary} />
           <Text style={styles.TextDate}>{eventDate}</Text>
         </View>
         <View style={styles.Time}>
-          <Ionicons name={'ios-time-outline'} size={25} color={Colors.primary}/>
+          <Ionicons name={'ios-time-outline'} size={25} color={Colors.primary} />
           <Text style={styles.TextDate}>{eventTime}</Text>
         </View>
         <View style={styles.Location}>
-          <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary}/>
+          <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
           <Text style={styles.TextLocation}>{eventLocation}</Text>
         </View>
       </View>
@@ -81,6 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     overflow: "hidden",
+    borderRadius: 15,
   },
   ImageCover: {
     position: "absolute",
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 160
   },
-  Image:{
+  Image: {
     borderRadius: 15,
     width: '100%',
     height: '100%',
@@ -187,7 +189,20 @@ const styles = StyleSheet.create({
     color: Colors.black,
     textAlign: 'center',
     marginTop: -15
+  },
+  shadowsButton: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    margin: 8,
+    borderRadius: 15,
   }
+
 });
 
 export default EventCard;

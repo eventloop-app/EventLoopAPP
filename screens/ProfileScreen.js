@@ -51,7 +51,6 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [])
 
   useEffect(() => {
-
     if (authData?.hasMember) {
       navigation.navigate('EditProfile', { user: authData })
       // setUserData(authData.user)
@@ -127,7 +126,7 @@ const ProfileScreen = ({ route, navigation }) => {
             />
             <Button
               title="Go to ProfileDetail"
-              onPress={() => navigation.navigate('ProfileDetail')}
+              onPress={() => navigation.navigate('ProfileDetail', { user: userData })}
             />
           </SafeAreaView>
           :
@@ -136,6 +135,10 @@ const ProfileScreen = ({ route, navigation }) => {
             <Button
               title="Sign in"
               onPress={() => promptAsync()}
+            />
+             <Button
+              title="Go to ProfileDetail"
+              onPress={() => navigation.navigate('ProfileDetail', { user: userData })}
             />
           </View>
       }
