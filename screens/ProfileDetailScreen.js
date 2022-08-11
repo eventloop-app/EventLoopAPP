@@ -25,6 +25,7 @@ import ProfileImageCard from '../components/ProfileImageCard';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Validate from '../services/Validate';
+import eventsService from '../services/eventsService';
 
 
 const ProfileDetailScreen = (props) => {
@@ -53,7 +54,12 @@ const ProfileDetailScreen = (props) => {
     const [isConfirm, setIsConfirm] = useState(false)
     const [username, setUsername] = useState("Johnyman62")
     const [cashInfo, setCashInfo] = useState("")
-    const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
+    const [showValidateMessage, setShowValidateMessage] = useState("")
+    const [isError, setIsError] = useState(false)
+    const [follower, setFollower] = useState(128)
+    const [following, setFollowing] = useState(352)
+
+
     // const [tags, setTags] = useState({ tag: '', tagsArray: [] })
     const setData = () => {
         setUserData(props.route.params.user)
@@ -98,11 +104,11 @@ const ProfileDetailScreen = (props) => {
                         console.log(res.data.hasUsername)
                         // setHasUser(true)
                         setIsError(true)
-                        SetIsShowValidateMessage("Username " + username + " is used!")
+                        setShowValidateMessage("Username " + username + " is used!")
                     } else {
                         // setHasUser(false)
                         setIsError(false)
-                        SetIsShowValidateMessage("")
+                        setShowValidateMessage("")
                     }
 
                 } else {
@@ -113,9 +119,23 @@ const ProfileDetailScreen = (props) => {
 
         } else {
             setIsError(true)
-            SetIsShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+            setShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
         }
     }
+
+    const checkTextInput = (value) => {
+        //Check for the Name TextInput
+        if (Validate.getValidateUsername(username) && !showValidateMessage) {
+            setIsError(false)
+            setShowValidateMessage("")
+        } else {
+            setIsError(true)
+            if (!showValidateMessage) {
+                setShowValidateMessage("Username must be between 3-15 characters long and contain only letter or number.")
+            }
+        }
+
+    };
 
     const test = () => {
         console.log(profileImage)
@@ -204,6 +224,7 @@ const ProfileDetailScreen = (props) => {
         if (status === "SAVE") {
             setEditStatus("SAVE")
             setIsSaveModalPopup(true)
+            checkTextInput()
         } else if (status === "DISCARD") {
             setIsDiscardModalPopup(true)
         }
@@ -212,14 +233,14 @@ const ProfileDetailScreen = (props) => {
 
     }
 
-
     const handleConfirmUpdateProfile = (isConfirm) => {
-        if (isConfirm === true) {
+
+        if (isConfirm === true && !isError) {
             setIsEdit(!isEdit)
             handleUploadProfile()
             //setIsSaveModalPopup must move to handleUploadProfile
             setIsSaveModalPopup(false)
-        } else {
+        } else if (isConfirm === false) {
 
             setIsSaveModalPopup(false)
         }
@@ -232,6 +253,8 @@ const ProfileDetailScreen = (props) => {
             setUsername(cashInfo.username)
             setAboutMeDescription(cashInfo.description)
             setSelectedTag(cashInfo.selectedTag)
+            setShowValidateMessage("")
+            setIsError(false)
             setIsDiscardModalPopup(false)
         } else {
 
@@ -299,9 +322,12 @@ const ProfileDetailScreen = (props) => {
                     <View style={[styles.centeredView,]}>
                         <View style={styles.modalView}>
                             <Text style={styles.modalText}>ยืนยันการเปลี่ยนแปลง</Text>
+                            <Text style={[styles.validateMessage, { display: showValidateMessage ? "flex" : "none" }]}>{showValidateMessage}</Text>
+
                             <View style={{ flexDirection: "row", }}>
                                 <TouchableOpacity
-                                    style={[styles.button, styles.buttonClose]}
+                                    disabled={isError}
+                                    style={[styles.button, styles.buttonClose, { backgroundColor: isError ? Colors.darkGray : Colors.bag12Bg }]}
                                     onPress={() => handleConfirmUpdateProfile(true)}>
                                     <Text style={styles.textStyle}>บันทึก</Text>
                                 </TouchableOpacity>
@@ -424,14 +450,7 @@ const ProfileDetailScreen = (props) => {
                         </View>
                     </View>
                 </Modal>
-
-
-                {/* <TouchableOpacity
-          style={[styles.button, styles.buttonOpen]}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.textStyle}>Show Modal</Text>
-        </TouchableOpacity> */}
+ 
             </View>)
     }
 
@@ -496,11 +515,8 @@ const ProfileDetailScreen = (props) => {
                         Edit
                     </Button>
                 </View>
-
                 <View>
-                    {/* <View style={{ position: "absolute", alignItems: "center", justifyContent: "center", borderRadius: 20, height: 40, width: 40, borderColor: "white", borderWidth: 1, backgroundColor: "lightgray", marginTop: 170, marginLeft: 230, zIndex: 1, display: isEdit ? "flex" : "none" }}>
-            <Ionicons style={{ backgroundColor: "lightgray" }} name={"camera"} size={24} color="black" />
-          </View> */}
+ 
                     <ProfileImageCard getData={getProfileImage} status={editStatus} uploadImageBtt={false} isEdit={isEdit} />
                 </View>
                 <View style={{ alignItems: "center", marginTop: 6 }}>
@@ -508,28 +524,28 @@ const ProfileDetailScreen = (props) => {
                         <Text style={[styles.Name, { display: isEdit ? "none" : "flex", }]}>{username}</Text>
                         <View style={{
                             display: isEdit ? "flex" : "none",
-                            borderColor: isShowValidateMessage ? "red" : "#CBCBCB",
+                            borderColor: showValidateMessage ? "red" : "#CBCBCB",
                             borderWidth: 1,
                             borderRadius: 15,
                             padding: 5,
                             width: "85%"
                         }}>
-                            <TextInput textAlign={'center'} style={[styles.Name, { textDecorationLine: "underline" }]} onChangeText={(value) => setUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />
-                            {/* <TextInput textAlign={'center'} label="Email" style={[styles.Name, { textDecorationLine: "underline" }]} onChangeText={(value) => setUsername(value)} value={username}></TextInput> */}
+                            <TextInput textAlign={'center'} style={[styles.Name, { textDecorationLine: "underline" }]} onChangeText={(value) => setUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ขื่อผู้ใช้ของคุณ" />    
                         </View>
                         <AntDesign style={{ display: isEdit ? "flex" : "none", }} name={"edit"} size={24} color="black" />
 
                     </View>
+                    <Text style={[styles.validateMessage, { display: showValidateMessage ? "flex" : "none" }]}>{showValidateMessage}</Text>
 
                     <View style={{ flexDirection: "row", marginTop: 4 }}>
                         <View style={{ alignItems: "center", width: 100 }}>
                             <Text style={styles.followText}>กำลังติดตาม</Text>
-                            <Text style={styles.followText}>152</Text>
+                            <Text style={styles.followText}>{following}</Text>
                         </View>
                         <View style={{ marginLeft: 11, marginRight: 0, borderColor: "black", borderWidth: 1 }}></View>
                         <View style={{ alignItems: "center", width: 100 }}>
                             <Text style={styles.followText}>ผู้ติดตาม</Text>
-                            <Text style={styles.followText}>125</Text>
+                            <Text style={styles.followText}>{follower}</Text>
                         </View>
                     </View>
                 </View>
@@ -540,10 +556,7 @@ const ProfileDetailScreen = (props) => {
                             fontSize: FontSize.primary,
                             padding: 6,
                         }}>เกี่ยวกับฉัน</Text>
-                        {/* <Text style={{ fontFamily: Fonts.primary, fontSize: FontSize.small, paddingLeft: 16, }} >Lorem Ipsum is simply dummy text of the printing and typesetting industry.  </Text> */}
-                        {/* <TextInput style={[styles.input, { backgroundColor: "white", height: 100, textAlignVertical: 'top', borderWidth: isEdit ? 1 : 0 }]}
-            returnKeyType={"done"} onSubmitEditing={Keyboard.dismiss}
-            multiline={true} numberOfLines={1} value={aboutMeDescription} onChangeText={setAboutMeDescription} editable={isEdit} placeholderTextColor={"gray"} placeholder="เพิ่มคำอธิบายเกี่ยวกับคุณ" /> */}
+                       
                         <View style={[styles.textAreaContainer, { borderWidth: isEdit ? 1 : 0 }]}>
                             <TextInput style={[styles.textArea, { display: (isEdit ? "flex" : "none"), }]}
                                 value={aboutMeDescription}
@@ -568,7 +581,7 @@ const ProfileDetailScreen = (props) => {
                             fontSize: FontSize.primary,
                             padding: 6,
                         }}>สิ่งที่ฉันสนใจ</Text>
-                        {/* <Button onPress={() => { console.log(profileImage) }}>test</Button> */}
+                      
                         {renderTags()}
                         {popupSelectTag()}
                     </View>
@@ -664,7 +677,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F194FF",
     },
     buttonClose: {
-        backgroundColor: "#2196F3",
+        backgroundColor: Colors.bag12Bg,
         margin: 10,
         width: 100
     },
@@ -674,11 +687,16 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     modalText: {
-        marginBottom: 15,
         textAlign: "center",
         fontFamily: Fonts.medium,
         fontSize: FontSize.medium
+    },
+    validateMessage: {
+        alignSelf: "center",
+        color: "red",
+        marginVertical: 4
     }
+
 });
 
 export default ProfileDetailScreen;
