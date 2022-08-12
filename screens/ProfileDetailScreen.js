@@ -475,7 +475,6 @@ const ProfileDetailScreen = (props) => {
 
                 })}
                 <View View style={{
-                    display: 'flex',
                     flexDirection: "column",
                     backgroundColor: Color.yellow,
                     alignSelf: 'flex-start',

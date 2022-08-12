@@ -8,25 +8,26 @@ import eventsService from "../services/eventsService";
 export const SignIn = (token, codeverifier) => (dispatch) => {
   Auth.onSignIn(token, codeverifier).then(token => {
     const user = decode.jwt(token.idToken)
-    eventsService.transferMemberData(user).then( res => {
-      if(res.status === 200){
-        storages.save('user', JSON.stringify({
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
-          idToken: token.idToken
-        }))
-        dispatch({
-          type: SIGN_IN_SUCCESS,
-          payload: {user: user, hasMember: res.data.hasMember},
-        })
-      }
-    }).catch(e => {
-      console.log(e)
-      dispatch({
-        type: SIGN_IN_FAIL,
-        payload: e
-      })
-    })
+    dispatch({type: SIGN_IN_SUCCESS, payload: {user: user}})
+    // eventsService.transferMemberData(user).then( res => {
+    //   if(res.status === 200){
+    //     storages.save('user', JSON.stringify({
+    //       accessToken: token.accessToken,
+    //       refreshToken: token.refreshToken,
+    //       idToken: token.idToken
+    //     }))
+    //     dispatch({
+    //       type: SIGN_IN_SUCCESS,
+    //       payload: {user: user, hasMember: res.data.hasMember},
+    //     })
+    //   }
+    // }).catch(e => {
+    //   console.log(e)
+    //   dispatch({
+    //     type: SIGN_IN_FAIL,
+    //     payload: e
+    //   })
+    // })
   }).catch(e => {
     console.log(e)
     dispatch({

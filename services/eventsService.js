@@ -1,5 +1,4 @@
 import api from "./api"
-import { re } from "@babel/core/lib/vendor/import-meta-resolve";
 
 class eventsService {
 
@@ -93,6 +92,13 @@ class eventsService {
       eventId: eveId
     }
     return api.post(`events/isRegister`, data)
+  }
+
+  async checkEmail(email) {
+    const data = {
+      email: email,
+    }
+    return api.post(`members/hasEmail`, data)
   }
 
 
