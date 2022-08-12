@@ -56,7 +56,7 @@ const EventCard = ({ item, onPress }) => {
           <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red} />
         </View>
         <View style={styles.Title}>
-          <Text style={styles.TextTitle}>{(eventName.length >= 20 ? eventName.slice(0, 20) + "..." : eventName)}</Text>
+          <Text numberOfLines={1} style={styles.TextTitle}>{(eventName.length >= 20 ? eventName.slice(0, 20) + "..." : eventName)}</Text>
         </View>
         <View style={styles.Date}>
           <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary} />
