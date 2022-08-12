@@ -61,3 +61,5 @@ buck-out/
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+
+.expo/web/cache/development/babel-loader/0083e91fa90a3f28baba6e33c6d43173.json
