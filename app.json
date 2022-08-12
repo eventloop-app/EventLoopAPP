@@ -5,6 +5,7 @@
     "scheme": "eventloop",
     "owner": "eventloop",
     "description": "",
+    "icon": "./assets/images/icon.png",
     "plugins": [
       [
         "expo-image-picker",
@@ -12,6 +13,20 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ]
+    ],
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    }
   }
 }

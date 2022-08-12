@@ -84,13 +84,11 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   };
 
   const checkHasUserName = (value) => {
-    console.log(value.nativeEvent.text)
     const username = value.nativeEvent.text
     //Validate Username
     if (Validate.getValidateUsername(username)) {
       // setIsError(false)
       eventsService.hasUsername(username).then(res => {
-        console.log(res)
         //Check response status.
         if (res.status === 200) {
 
@@ -107,7 +105,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
           }
 
         } else {
-          console.log(res.status)
           alert("server error : " + res.status)
         }
       })
@@ -134,7 +131,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   };
 
   const handleOnSelectTags = (indexToSelect, itemSelected) => {
-    console.log('sadas')
     const newState = tags.map((item, index) => {
       return {
         ...item,
@@ -144,50 +140,60 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     setTags(newState);
   };
 
-  const handleSubmitForm = () => {
-    handlePushTag()
-    handleUploadData()
+  const handleSubmitForm = async () => {
+    await handlePushTag()
+
+    let data = {
+      username: username,
+      firstName: userData.name.split(' ').slice(0, -1).join(' ').toLowerCase(),
+      lastName:  userData.name.split(' ').slice(-1).join(' ').toLowerCase(),
+      email: userData.email,
+      memberId: userData.memberId,
+      tags: selectedTag
+    }
+    console.log(data)
+    // handlePushTag()
+    // handleUploadData()
   }
 
   const handlePushTag = () => {
-    console.log('Hekki')
     setSelectedTag([])
     tags.map((item, index) => {
       if (item.isSelect === true) {
-        return selectedTag.push(item.title)
+         selectedTag.push(item.title)
       }
     })
   }
 
-  // const handleUploadData = () => {
-  //   let localUri = imageProfile;
-  //   let filename = imageProfile.split('/').pop();
-  //   let match = /\.(\w+)$/.exec(filename);
-  //   let type = match ? `image/${match[1]}` : `image`;
-  //   let memberId = userData.memberId
-  //   let email = userData.email
-  //   let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
-  //   let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
-  //
-  //   const formData = new FormData();
-  //   formData.append('profileImage', { uri: localUri, name: filename, type: type });
-  //   formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
-  //
-  //   console.log(formData)
-  //   return axios({
-  //     url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
-  //     method: 'POST',
-  //     data: formData,
-  //     headers: {
-  //       'Content-Type': `multipart/form-data`,
-  //     },
-  //   }).then(res => {
-  //     console.log(res)
-  //     if (res.status === 200) {
-  //       navigation.navigate('ProfileDetail')
-  //     } else { alert(res.status) }
-  //   })
-  // }
+  const handleUploadData = () => {
+    // let localUri = imageProfile;
+    // let filename = imageProfile.split('/').pop();
+    // let match = /\.(\w+)$/.exec(filename);
+    // let type = match ? `image/${match[1]}` : `image`;
+    // let memberId = userData.memberId
+    // let email = userData.email
+    // let firstName = userData.name.split(' ').slice(0, -1).join(' ').toLowerCase();
+    // let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
+    //
+    // const formData = new FormData();
+    // formData.append('profileImage', { uri: localUri, name: filename, type: type });
+    // formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
+    //
+    // console.log(formData)
+    // return axios({
+    //   url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
+    //   method: 'POST',
+    //   data: formData,
+    //   headers: {
+    //     'Content-Type': `multipart/form-data`,
+    //   },
+    // }).then(res => {
+    //   console.log(res)
+    //   if (res.status === 200) {
+    //     navigation.navigate('ProfileDetail')
+    //   } else { alert(res.status) }
+    // })
+  }
 
   const formStep1 = () => {
     const firstName = userData?.name.split(' ').slice(0, -1).join(' ').toLowerCase();
@@ -295,7 +301,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
                     {formStep2()}
                 </View>
               </ProgressStep>
-              <ProgressStep onSubmit={()=> console.log({ memberId: userData.memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag })} previousBtnText={'ย้อนกลับ'} finishBtnText={'ยืนยัน'} previousBtnTextStyle={{ fontFamily: Fonts.primary }} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="สิ่งที่คุณสนใจ" >
+              <ProgressStep onSubmit={()=> handleSubmitForm()} previousBtnText={'ย้อนกลับ'} finishBtnText={'ยืนยัน'} previousBtnTextStyle={{ fontFamily: Fonts.primary }} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="สิ่งที่คุณสนใจ" >
                 <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
                   {
                     formStep3()
