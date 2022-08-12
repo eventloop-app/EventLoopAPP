@@ -38,6 +38,7 @@ export const SignIn = (token, codeverifier) => (dispatch) => {
 }
 
 export const SignOut = () => (dispatch) => {
+  console.log("REMOVE USERDATA!!")
   try {
     storages.remove('user')
     dispatch({

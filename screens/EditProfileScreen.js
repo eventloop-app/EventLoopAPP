@@ -11,13 +11,11 @@ import { Camera, CameraType } from 'expo-camera';
 import Validate from '../services/Validate';
 import eventsService from '../services/eventsService';
 import { useDispatch, useSelector } from "react-redux";
-import decode from "../services/decode";
-import BubbleSelect, { Bubble } from 'react-native-bubble-select';
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
-import axios from "react-native-axios";
-import demoImageProfile from '../assets/images/profileImage.jpg'
-
+import * as Notifications from 'expo-notifications'
+import storages from "../services/storages";
+import {saveUser} from "../actions/user";
 
 const EditProfileScreen = ({ props, route, navigation }) => {
   //declare variable
@@ -38,7 +36,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
   const [hasUser, setHasUser] = useState(false)
-
+  const dispatch = useDispatch();
   const [tags, setTags] = useState([
     { title: "Music", icon: "music", source: "Feather", isSelect: false },
     { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
@@ -68,6 +66,26 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     const user = route.params.user
     setUserData(user)
   }, [])
+
+  useEffect(()=>{
+    if(userData !== null){
+      registerForPushNotification().then(token =>{
+        setUserData({...userData, deviceId: token})
+      }).catch(e =>{
+        console.error(e)
+      })
+    }
+  },[userData])
+
+  const registerForPushNotification = async () => {
+    const {status} = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return ;
+    }else{
+      return (await Notifications.getExpoPushTokenAsync()).data
+    }
+  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -142,6 +160,10 @@ const EditProfileScreen = ({ props, route, navigation }) => {
 
   const handleSubmitForm = async () => {
     await handlePushTag()
+    const filename = imageProfile?.split('/').pop();
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : `image`;
+    const localUri = imageProfile;
 
     let data = {
       username: username,
@@ -149,11 +171,24 @@ const EditProfileScreen = ({ props, route, navigation }) => {
       lastName:  userData.name.split(' ').slice(-1).join(' ').toLowerCase(),
       email: userData.email,
       memberId: userData.memberId,
-      tags: selectedTag
+      tags: selectedTag,
+      deviceId: userData.deviceId
     }
-    console.log(data)
-    // handlePushTag()
-    // handleUploadData()
+    const formData = new FormData();
+    formData.append('profileImage', localUri ? { uri: localUri, name: filename, type: type } : null);
+    formData.append('memberInfo', JSON.stringify(data));
+
+    await eventsService.transferMemberData(formData).then(async res => {
+      if(res.status === 200){
+        await dispatch(saveUser(JSON.stringify(res.data.member)))
+        setTimeout(()=>{
+          navigation.navigate('Profile')
+        }, 500)
+
+      }
+    }).catch(e => {
+      console.error(e)
+    })
   }
 
   const handlePushTag = () => {

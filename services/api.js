@@ -1,7 +1,8 @@
 import axios from "react-native-axios";
+import {APP_API} from '@env'
 
 const instance = axios.create({
-  baseURL: "https://api-eventloop.sit.kmutt.ac.th/dev/eventService/",
+  baseURL: APP_API,
 });
 
 export default instance;

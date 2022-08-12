@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, FlatList, SafeAreaView, ScrollView, Text,} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
-import {getUserToken} from "../actions/user";
+import {getUser} from "../actions/user";
 import decode from "../services/decode";
 import eventsService from "../services/eventsService";
 import EventCardList from "../components/EventCardList";
@@ -15,7 +15,7 @@ const CreatedEventListScreen = ({route, navigation}) => {
 
 
     useEffect(() => {
-        dispatch(getUserToken())
+        dispatch(getUser())
     }, [])
 
     useEffect(()=> {

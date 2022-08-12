@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import fontSize from "../constants/FontSize";
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,56 +7,34 @@ import Fonts from "../constants/Fonts";
 import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
 
-const platform = ['Discord', 'Zoom', 'Google', 'Microsoft']
-
 const EventCard = ({ item, onPress }) => {
-
   const eventName = item.eventName
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
   const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item.type === 'ONLINE' ? platform.map(items => {
-    if (item.location.includes(items.toLocaleLowerCase())) {
-      return items
-    }
-  }) : item.location.slice(0, 18) + '...'
-  const ImageCover = item.coverImageUrl
-
-  const checkPlatForm = (url) => {
-    console.log(url)
-    //
-    // platform.map(item => url.includes(item))
-    // return ""
-  }
-
-  const onLoadImage = () => {
-    setTimeout(() => {
-      setIsLoading(true)
-    }, 1000)
-  }
+  const eventLocation = item.location?.name
+  const ImageCover = item?.coverImageUrl
 
   return (
     <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={styles.shadowsButton} >
-
       <View style={styles.Container}>
         <View style={styles.ImageCover}>
           <Image
             style={styles.Image}
             source={{
-              uri: (isLoading ? ImageCover : 'https://cdn.dribbble.com/users/1284666/screenshots/6321168/__3.gif')
+              uri: (ImageCover)
             }}
-            onLoad={onLoadImage}
           />
         </View>
         <View style={styles.DateBox}>
-          <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("DD")}</Text>
+          <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("D")}</Text>
           <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
         </View>
         <View style={styles.BookmarkBox}>
           <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red} />
         </View>
         <View style={styles.Title}>
-          <Text style={styles.TextTitle}>{(eventName.length >= 20 ? eventName.slice(0, 20) + "..." : eventName)}</Text>
+          <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
         </View>
         <View style={styles.Date}>
           <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary} />
@@ -68,7 +46,7 @@ const EventCard = ({ item, onPress }) => {
         </View>
         <View style={styles.Location}>
           <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
-          <Text style={styles.TextLocation}>{eventLocation}</Text>
+          <Text numberOfLines={1} style={styles.TextLocation}>{eventLocation}</Text>
         </View>
       </View>
     </TouchableOpacity>)
@@ -77,8 +55,8 @@ const EventCard = ({ item, onPress }) => {
 const styles = StyleSheet.create({
   Container: {
     position: "relative",
-    width: 240,
-    height: 300,
+    width: 220,
+    height: 280,
     backgroundColor: "white",
     alignItems: "center",
     overflow: "hidden",
@@ -89,11 +67,11 @@ const styles = StyleSheet.create({
     left: 9,
     top: 9,
     borderRadius: 15,
-    width: 220,
-    height: 160
+    width: 200,
+    height: 140
   },
   Image: {
-    borderRadius: 15,
+    borderRadius: 10,
     width: '100%',
     height: '100%',
   },
@@ -120,6 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   Title: {
+    width:"91.5%",
     position: "absolute",
     bottom: 95,
     left: 9
@@ -143,10 +122,11 @@ const styles = StyleSheet.create({
     left: 9,
   },
   Location: {
+    width:"91.5%",
     position: "absolute",
     bottom: 5,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     left: 9,
   },
@@ -171,6 +151,7 @@ const styles = StyleSheet.create({
     marginLeft: 5
   },
   TextLocation: {
+    width:"84.5%",
     fontFamily: Fonts.primary,
     fontSize: fontSize.primary,
     color: Colors.black,
@@ -196,13 +177,12 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    margin: 8,
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+    margin: 5,
     borderRadius: 15,
   }
-
 });
 
 export default EventCard;

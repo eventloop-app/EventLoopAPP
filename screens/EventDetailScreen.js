@@ -1,13 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Image, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View} from "react-native";
+import {Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import moment from "moment/moment";
-import {useDispatch, useSelector} from "react-redux";
-import decode from "../services/decode";
-import {getUserToken} from "../actions/user";
+import {useSelector} from "react-redux";
 import fontSize from "../constants/FontSize";
 import eventsService from "../services/eventsService";
 import AwesomeAlert from "react-native-awesome-alerts";
@@ -20,14 +18,14 @@ const EventDetailScreen = (props) => {
     const [showConfirmCancelEvent, setShowConfirmCancelEvent] = useState(false)
     const [showRegisterEvent, setShowRegisterEvent] = useState(false)
     const [isRegister, setIsRegister] = useState(null)
-    const dispatch = useDispatch();
-    const {userToken, userError} = useSelector(state => state.user)
+    const {user} = useSelector(state => state.user)
     const [isCheckIn, setIsCheckIn] = useState(false)
     const [CheckInCode, setCheckInCode] = useState(null)
     const [isOwner, setIsOwner] = useState(false)
 
     useEffect(() => {
         if (props.route.params.QRcode) {
+            console.log('QRCODE')
             setTimeout(async () => {
                 await CheckInByQrCode()
             }, 500)
@@ -36,15 +34,17 @@ const EventDetailScreen = (props) => {
 
     useEffect(() => {
         console.log('EventDetail')
-        dispatch(getUserToken())
         getEvent()
     }, [])
 
     useEffect(() => {
         if (userData !== null && event !== null) {
-            eventsService.isRegisterEvent(userData.memberId, event.id).then(res => {
+            eventsService.isRegisterEvent(userData.id, event.id).then(res => {
                 setIsRegister(res.data.isRegister)
+            }).catch(e => {
+                console.log("CheckUserRegisterEventError:", e.message)
             })
+
             if (userData.email === event.email) {
                 console.log('Is owner event')
                 setIsOwner(true)
@@ -54,14 +54,14 @@ const EventDetailScreen = (props) => {
     }, [userData])
 
     useEffect(() => {
-        if (userToken !== null) {
-            setUserData(decode.jwt(JSON.parse(userToken).idToken))
+        if (user !== null) {
+            setUserData(JSON.parse(user))
             setIsLogin(true)
         }
-    }, [userToken])
+    }, [user])
 
     const CheckUserCheckIn = () => {
-        eventsService.isCheckIn(userData.memberId, event.id).then(async res => {
+        eventsService.isCheckIn(userData.id, event.id).then(async res => {
             if (res.status === 200 && res.data.isCheckIn === true) {
                 setIsCheckIn(true)
                 await console.log('User is Checked in !')
@@ -74,7 +74,7 @@ const EventDetailScreen = (props) => {
     }
 
     const CheckInByQrCode = () => {
-        eventsService.checkInByCode(userData.memberId, props.route.params.QRcode, event.id).then(res => {
+        eventsService.checkInByCode(userData.id, props.route.params.QRcode, event.id).then(res => {
             if (res.status === 200) {
                 console.log('Pass')
                 alert(`ยืนยันการเช็คอินเรียบร้อยแล้ว`)
@@ -88,29 +88,13 @@ const EventDetailScreen = (props) => {
         await setIsLoading(false)
     }
 
-    const onLoadImage = () => {
-        checkPlatform()
-        setTimeout(() => {
-            setIsLoading(true)
-        }, 1000)
-    }
-
     const hideAlert = () => {
         setShowConfirmCancelEvent(false)
         setShowRegisterEvent(false)
     };
 
-    const checkPlatform = () => {
-        const platform = ['Discord', 'Zoom', 'Google', 'Microsoft']
-        platform.map(items => {
-            if (event.location.includes(items.toLocaleLowerCase())) {
-                event.location = items
-            }
-        })
-    }
-
     const onUnregisterEvent = async () => {
-        await eventsService.unRegisterEvent(userData.memberId, event.id).then(res => {
+        await eventsService.unRegisterEvent(userData.id, event.id).then(res => {
             if (res.status === 200) {
                 setIsRegister(false)
             }
@@ -195,13 +179,15 @@ const EventDetailScreen = (props) => {
     }
 
     return (
+      isLoading ? <SafeAreaView>
+          <Text>LOADING</Text>
+        </SafeAreaView> :
         <View style={styles.container}>
             <View style={styles.imageCover}>
                 <Image style={styles.image}
                        source={{
-                           uri: (isLoading ? event.coverImageUrl : 'https://cdn.dribbble.com/users/1284666/screenshots/6321168/__3.gif')
+                           uri: (event?.coverImageUrl)
                        }}
-                       onLoad={onLoadImage}
                 />
             </View>
             <View style={styles.content}>
@@ -244,14 +230,9 @@ const EventDetailScreen = (props) => {
                             <View style={{height: 50, marginLeft: 10, justifyContent: 'center'}}>
                                 <Text style={styles.sub_title}>
                                     {
-                                        event?.location
+                                        event?.location?.name
                                     }
                                 </Text>
-                                {
-                                    event?.type === "ONLINE" ?
-                                        <Text style={styles.sub_title}>LINK</Text>
-                                        : null
-                                }
                             </View>
                         </View>
                         <View style={{flexDirection: 'row', alignItems: 'center', height: 50, marginTop: 10}}>

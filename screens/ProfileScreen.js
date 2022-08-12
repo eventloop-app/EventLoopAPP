@@ -1,76 +1,36 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Button, RefreshControl, SafeAreaView, StatusBar, StyleSheet, Text, View} from "react-native";
+import React, {useEffect, useState} from 'react';
+import {Button,  SafeAreaView, StyleSheet, Text, View} from "react-native";
 import {makeRedirectUri, useAuthRequest, useAutoDiscovery} from "expo-auth-session";
 import {useDispatch, useSelector} from "react-redux";
 import {SignIn, SignOut} from "../actions/auth";
-import {getUserToken} from "../actions/user";
-import jwt_decode from "jwt-decode";
-import decode from "../services/decode";
+import {saveUser} from "../actions/user";
 import fonts from "../constants/Fonts";
 import fontSize from "../constants/FontSize";
-import {SignInButtons} from "../components/SignInButtons";
-import {useFocusEffect} from '@react-navigation/native'
 import eventsService from "../services/eventsService";
+import ProfileDetailScreen from "./ProfileDetailScreen";
 
-
-const ProfileScreen = ({route, navigation}) => {
-    const [isLoad, setIsLoad] = useState(true)
-    const [userData, setUserData] = useState(null)
-    const [isVisible, setIsVisible] = useState(false)
+const ProfileScreen = ({navigation}) => {
+    const [isLoad, setIsLoad] = useState(false)
     const discovery = useAutoDiscovery("https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d/v2.0");
-    const redirectUri = makeRedirectUri({scheme: "exp://fy-kbp.eventloop.eventloopapp.exp.direct:80"});
+    const redirectUri = makeRedirectUri({scheme: null});
     const dispatch = useDispatch();
-
     //ดึงข้อมูลตอน Login
     const {authData, authDataError} = useSelector(state => state.auth)
-    //ดึงข้อมูลตอน User จาก Storage
-    const {userToken, userError} = useSelector(state => state.user)
-
-    // useFocusEffect(
-    //   useCallback(() => {
-    //     setIsVisible(true)
-    //     console.log('true')
-    //     return () => {
-    //       setIsVisible(false)
-    //       console.log('false')
-    //     }
-    //   }, [])
-    // )
-
-    // useEffect(() => {
-    //     const unsubscribe = navigation.addListener('focus', () => {
-    //         console.log("Profileeee")
-    //     });
-    //     return unsubscribe;
-    // }, [navigation])
-
-    useEffect(() => {
-        console.log("Check Token")
-        dispatch(getUserToken())
-    }, [])
+    const {user} = useSelector(state => state.user)
 
     useEffect( ()=> {
-        if(authData !== null){
-            eventsService.checkEmail(authData.user.email).then(res => {
+        if(authData !== null && user === null){
+            eventsService.checkEmail(authData.user.email).then( async res => {
                 if(!res.data.hasEmail) {
                     navigation.navigate('EditProfile', {user: authData.user})
+                }else{
+                    setTimeout(()=>{
+                        dispatch(saveUser(JSON.stringify(res.data.member)))
+                    }, 200)
                 }
             })
         }
     }, [authData])
-
-    useEffect(() => {
-        if (userToken !== null) {
-            const idToken = JSON.parse(userToken).idToken
-            const user = decode.jwt(idToken)
-            setUserData(user)
-            console.log(user)
-        }
-        if (userError) {
-            console.log("userTokenErrorr : " + userError)
-        }
-        setIsLoad(false)
-    }, [userToken])
 
     const [request, response, promptAsync] = useAuthRequest(
         {
@@ -97,11 +57,6 @@ const ProfileScreen = ({route, navigation}) => {
         }
     }, [response]);
 
-    const signOut = () => {
-        dispatch(SignOut())
-        setUserData(null)
-    }
-
     const renderProfile = () => (
         <SafeAreaView>
             <View>
@@ -115,6 +70,9 @@ const ProfileScreen = ({route, navigation}) => {
     )
 
     return (
+      user ?
+      <ProfileDetailScreen/>
+        :
         <SafeAreaView style={styles.Container}>
             {
                 isLoad ?

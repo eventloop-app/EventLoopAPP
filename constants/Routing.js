@@ -61,7 +61,8 @@ const Routing = () => {
                 <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}/>
                 <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
-                <Tab.Screen name={'Profile'} component={ProfileScreen}
+                <Tab.Screen name={'Profile'}
+                            component={ProfileScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}
                 />
             </Tab.Navigator>
@@ -99,7 +100,7 @@ const Routing = () => {
                             }}
                             onPress={() => navigation.goBack()}
                         >
-                            <Ionicons name="arrow-back-outline" size={25} color="back" />
+                            <Ionicons name="arrow-back-outline" size={25} color={Colors.black} />
                         </TouchableOpacity>
                     )
                 })}/>
@@ -118,7 +119,7 @@ const Routing = () => {
                     title: route.params.name
                 })}/>
 
-                <Stack.Screen  name={'EditProfile'} component={EditProfileScreen} options={ ({route}) => ({
+                <Stack.Screen  name={'EditProfile'} component={EditProfileScreen} options={ ({route,navigation}) => ({
                     headerShown: true,
                     headerTransparent: true,
                     tabBarShowLabel: false,
@@ -129,10 +130,10 @@ const Routing = () => {
                         color: Colors.black,
                     },
                     headerBackTitle: '',
-                    title: 'ตั้งค่าโปรไฟล์'
+                    title: 'ตั้งค่าโปรไฟล์',
                 })} />
 
-                <Stack.Screen name={'ProfileDetail'} component={ProfileDetailScreen} options={({ route }) => ({
+                <Stack.Screen name={'ProfileDetail'} component={ProfileDetailScreen} options={({ route, navigation }) => ({
                     headerShown: true,
                     headerTransparent: true,
                     tabBarShowLabel: false,
@@ -143,7 +144,23 @@ const Routing = () => {
                         color: Colors.black,
                     },
                     headerBackTitle: '',
-                    title: 'โปรไฟล์'
+                    title: 'โปรไฟล์',
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      style={{
+                        paddingLeft: 10,
+                        borderRadius: 100,
+                        backgroundColor: 'rgba(255,255,255,0.8)',
+                        width: 50,
+                        height: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}
+                      onPress={() => navigation.navigate('Feed')}
+                    >
+                      <Ionicons name="arrow-back-outline" size={25} color={Colors.black} />
+                    </TouchableOpacity>
+                  )
                 })} />
 
                 <Stack.Screen  name={'CreatedEventList'} component={CreatedEventListScreen} options={ ({route}) => ({
@@ -161,7 +178,6 @@ const Routing = () => {
                 })}/>
 
                 <Stack.Screen name={'Scanner'} component={ScannerScreen} options={{ headerShown:false}}/>
-
                 <Stack.Group screenOptions={{ presentation: 'fullScreenModal'}}>
                     <Stack.Screen name={'ManageEvent'} component={ManageEventScreen} options={ ({route,navigation}) => ({
                         headerShown: true,
@@ -242,5 +258,4 @@ const Routing = () => {
         </NavigationContainer>
     );
 };
-
 export default Routing;
