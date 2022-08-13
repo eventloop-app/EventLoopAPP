@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, Button } from "react-native";
 import React, { useCallback, useEffect, useState, } from "react";
 import EventCard from "../components/EventCard";
 import eventsService from "../services/eventsService";
@@ -18,7 +18,9 @@ const FeedScreen = ({ route, navigation }) => {
   const [title, setTitle] = useState("กิจกรรมที่กำลังจะเริ่มเร็วๆนี้")
   const [feedbackImageCover, setFeedbackImageCover] = useState("https://cdn.zipeventapp.com/blog/2020/09/2020-09-09_04-59-46_zip-onlineevent.png")
   const [feedbackTitle, setFeedbackTitle] = useState("ราชสีมาวิทยาลัย")
-
+  const [eventByTag, setEventByTag] = useState([])
+  const [eventByRegister, setEventByRegister] = useState([])
+  const [selectedTag, setSelectedTag] = useState(["A", "B", "C"])
   // useFocusEffect(
   //   useCallback(() => {
   //     setIsVisible(true)
@@ -47,11 +49,26 @@ const FeedScreen = ({ route, navigation }) => {
 
 
 
+  const getEventByTag = () => {
+    eventsService.getEventByTag(selectedTag).then((res) => {
+      setEventByTag(res)
+    })
+
+
+
+    // let test = ["A", "B", "C", "D"]
+    // let text = " "
+    // let x = ""
+    // text = test.map((item) => { return text += `&tags=${item}` })
+
+    // console.log(text[text.length - 1])
+  }
+
 
 
   const renderRemindFeedback = () => {
     return (
-      <View style={[styles.shadowsCard, { backgroundColor: "lightgray", height: 150, backgroundColor: Colors.bag1Bg, }]}>
+      <View style={[styles.shadowsCard, { height: 150, backgroundColor: Colors.bag1Bg, }]}>
         <View style={{}}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 6 }}>
             <Text style={styles.textTitle}>กิจกรรมที่ยังไม่รีวิว</Text>
@@ -129,6 +146,7 @@ const FeedScreen = ({ route, navigation }) => {
             <View style={styles.header}>
               {/*something*/}
             </View>
+            <Button title="Test" onPress={() => getEventByTag()} />
             <ScrollView style={{}}>
               {renderEventSection()}
               <View style={{ display: "flex" }}>

@@ -17,6 +17,30 @@ class eventsService {
     }
   }
 
+  // async getEventByMemberID() {
+  //   try {
+  //     return api.get('eventService/events/getEventByTag')
+
+  //     // "events?pageNo=0&pageSize=10&sortBy=endDate&orderBy=desending"
+  //   } catch (e) {
+  //     return new Promise(reject => reject(e))
+  //   }
+  // }
+
+  async getEventByTag(selectTag) {
+    let tags = ""
+    let tag = ""
+    tags = selectTag.map((item) => { return tags += `&tags=${item}` })
+    tag = tags[tags.length - 1]
+    console.log('events/getEventByTag?tags=INT210' + tag + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
+    // try {
+    //   return api.get('events/getEventByTag?tags=INT210' + tag + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
+    // } catch (e) {
+    //   return new Promise(reject => reject(e))
+    // }
+  }
+
+
   async transferMemberData(mem) {
     const data = {
       name: mem.name,
