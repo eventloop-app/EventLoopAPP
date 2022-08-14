@@ -37,6 +37,7 @@ const FeedScreen = ({ route, navigation }) => {
     getEvent()
   }, [])
 
+
   const getEvent = async () => {
     eventsService.getEventAll().then(res => {
       setEvent(res.data.content)

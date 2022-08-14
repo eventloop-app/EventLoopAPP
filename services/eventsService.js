@@ -28,16 +28,14 @@ class eventsService {
   // }
 
   async getEventByTag(selectTag) {
-    let tags = ""
-    let tag = ""
-    tags = selectTag.map((item) => { return tags += `&tags=${item}` })
-    tag = tags[tags.length - 1]
-    console.log('events/getEventByTag?tags=INT210' + tag + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
-    // try {
-    //   return api.get('events/getEventByTag?tags=INT210' + tag + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
-    // } catch (e) {
-    //   return new Promise(reject => reject(e))
-    // }
+    let tags = selectTag.map((item) => `&tags=${item}`).join('')
+
+    console.log('events/getEventByTag?tags=INT210' + tags + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
+    try {
+      return api.get('events/getEventByTag?tags=INT210' + tag + '&pageSize=20&pageNo=0&sortBy=startDate&orderBy=desc')
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
   }
 
 
