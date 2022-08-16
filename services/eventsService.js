@@ -32,7 +32,7 @@ class eventsService {
 
     console.log('events/getEventByTag?tags=INT210' + tags + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
     try {
-      return api.get('events/getEventByTag?tags=INT210' + tag + '&pageSize=20&pageNo=0&sortBy=startDate&orderBy=desc')
+      return api.get('events/getEventByTag?tags=INT210' + tags + '&pageSize=20&pageNo=0&sortBy=startDate&orderBy=desc')
     } catch (e) {
       return new Promise(reject => reject(e))
     }
