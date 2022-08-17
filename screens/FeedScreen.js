@@ -14,12 +14,13 @@ const FeedScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [eventId, setEventId] = useState(true)
   const [allEvents, setAllEvent] = useState([])
+  const [eventByTag, setEventByTag] = useState([])
+  const [eventByRegistered, setEventByRegistered] = useState([])
+  const [eventByAttention, setEventByAttention] = useState([])
   const [isVisible, setIsVisible] = useState(false)
   const [title, setTitle] = useState("กิจกรรมที่กำลังจะเริ่มเร็วๆนี้")
   const [feedbackImageCover, setFeedbackImageCover] = useState("https://cdn.zipeventapp.com/blog/2020/09/2020-09-09_04-59-46_zip-onlineevent.png")
   const [feedbackTitle, setFeedbackTitle] = useState("ราชสีมาวิทยาลัย")
-  const [eventByTag, setEventByTag] = useState([])
-  const [eventByRegister, setEventByRegister] = useState([])
   const [selectedTag, setSelectedTag] = useState(["บันเทิง", "การศึกษา", "อาหาร", "กีฬา", "ท่องเที่ยว"])
   // useFocusEffect(
   //   useCallback(() => {
@@ -36,11 +37,14 @@ const FeedScreen = ({ route, navigation }) => {
   useEffect(() => {
     getEvent()
     getEventByTag()
+    getEventByAttention()
+    getRegisterEvent()
   }, [])
 
 
+  // get Event
   const getEvent = async () => {
-    eventsService.getEventAll().then(res => {
+    eventsService.getAllEvent().then(res => {
       setAllEvent(res.data.content)
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
@@ -49,11 +53,9 @@ const FeedScreen = ({ route, navigation }) => {
     await setIsLoading(false)
   }
 
-
-
   const getEventByTag = async () => {
     eventsService.getEventByTag(selectedTag).then((res) => {
-      setEventByTag(res)
+      setEventByTag(res.data.content)
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
     })
@@ -62,63 +64,82 @@ const FeedScreen = ({ route, navigation }) => {
 
   }
 
+  const getEventByAttention = async () => {
+    eventsService.getEventByAttention().then(res => {
+      setEventByAttention(res.data.content)
+    }).catch(error => {
+      console.log('get_all_event: ' + error.message)
+      alert('ผิดพลาดดด \n' + error.message)
+    })
+    await setIsLoading(false)
+  }
+
+  const getRegisterEvent = async () => {
+    eventsService.getAllRegisteredEvent().then(res => {
+      setEventByRegistered(res.data.content)
+    }).catch(error => {
+      console.log('get_all_event: ' + error.message)
+      alert('ผิดพลาดดด \n' + error.message)
+    })
+    await setIsLoading(false)
+  }
+
+
   const renderEventShortcutSection = () => {
     return (
-      <View style={[styles.shadowsCard, { height: "auto", backgroundColor: Colors.bag9Bg, }]}>
-        <View style={{ padding: 16, flexDirection: "column" }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-around", }}>
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginHorizontal: 4 }}>
+      <View style={[styles.shadowsCard, { height: "auto", backgroundColor: Colors.bag9Bg, alignItems: "center" }]}>
+        <View>
+          <View style={{ paddingVertical: 10, flexDirection: "row", flexWrap: "wrap", width: "100%", alignItems: "center", }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center", }}>
                 <MaterialCommunityIcons color={"red"} name={"fire"} size={30} />
               </View>
               <Text>มาแรง</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginHorizontal: 4 }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center" }}>
                 <Ionicons color={"black"} name={"pricetag"} size={30} />
               </View>
               <Text>ความสนใจ</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginHorizontal: 4 }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center" }}>
                 <Ionicons color={"black"} name={"bookmark"} size={30} />
               </View>
               <Text>บุ๊กมาร์ก</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginHorizontal: 4 }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center" }}>
                 <Ionicons color={"black"} name={"md-location-sharp"} size={30} />
               </View><Text>ใกล้ฉัน</Text>
             </TouchableOpacity>
-          </View>
 
-          <View style={{ flexDirection: "row", }}>
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginLeft: 9 }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center" }}>
                 <MaterialCommunityIcons color={"black"} name={"calendar-clock"} size={30} />
               </View>
               <Text>กำลังจะเริ่ม</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginLeft: 22 }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center" }}>
                 <AntDesign color={"black"} name={"form"} size={30} />
               </View><Text>ที่ลงทะเบียน</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", marginHorizontal: 29 }}>
+            <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, height: 50, width: 50, alignItems: "center", justifyContent: "center" }}>
                 <Ionicons color={"black"} name={"ios-layers"} size={30} />
               </View><Text>ทั้งหมด</Text>
             </TouchableOpacity>
+
+
           </View>
-
-
         </View>
-      </View>
+      </View >
     )
   }
 
@@ -165,12 +186,13 @@ const FeedScreen = ({ route, navigation }) => {
     )
   }
 
+  //Event render
   const renderEventSection = () => {
     return (
       <View style={{ backgroundColor: "white" }}>
         <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
-            <Text style={styles.textTitle}>{title}</Text>
+            <Text style={styles.textTitle}>กิจกรรม</Text>
           </View>
           <View onTouchEnd={() => navigation.navigate('EventList', { name: 'รายการกิจกรรมที่ลงทะเบียน' })} style={{ flex: 0.3, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 10 }}>
             <Text style={styles.textMore}>
@@ -197,10 +219,9 @@ const FeedScreen = ({ route, navigation }) => {
   const renderEventByTagSection = () => {
     return (
       <View style={{ backgroundColor: "white" }}>
-        {console.log(eventByTag)}
         <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
-            <Text style={styles.textTitle}>กิจกรรมที่คุณสนใจ</Text>
+            <Text style={styles.textTitle}>กิจกรรมที่เหมาะกับคุณ</Text>
           </View>
           <View onTouchEnd={() => navigation.navigate('EventList', { name: 'รายการกิจกรรมที่ลงทะเบียน' })} style={{ flex: 0.3, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 10 }}>
             <Text style={styles.textMore}>
@@ -211,6 +232,64 @@ const FeedScreen = ({ route, navigation }) => {
         </View>
         <FlatList
           data={eventByTag}
+          renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
+            item: item,
+            name: item.eventName
+          })} />)}
+          keyExtractor={(item) => item.id}
+          extraData={eventId}
+          showsHorizontalScrollIndicator={false}
+          horizontal={true}
+        />
+      </View>
+    )
+  }
+
+  const renderEventByAttentionSection = () => {
+    return (
+      <View style={{ backgroundColor: "white" }}>
+        <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
+          <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
+            <Text style={styles.textTitle}>กำลังมาแรง</Text>
+          </View>
+          <View onTouchEnd={() => navigation.navigate('EventList', { name: 'รายการกิจกรรมที่ลงทะเบียน' })} style={{ flex: 0.3, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+            <Text style={styles.textMore}>
+              เพิ่มเติม
+            </Text>
+            <Ionicons name={'play'} color={Colors.black} size={10} />
+          </View>
+        </View>
+        <FlatList
+          data={eventByAttention}
+          renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
+            item: item,
+            name: item.eventName
+          })} />)}
+          keyExtractor={(item) => item.id}
+          extraData={eventId}
+          showsHorizontalScrollIndicator={false}
+          horizontal={true}
+        />
+      </View>
+    )
+  }
+
+  const renderRegisteredEventSection = () => {
+    return (
+      <View style={{ backgroundColor: "white" }}>
+        <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
+          <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
+            <Text style={styles.textTitle}>กิจกรรมที่คุณได้ลงทะเบียน</Text>
+          </View>
+          <View onTouchEnd={() => navigation.navigate('EventList', { name: 'รายการกิจกรรมที่ลงทะเบียน' })} style={{ flex: 0.3, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 10 }}>
+            <Text style={styles.textMore}>
+              เพิ่มเติม
+            </Text>
+            <Ionicons name={'play'} color={Colors.black} size={10} />
+          </View>
+        </View>
+        <FlatList
+          data={eventByRegistered}
           renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
@@ -238,19 +317,21 @@ const FeedScreen = ({ route, navigation }) => {
               <View style={{ marginTop: 10 }}>
                 {renderEventShortcutSection()}
                 {renderEventSection()}
-                <View style={{ display: "none" }}>
-                  {renderRemindFeedback()}
-                </View>
 
-                {/* {renderEventByTagSection()} */}
+                {renderEventByTagSection()}
+                {renderEventByAttentionSection()}
+                {renderRegisteredEventSection()}
+                {/* <View style={{}}>
+                  {renderRemindFeedback()}
+                </View> */}
+
+
+
               </View>
             </ScrollView>
           </View>
 
-
       }
-
-
 
     </View>
   )

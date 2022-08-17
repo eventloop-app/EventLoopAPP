@@ -9,7 +9,7 @@ class eventsService {
     return api.post('members/hasUsername', data)
   }
 
-  async getEventAll() {
+  async getAllEvent() {
     try {
       return api.get('events?pageSize=20')
     } catch (e) {
@@ -17,17 +17,7 @@ class eventsService {
     }
   }
 
-  // async getEventByMemberID() {
-  //   try {
-  //     return api.get('eventService/events/getEventByTag')
-
-  //     // "events?pageNo=0&pageSize=10&sortBy=endDate&orderBy=desending"
-  //   } catch (e) {
-  //     return new Promise(reject => reject(e))
-  //   }
-  // }
-
-  async getEventByTag(selectTag) {
+  async getEventByTag(selectTag = []) {
     let tags = selectTag.map((item) => `&tags=${item}`).join('')
 
     console.log('events/getEventByTag?tags=INT210' + tags + '&pageSize=3&pageNo=0&sortBy=startDate&orderBy=desc')
@@ -37,6 +27,24 @@ class eventsService {
       return new Promise(reject => reject(e))
     }
   }
+
+  async getEventByAttention(pageNo = 0, pageSize = 20) {
+    try {
+      return api.get('events/attention?pageNo=' + pageNo + '&pageSize=' + pageSize)
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
+  }
+
+
+  async getAllRegisteredEvent() {
+    try {
+      return api.get('members/82c85d89-570d-4630-a463-7d1e3247dfc6/registerEvent?pageSize=1&pageNo=0')
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
+  }
+
 
 
   async transferMemberData(mem) {
