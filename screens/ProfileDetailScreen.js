@@ -77,7 +77,13 @@ const ProfileDetailScreen = ({props, navigation}) => {
 
 
   useEffect(() => {
-    setData()
+    let unmount = false
+    if(!unmount){
+      setData()
+    }
+    return ()=> {
+      unmount = true
+    }
   }, [])
 
   const checkHasUserName = (value) => {
@@ -560,6 +566,7 @@ const ProfileDetailScreen = ({props, navigation}) => {
               renderTags()
             }
           </View>
+          <Button onPress={() => signOut()} title={'ออกจากระบบ'}/>
         </View>
       </View>
     );

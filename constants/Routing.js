@@ -254,6 +254,36 @@ const Routing = () => {
                             </TouchableOpacity>
                         )
                     })}/>
+
+                  <Stack.Screen name={'GoogleMap'} component={MapScreen} options={ ({route,navigation}) => ({
+                    headerShown: true,
+                    headerTransparent: true,
+                    tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    headerTitleStyle: {
+                      fontFamily: Fonts.bold,
+                      fontSize: fontSize.primary,
+                      color: Colors.black,
+                    },
+                    title: "เลือกสถานที่",
+                    headerTintColor: Colors.white,
+                    headerBackTitle: '',
+                    headerLeft: () => (
+                      <TouchableOpacity
+                        style={{
+                          borderRadius: 100,
+                          backgroundColor: 'rgba(255,255,255,0.8)',
+                          width: 30,
+                          height: 30,
+                          justifyContent: 'center',
+                          alignItems: 'center'
+                        }}
+                        onPress={() => navigation.goBack()}
+                      >
+                        <Ionicons name="md-close" size={25} color={Colors.black} />
+                      </TouchableOpacity>
+                    )
+                  })}/>
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>
