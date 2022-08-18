@@ -40,17 +40,17 @@ const ProfileImageCard = (props) => {
     }
   };
 
-  useEffect(() => {
-    if (userToken !== null) {
-      const idToken = JSON.parse(userToken).idToken;
-      const user = decode.jwt(idToken);
-      setUserData(user);
-    }
-    if (userError) {
-      console.log('userTokenErrorr : ' + userError);
-    }
-    setIsLoad(false);
-  }, [userToken]);
+  // useEffect(() => {
+  //   if (userToken !== null) {
+  //     const idToken = JSON.parse(userToken).idToken;
+  //     const user = decode.jwt(idToken);
+  //     setUserData(user);
+  //   }
+  //   if (userError) {
+  //     console.log('userTokenErrorr : ' + userError);
+  //   }
+  //   setIsLoad(false);
+  // }, [userToken]);
 
   useEffect(() => {
     let setOldProfileImage = ""
@@ -71,7 +71,6 @@ const ProfileImageCard = (props) => {
 
   const sendProfileImage = () => {
     // let currentImage = status === "SAVE" ? profileImage : oldImage
- 
     props.getData(profileImage)
   }
 

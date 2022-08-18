@@ -184,7 +184,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
         setTimeout(()=>{
           navigation.navigate('Profile')
         }, 500)
-
       }
     }).catch(e => {
       console.error(e)

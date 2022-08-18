@@ -7,9 +7,9 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Dimensions,
   Modal,
-  Pressable, Button
+  Pressable,
+  Button
 } from "react-native";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
@@ -17,18 +17,13 @@ import Color from "../constants/Colors";
 import {Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useDispatch, useSelector} from "react-redux";
 import Colors from '../constants/Colors';
-import FormData from 'form-data';
-import axios from "react-native-axios";
-import demoImageProfile from '../assets/images/profileImage.jpg'
-import ProfileImageCard from '../components/ProfileImageCard';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import AwesomeAlert from 'react-native-awesome-alerts';
 import Validate from '../services/Validate';
 import eventsService from '../services/eventsService';
 import {SignOut} from "../actions/auth";
+import profileImageMock from "../assets/images/profileImage.jpg"
 
-
-const ProfileDetailScreen = ({props,navigation}) => {
+const ProfileDetailScreen = ({props, navigation}) => {
   //declare variable
   const [isLoad, setIsLoad] = useState(false);
   const [profileImage, setProfileImage] = useState("");
@@ -59,6 +54,7 @@ const ProfileDetailScreen = ({props,navigation}) => {
 
 
   const setData = async () => {
+    console.log(user)
     await setUserData(JSON.parse(user))
   }
 
@@ -199,7 +195,6 @@ const ProfileDetailScreen = ({props,navigation}) => {
   }
 
   // const updateProfile = (isEditForm) => {
-
   //     setIsEdit(isEditForm)
   // }
 
@@ -212,7 +207,6 @@ const ProfileDetailScreen = ({props,navigation}) => {
   }
 
   const handleUpdateProfile = (status) => {
-
     if (status === "EDIT") {
       setIsEdit(!isEdit)
       setEditStatus("EDIT")
@@ -226,8 +220,6 @@ const ProfileDetailScreen = ({props,navigation}) => {
       setIsDiscardModalPopup(true)
     }
     // setIsSaveModalPopup(true)
-
-
   }
 
   const handleConfirmUpdateProfile = (isConfirm) => {
@@ -254,13 +246,8 @@ const ProfileDetailScreen = ({props,navigation}) => {
       setIsError(false)
       setIsDiscardModalPopup(false)
     } else {
-
       setIsDiscardModalPopup(false)
     }
-  }
-
-  const handleDiscardProfile = () => {
-
   }
 
   const keepCashInfo = () => {
@@ -287,11 +274,9 @@ const ProfileDetailScreen = ({props,navigation}) => {
     // let lastName = userData.name.split(' ').slice(-1).join(' ').toLowerCase()
     // let image = profileImage
     // let username = userData.Username
-
     // const formData = new FormData();
     // formData.append('profileImage', { uri: localUri, name: filename, type: type });
     // formData.append('memberInfo', JSON.stringify({ memberId: memberId, username: username, firstName: firstName, lastName: lastName, email: email, tags: selectedTag }));
-
     // // console.log(formData)
     // return axios({
     //     url: 'https://dev-eventloop.wavemoroc.app/eventService/members/transferMemberData',
@@ -305,7 +290,6 @@ const ProfileDetailScreen = ({props,navigation}) => {
     //     if (res.status === 200) {
     //         navigation.navigate('ProfileDetail')
     //     } else { alert(res.status) }
-
     // })
   }
 
@@ -372,7 +356,6 @@ const ProfileDetailScreen = ({props,navigation}) => {
     )
   }
 
-
   const showIcon = (iconSource, icon) => {
     switch (iconSource) {
       case 'Feather':
@@ -386,7 +369,6 @@ const ProfileDetailScreen = ({props,navigation}) => {
       default:
         return null
     }
-
   }
 
   const renderTagCard = () => {
@@ -449,15 +431,13 @@ const ProfileDetailScreen = ({props,navigation}) => {
             </View>
           </View>
         </Modal>
-
       </View>)
   }
-
 
   const renderTags = () => {
     return (
       <View style={{width: "100%", flexDirection: "row", flexWrap: "wrap", paddingLeft: 6}}>
-        {selectedTag?.map((item, index) => {
+        {userData?.tags.map((item, index) => {
           return (
             <View key={index} View style={{
               flexDirection: "row", backgroundColor: Colors.skyBlue, alignSelf: 'flex-start'
@@ -499,46 +479,18 @@ const ProfileDetailScreen = ({props,navigation}) => {
   const renderProfileScreen = () => {
     return (
       <View>
-        <View style={{flexDirection: "row", justifyContent: "flex-end"}}>
-          <Button color={Color.white} style={{
-            display: isEdit === true ? "flex" : "none",
-            alignSelf: "flex-end",
-            backgroundColor: Colors.orange,
-            margin: 4,
-            marginRight: 8,
-            borderRadius: 20
-          }}
-                  onPress={() => handleUpdateProfile("DISCARD")}>
-            Discard
-          </Button>
-          <Button color={Color.white} style={{
-            display: isEdit ? "flex" : "none",
-            alignSelf: "flex-end",
-            backgroundColor: Colors.primaryDark,
-            margin: 4,
-            marginRight: 10,
-            borderRadius: 20
-          }}
-                  onPress={() => handleUpdateProfile("SAVE")}>
-            Save
-          </Button>
-          <Button color={Color.white} style={{
-            display: isEdit ? "none" : "flex",
-            alignSelf: "flex-end",
-            backgroundColor: Colors.primaryDark,
-            margin: 4,
-            marginRight: 10,
-            borderRadius: 20
-          }}
-                  onPress={() => handleUpdateProfile("EDIT")}>
-            Edit
-          </Button>
+        <View style={{width: '100%', height: 220, justifyContent: 'center', alignItems: 'center'}}>
+          <Image
+            source={
+              userData?.profileUrl
+                ? {uri: userData?.profileUrl}
+                : profileImageMock
+            }
+            style={{width: 200, height: 200, borderRadius: '100%', borderWidth: 4, borderColor: Colors.primary}}
+          />
         </View>
-        <View>
 
-          <ProfileImageCard getData={getProfileImage} status={editStatus} uploadImageBtt={false} isEdit={isEdit}/>
-        </View>
-        <View style={{alignItems: "center", marginTop: 6}}>
+        <View style={{alignItems: "center"}}>
           <View style={{flexDirection: "row"}}>
             <Text style={[styles.Name, {display: isEdit ? "none" : "flex",}]}>{userData?.username}</Text>
             <View style={{
@@ -555,10 +507,7 @@ const ProfileDetailScreen = ({props,navigation}) => {
                          placeholder="ขื่อผู้ใช้ของคุณ"/>
             </View>
             <AntDesign style={{display: isEdit ? "flex" : "none",}} name={"edit"} size={24} color="black"/>
-
           </View>
-          <Text
-            style={[styles.validateMessage, {display: showValidateMessage ? "flex" : "none"}]}>{showValidateMessage}</Text>
 
           <View style={{flexDirection: "row", marginTop: 4}}>
             <View style={{alignItems: "center", width: 100}}>
@@ -572,6 +521,7 @@ const ProfileDetailScreen = ({props,navigation}) => {
             </View>
           </View>
         </View>
+
         <View style={{padding: 4,}}>
           <View style={{}}>
             <Text style={{
@@ -582,9 +532,9 @@ const ProfileDetailScreen = ({props,navigation}) => {
 
             <View style={[styles.textAreaContainer, {borderWidth: isEdit ? 1 : 0}]}>
               <TextInput style={[styles.textArea, {display: (isEdit ? "flex" : "none"),}]}
-                         value={aboutMeDescription}
+                         value={userData?.description}
                          onChangeText={setAboutMeDescription}
-                         placeholder={aboutMeDescription ? "" : "เพิ่มคำอธิบายเกี่ยวกับคุณ"}
+                         placeholder={userData?.description ? "" : "คุณยังไม่ได้เพิ่มคำอธิบาย"}
                          placeholderTextColor="grey"
                          numberOfLines={10}
                          multiline={true}
@@ -593,8 +543,8 @@ const ProfileDetailScreen = ({props,navigation}) => {
               />
               <Text style={[styles.input, {
                 display: isEdit ? "none" : "flex",
-                color: aboutMeDescription ? Color.black : "gray",
-              }]}>{aboutMeDescription ? aboutMeDescription.trim() : "เพิ่มคำอธิบายเกี่ยวกับคุณ"}</Text>
+                color: userData?.description ? Color.black : "gray",
+              }]}>{userData?.description ? userData?.description.trim() : "คุณยังไม่ได้เพิ่มคำอธิบาย"}</Text>
             </View>
           </View>
 
@@ -603,42 +553,42 @@ const ProfileDetailScreen = ({props,navigation}) => {
               fontFamily: Fonts.bold,
               fontSize: FontSize.primary,
               padding: 6,
-            }}>สิ่งที่ฉันสนใจ</Text>
-
-            {renderTags()}
-            {popupSelectTag()}
+            }}>
+              สิ่งที่ฉันสนใจ
+            </Text>
+            {
+              renderTags()
+            }
           </View>
         </View>
-        {popupSaveProfile()}
-        {popupDiscardProfile()}
       </View>
     );
   };
 
   const signOut = async () => {
     await dispatch(SignOut())
-    setTimeout(()=>{
-      try{
-       navigation.navigate("Profile")
-      }catch (e) {
+    setTimeout(() => {
+      try {
+        navigation.navigate("Profile")
+      } catch (e) {
         return;
       }
-    },1000)
+    }, 1000)
   }
 
   return (
-    <SafeAreaView style={{flex: 1,backgroundColor: 'white'}}>
-      <View>
-        <Text>
-          {
-            userData?.username
-          }
-        </Text>
-        <Button
-          title="Sign out"
-          onPress={() => signOut()}
-        />
-      </View>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+      {/*<View>*/}
+      {/*  <Text>*/}
+      {/*    {*/}
+      {/*      userData?.username*/}
+      {/*    }*/}
+      {/*  </Text>*/}
+      {/*  <Button*/}
+      {/*    title="Sign out"*/}
+      {/*    onPress={() => signOut()}*/}
+      {/*  />*/}
+      {/*</View>*/}
 
       {/*{isLoad ? (*/}
       {/*  <Text style={styles.CenterScreenText}>Loading...</Text>*/}
@@ -647,6 +597,9 @@ const ProfileDetailScreen = ({props,navigation}) => {
       {/*    {renderProfileScreen()}*/}
       {/*  </KeyboardAwareScrollView>*/}
       {/*)}*/}
+      {
+        renderProfileScreen()
+      }
     </SafeAreaView>
   );
 };
@@ -742,7 +695,6 @@ const styles = StyleSheet.create({
     color: "red",
     marginVertical: 4
   }
-
 });
 
 export default ProfileDetailScreen;
