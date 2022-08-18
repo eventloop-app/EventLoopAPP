@@ -20,6 +20,7 @@ import ScannerScreen from "../screens/ScannerScreen";
 import ManageEventScreen from "../screens/ManageEventScreen";
 import ReviewEventScreen from "../screens/ReviewEventScreen";
 import {NavigationContainer} from "@react-navigation/native";
+import MapScreen from "../screens/MapScreen";
 const Routing = () => {
 
     const Stack = createNativeStackNavigator();
@@ -60,7 +61,7 @@ const Routing = () => {
                 <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
                 <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}/>
-                <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+                <Tab.Screen name={'Like'} component={MapScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
                 <Tab.Screen name={'Profile'}
                             component={ProfileScreen}
                             options={{headerShown: false, tabBarShowLabel: false}}
