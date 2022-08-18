@@ -486,7 +486,7 @@ const ProfileDetailScreen = ({props, navigation}) => {
                 ? {uri: userData?.profileUrl}
                 : profileImageMock
             }
-            style={{width: 200, height: 200, borderRadius: '100%', borderWidth: 4, borderColor: Colors.primary}}
+            style={{width: 200, height: 200, borderRadius: 200/2, borderWidth: 4, borderColor: Colors.primary}}
           />
         </View>
 
