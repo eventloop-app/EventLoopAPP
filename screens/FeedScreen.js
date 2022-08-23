@@ -7,21 +7,24 @@ import { useFocusEffect } from '@react-navigation/native'
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
-
+import EventCardHorizon from "../components/EventCardHorizon";
 import { Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+
 
 const FeedScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [eventId, setEventId] = useState(true)
-  const [allEvents, setAllEvent] = useState([])
-  const [eventByTag, setEventByTag] = useState([])
-  const [eventByRegistered, setEventByRegistered] = useState([])
-  const [eventByAttention, setEventByAttention] = useState([])
+  const [allEvents, setAllEvent] = useState("")
+  const [eventByTag, setEventByTag] = useState("")
+  const [eventByRegistered, setEventByRegistered] = useState("")
+  const [eventByAttention, setEventByAttention] = useState("")
   const [isVisible, setIsVisible] = useState(false)
   const [title, setTitle] = useState("กิจกรรมที่กำลังจะเริ่มเร็วๆนี้")
   const [feedbackImageCover, setFeedbackImageCover] = useState("https://cdn.zipeventapp.com/blog/2020/09/2020-09-09_04-59-46_zip-onlineevent.png")
   const [feedbackTitle, setFeedbackTitle] = useState("ราชสีมาวิทยาลัย")
   const [selectedTag, setSelectedTag] = useState(["บันเทิง", "การศึกษา", "อาหาร", "กีฬา", "ท่องเที่ยว"])
+  const [feedBack, setFeedBack] = useState("")
+  const [hasFeedBack, setHasFeedBack] = useState(false)
   // useFocusEffect(
   //   useCallback(() => {
   //     setIsVisible(true)
@@ -146,7 +149,7 @@ const FeedScreen = ({ route, navigation }) => {
 
   const renderRemindFeedback = () => {
     return (
-      <View style={[styles.shadowsCard, { height: 150, backgroundColor: Colors.bag1Bg, }]}>
+      <View style={[styles.shadowsCard, styles.feedBack, { display: "flex" }]}>
         <View style={{}}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", paddingTop: 6 }}>
             <Text style={styles.textTitle}>กิจกรรมที่ยังไม่รีวิว</Text>
@@ -171,6 +174,7 @@ const FeedScreen = ({ route, navigation }) => {
                 <Text numberOfLines={1} style={{ fontFamily: Fonts.medium, fontSize: FontSize.primary }}>{feedbackTitle}</Text>
               </View>
               <View style={{ flexDirection: "row", marginTop: 10 }}>
+
                 <AntDesign color={"yellow"} name={"staro"} size={32}></AntDesign>
                 <AntDesign color={"yellow"} name={"staro"} size={32}></AntDesign>
                 <AntDesign color={"yellow"} name={"staro"} size={32}></AntDesign>
@@ -247,7 +251,7 @@ const FeedScreen = ({ route, navigation }) => {
 
   const renderEventByAttentionSection = () => {
     return (
-      <View style={{ backgroundColor: "white" }}>
+      <View style={{ backgroundColor: "white", display: eventByAttention ? "flex" : "none" }}>
         <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
             <Text style={styles.textTitle}>กำลังมาแรง</Text>
@@ -261,7 +265,7 @@ const FeedScreen = ({ route, navigation }) => {
         </View>
         <FlatList
           data={eventByAttention}
-          renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
+          renderItem={({ item }) => (<EventCardHorizon item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })} />)}
@@ -315,15 +319,17 @@ const FeedScreen = ({ route, navigation }) => {
             {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
             <ScrollView>
               <View style={{ marginTop: 10 }}>
+
+                {renderEventByAttentionSection()}
                 {renderEventShortcutSection()}
                 {renderEventSection()}
 
                 {renderEventByTagSection()}
-                {renderEventByAttentionSection()}
+
                 {renderRegisteredEventSection()}
-                {/* <View style={{}}>
+                <View style={{ display: hasFeedBack ? "flex" : "none" }}>
                   {renderRemindFeedback()}
-                </View> */}
+                </View>
 
 
 
@@ -375,7 +381,12 @@ const styles = StyleSheet.create({
     elevation: 5,
     margin: 8,
     borderRadius: 15,
+  },
+  feedBack: {
+    height: 150,
+    backgroundColor: Colors.bag1Bg,
   }
+
 
 
   // ImageCover: {
