@@ -11,7 +11,7 @@ class eventsService {
 
   async getEventAll() {
     try {
-      return api.get('events?pageSize=20')
+      return api.get('events?pageSize=10')
     } catch (e) {
       return new Promise(reject => reject(e))
     }

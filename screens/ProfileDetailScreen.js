@@ -54,7 +54,6 @@ const ProfileDetailScreen = ({props, navigation}) => {
 
 
   const setData = async () => {
-    console.log(user)
     await setUserData(JSON.parse(user))
   }
 
@@ -87,7 +86,6 @@ const ProfileDetailScreen = ({props, navigation}) => {
   }, [])
 
   const checkHasUserName = (value) => {
-    console.log(value.nativeEvent.text)
     const username = value.nativeEvent.text
 
     //Validate Username

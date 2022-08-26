@@ -9,130 +9,126 @@ import fontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 
 const MapScreen = (props) => {
-    const [location, setLocation] = useState({
-      latitude: 13.655195982451191,
-      longitude: 100.49923007148183,
-      latitudeDelta: 0.6616193304764995,
-      longitudeDelta: 0.34865230321884155
-    })
-    const mapRef = createRef();
-    const mapRef2 = createRef();
-    const [mapData, setMapData] = useState({
-      name: null,
-      lat: null,
-      lng: null,
-    })
-    const [marker, setMarker] = useState({lat: 0, lng: 0});
 
-    useEffect(() => {
-      let unmount = false
-      if(!unmount){
-        checkPermissions().then()
-      }
-      return () => {
-        unmount = true
-      }
-    }, [])
+  const [location, setLocation] = useState({
+    latitude: 13.655195982451191,
+    longitude: 100.49923007148183,
+    latitudeDelta: 0.6616193304764995,
+    longitudeDelta: 0.34865230321884155
+  })
 
-    useEffect(() => {
-      if (marker.lat !== 0) {
-        mapRef.current.animateToRegion({
-          latitude: marker.lat,
-          longitude: marker.lng,
-          longitudeDelta: 0.001,
-          latitudeDelta: 0.001
-        })
-      }
-      return;
-    }, [marker])
+  const mapRef = createRef();
+  const mapRef2 = createRef();
+  const [mapData, setMapData] = useState({
+    name: null,
+    lat: null,
+    lng: null,
+  })
+  const [marker, setMarker] = useState({lat: 0, lng: 0});
 
-    const checkPermissions = async () => {
-      let {status} = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission to access location was denied');
-        return;
-      }
-      let nowLocation = await Location.getCurrentPositionAsync({});
-      await setLocation({
-        ...location,
-        latitude: nowLocation.coords.latitude,
-        longitude: nowLocation.coords.longitude
+  useEffect(() => {
+    checkPermissions().then()
+  }, [])
+
+  useEffect(() => {
+    if (marker.lat !== 0) {
+      mapRef.current.animateToRegion({
+        latitude: marker.lat,
+        longitude: marker.lng,
+        longitudeDelta: 0.001,
+        latitudeDelta: 0.001
       })
     }
+  }, [marker])
 
-    return (
-      <View style={styles.container}>
-        <View>
-          <MapView
-            showsMyLocationButton={true}
-            ref={mapRef}
-            moveOnMarkerPress={true}
-            onMarkerDrag={() => console.log('Mark')}
-            style={styles.maps}
-            provider={"google"}
-            showsUserLocation={true}
-            initialRegion={location}
-            followsUserLocation={true}
-            onPoiClick={(a) => {
+  const checkPermissions = async () => {
+    let {status} = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return;
+    }
+    let nowLocation = await Location.getCurrentPositionAsync({});
+    await setLocation({
+      ...location,
+      latitude: nowLocation.coords.latitude,
+      longitude: nowLocation.coords.longitude
+    })
+  }
+
+  return (
+    <View style={styles.container}>
+      <View>
+        <MapView
+          showsMyLocationButton={true}
+          ref={mapRef}
+          moveOnMarkerPress={true}
+          onMarkerDrag={() => console.log('Mark')}
+          style={styles.maps}
+          provider={"google"}
+          showsUserLocation={true}
+          initialRegion={location}
+          followsUserLocation={true}
+          onPoiClick={(a) => {
+            setMarker({
+              lat: a.nativeEvent.coordinate.latitude,
+              lng: a.nativeEvent.coordinate.longitude,
+            })
+            setMapData({
+              lat: a.nativeEvent.coordinate.latitude,
+              lng: a.nativeEvent.coordinate.longitude,
+              name: a.nativeEvent.name
+            })
+          }}>
+          <Marker image={'https://cdn.discordapp.com/emojis/855437648718069771.webp?size=96&quality=lossless'}
+                  description={mapData?.name} coordinate={{latitude: marker.lat, longitude: marker.lng}}/>
+        </MapView>
+        <View style={{
+          position: 'absolute',
+          top: (Platform.OS === "android" ? 70 : 100),
+          width: '90%',
+          left: "5%",
+          zIndex: 10
+        }}>
+          <GooglePlacesAutocomplete
+            ref={mapRef2}
+            styles={{
+              textInput: {
+                fontFamily: fonts.primary,
+                fontSize: fontSize.primary
+              },
+            }}
+            placeholder={'ค้นหาสถานที่'}
+            autoFocus={true}
+            fetchDetails={true}
+            onPress={(data, details = null) => {
               setMarker({
-                lat: a.nativeEvent.coordinate.latitude,
-                lng: a.nativeEvent.coordinate.longitude,
+                ...marker,
+                lat: details.geometry.location.lat,
+                lng: details.geometry.location.lng,
               })
               setMapData({
-                lat: a.nativeEvent,
-                lng: a.nativeEvent.coordinate.longitude,
-                name: a.nativeEvent.name
+                ...mapData,
+                lat: details.geometry.location.lat,
+                lng: details.geometry.location.lng,
+                name: data.description
               })
-            }}>
-            <Marker image={'https://cdn.discordapp.com/emojis/855437648718069771.webp?size=96&quality=lossless'}
-                    description={mapData?.name} coordinate={{latitude: marker.lat, longitude: marker.lng}}/>
-          </MapView>
-          <View style={{
-            position: 'absolute',
-            top: (Platform.OS === "android" ? 70 : 100),
-            width: '90%',
-            left: "5%",
-            zIndex: 10
-          }}>
-            <GooglePlacesAutocomplete
-              ref={mapRef2}
-              styles={{
-                textInput: {
-                  fontFamily: fonts.primary,
-                  fontSize: fontSize.primary
-                },
-              }}
-              placeholder={'ค้นหาสถานที่'}
-              autoFocus={true}
-              fetchDetails={true}
-              onPress={(data, details = null) => {
-                setMarker({
-                  ...marker,
-                  lat: details.geometry.location.lat,
-                  lng: details.geometry.location.lng,
-                })
-                setMapData({
-                  ...mapData,
-                  lat: details.geometry.location.lat,
-                  lng: details.geometry.location.lng,
-                  name: data.description
-                })
-              }}
-              nearbyPlacesAPI='GooglePlacesSearch'
-              GooglePlacesSearchQuery={{
-                rankby: 'distance',
-              }}
-              query={{
-                key: 'AIzaSyBaiAdtJEvMsBB1MRKo_ld90kxv-kTEMi4',
-                location: `${location.latitude}, ${location.longitude}`,
-                radius: '15000',
-                language: 'th',
-                components: 'country:th',
+            }}
+            nearbyPlacesAPI='GooglePlacesSearch'
+            GooglePlacesSearchQuery={{
+              rankby: 'distance',
+            }}
+            query={{
+              key: 'AIzaSyBaiAdtJEvMsBB1MRKo_ld90kxv-kTEMi4',
+              location: `${location.latitude}, ${location.longitude}`,
+              radius: '15000',
+              language: 'th',
+              components: 'country:th',
 
-              }}
-            />
-          </View>
-          <View style={{
+            }}
+          />
+        </View>
+        {
+          (mapData.name && <View style={{
             width: "100%",
             height: 0,
             position: 'absolute',
@@ -183,11 +179,12 @@ const MapScreen = (props) => {
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </View>
+          </View>)
+        }
       </View>
-    )
-  }
+    </View>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {

@@ -278,7 +278,7 @@ const Routing = () => {
                           justifyContent: 'center',
                           alignItems: 'center'
                         }}
-                        onPress={() => navigation.goBack()}
+                        onPress={() => navigation.pop()}
                       >
                         <Ionicons name="md-close" size={25} color={Colors.black} />
                       </TouchableOpacity>
