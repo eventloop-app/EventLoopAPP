@@ -38,7 +38,6 @@ const CreateEventScreen = (props) => {
   const [isEditTime, setIsEditTime] = useState(false)
   const [isEndTime, setIsEndTime] = useState(false)
   const [tags, setTags] = useState(tagss)
-  const [oldLocation, setOldLocation] = useState(null)
   const [eventDetail, setEventDetail] = useState({
     eventName: 'ชื่อกิจกรรม',
     startDate: new Date(),
@@ -59,7 +58,6 @@ const CreateEventScreen = (props) => {
         ...eventDetail,
         location: null,
       })
-      // console.log(props.route.params.data)
       setTimeout(() => {
         setEventDetail({
           ...eventDetail,
@@ -68,14 +66,6 @@ const CreateEventScreen = (props) => {
           longitude: props.route.params.data.lng
         })
       }, 100)
-
-
-      // mapRef.current.animateToRegion({
-      //   latitude: props.route.params.data.lat,
-      //   longitude: props.route.params.data.lng,
-      //   longitudeDelta: 0.001,
-      //   latitudeDelta: 0.001
-      // })
     }
   }, [props])
 
@@ -133,7 +123,7 @@ const CreateEventScreen = (props) => {
       }}>
 
         <KeyboardAwareScrollView extraScrollHeight={150}>
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} >
             <View style={{paddingBottom: 200}}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <TextInput placeholder={'จิ้มเพื่อใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray} style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
@@ -149,7 +139,7 @@ const CreateEventScreen = (props) => {
                 <View style={{flex: 1, height: 80, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
                   {
                     tags.map((item, index) => (
-                        <TouchableOpacity onPress={() => {
+                        <TouchableOpacity key={index} onPress={() => {
                           setTags([...tags.slice(0, index), {
                             ...item,
                             isSelect: !item.isSelect
@@ -250,15 +240,29 @@ const CreateEventScreen = (props) => {
                 </View>
               </View>
 
+              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                <TouchableOpacity style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 10,
+                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                  <Ionicons name={'people-sharp'} color={Colors.primary} size={35}/>
+                </TouchableOpacity>
+                <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.primary
+                  }}>จำนวนผู้เข้าร่วมสูงสุด</Text>
+                  <TextInput keyboardType={"number-pad"} maxLength={2} onChange={(e)=> setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})} style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}} value={eventDetail.numberOfPeople.toString()}/>
+                </View>
+              </View>
+
               <View style={{display: 'flex', width: '80%', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                 <TouchableOpacity onPress={() => {
                   props.navigation.navigate('GoogleMap')
-
-                  setOldLocation({
-                    location: eventDetail.location,
-                    latitude: eventDetail.latitude,
-                    longitude: eventDetail.longitude
-                  })
                 }} style={{
                   width: 50,
                   height: 50,
@@ -284,6 +288,11 @@ const CreateEventScreen = (props) => {
                 (eventDetail?.location !== null &&
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                     <MapView
+                      scrollDuringRotateOrZoomEnabled={false}
+                      zoomControlEnabled={false}
+                      zoomEnabled={false}
+                      rotateEnabled={false}
+                      showsTraffic={true}
                       scrollEnabled={false}
                       provider={"google"}
                       followsUserLocation={true}
@@ -291,8 +300,8 @@ const CreateEventScreen = (props) => {
                       initialRegion={{
                         latitude: eventDetail.latitude,
                         longitude: eventDetail.longitude,
-                        latitudeDelta: 0.0066193304764995,
-                        longitudeDelta: 0.00865230321884155
+                        latitudeDelta: 0.0116193304764995,
+                        longitudeDelta: 0.01165230321884155
                       }}
                       style={{
                         borderRadius: 15,
@@ -305,26 +314,6 @@ const CreateEventScreen = (props) => {
                     </MapView>
                   </View>)
               }
-
-              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <TouchableOpacity style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                  <Ionicons name={'people-sharp'} color={Colors.primary} size={35}/>
-                </TouchableOpacity>
-                <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.primary
-                  }}>จำนวนผู้เข้าร่วมสูงสุด</Text>
-                  <TextInput keyboardType={"number-pad"} maxLength={2} onChange={(e)=> setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})} style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}} value={eventDetail.numberOfPeople.toString()}/>
-                </View>
-              </View>
 
               <View style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
                 <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.medium}}>

@@ -10,7 +10,7 @@ import Colors from "../constants/Colors";
 
 const MapScreen = (props) => {
 
-  const [location, setLocation] = useState({
+  const [location] = useState({
     latitude: 13.655195982451191,
     longitude: 100.49923007148183,
     latitudeDelta: 0.6616193304764995,
@@ -24,10 +24,11 @@ const MapScreen = (props) => {
     lat: null,
     lng: null,
   })
+
   const [marker, setMarker] = useState({lat: 0, lng: 0});
 
   useEffect(() => {
-    checkPermissions().then()
+    checkPermissions()
   }, [])
 
   useEffect(() => {
@@ -47,12 +48,13 @@ const MapScreen = (props) => {
       console.log('Permission to access location was denied');
       return;
     }
-    let nowLocation = await Location.getCurrentPositionAsync({});
-    await setLocation({
-      ...location,
-      latitude: nowLocation.coords.latitude,
-      longitude: nowLocation.coords.longitude
-    })
+    // let nowLocation = await Location.getCurrentPositionAsync({});
+
+    // await setLocation({
+    //   ...location,
+    //   latitude: nowLocation.coords.latitude,
+    //   longitude: nowLocation.coords.longitude
+    // })
   }
 
   return (
