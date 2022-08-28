@@ -25,6 +25,7 @@ const FeedScreen = ({ route, navigation }) => {
   const [selectedTag, setSelectedTag] = useState(["บันเทิง", "การศึกษา", "อาหาร", "กีฬา", "ท่องเที่ยว"])
   const [feedBack, setFeedBack] = useState("")
   const [hasFeedBack, setHasFeedBack] = useState(false)
+  const [stepReward, setStepReward] = useState(0);
   // useFocusEffect(
   //   useCallback(() => {
   //     setIsVisible(true)
@@ -48,6 +49,7 @@ const FeedScreen = ({ route, navigation }) => {
   // get Event
   const getEvent = async () => {
     eventsService.getAllEvent().then(res => {
+      console.log(res.data)
       setAllEvent(res.data.content)
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
@@ -90,7 +92,8 @@ const FeedScreen = ({ route, navigation }) => {
 
   const renderEventShortcutSection = () => {
     return (
-      <View style={[styles.shadowsCard, { height: "auto", backgroundColor: Colors.bag9Bg, alignItems: "center" }]}>
+      <View style={[styles.shadowsCard, { backgroundColor: Colors.bag9Bg, alignItems: "center" }]}>
+
         <View>
           <View style={{ paddingVertical: 10, flexDirection: "row", flexWrap: "wrap", width: "100%", alignItems: "center", }}>
             <TouchableOpacity style={{ alignItems: "center", justifyContent: "center", width: 80, marginVertical: 3 }}>
@@ -191,10 +194,10 @@ const FeedScreen = ({ route, navigation }) => {
   }
 
   //Event render
-  const renderEventSection = () => {
+  const renderAllEventSection = () => {
     return (
-      <View style={{ backgroundColor: "white" }}>
-        <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
+      <View style={[styles.eventSection, { display: allEvents ? "flex" : "none" }]}>
+        <View style={[styles.cardHeader]}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
             <Text style={styles.textTitle}>กิจกรรม</Text>
           </View>
@@ -222,8 +225,8 @@ const FeedScreen = ({ route, navigation }) => {
 
   const renderEventByTagSection = () => {
     return (
-      <View style={{ backgroundColor: "white" }}>
-        <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
+      <View style={[styles.eventSection, { display: eventByTag ? "flex" : "none" }]}>
+        <View style={[styles.cardHeader]}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
             <Text style={styles.textTitle}>กิจกรรมที่เหมาะกับคุณ</Text>
           </View>
@@ -251,8 +254,8 @@ const FeedScreen = ({ route, navigation }) => {
 
   const renderEventByAttentionSection = () => {
     return (
-      <View style={{ backgroundColor: "white", display: eventByAttention ? "flex" : "none" }}>
-        <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
+      <View style={[styles.eventSection, { display: eventByAttention ? "flex" : "none" }]}>
+        <View style={[styles.cardHeader]}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
             <Text style={styles.textTitle}>กำลังมาแรง</Text>
           </View>
@@ -280,8 +283,8 @@ const FeedScreen = ({ route, navigation }) => {
 
   const renderRegisteredEventSection = () => {
     return (
-      <View style={{ backgroundColor: "white" }}>
-        <View style={{ display: 'flex', flexDirection: 'row', width: '100%', height: 30 }}>
+      <View style={[styles.eventSection, { display: eventByRegistered ? "flex" : "none" }]}>
+        <View style={[styles.cardHeader]}>
           <View style={{ flex: 0.7, alignItems: 'flex-start', justifyContent: 'center' }}>
             <Text style={styles.textTitle}>กิจกรรมที่คุณได้ลงทะเบียน</Text>
           </View>
@@ -308,6 +311,8 @@ const FeedScreen = ({ route, navigation }) => {
   }
 
 
+
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       {
@@ -318,14 +323,12 @@ const FeedScreen = ({ route, navigation }) => {
             </View>
             {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
             <ScrollView>
-              <View style={{ marginTop: 10 }}>
+              <View  >
 
                 {renderEventByAttentionSection()}
                 {renderEventShortcutSection()}
-                {renderEventSection()}
-
+                {renderAllEventSection()}
                 {renderEventByTagSection()}
-
                 {renderRegisteredEventSection()}
                 <View style={{ display: hasFeedBack ? "flex" : "none" }}>
                   {renderRemindFeedback()}
@@ -385,6 +388,15 @@ const styles = StyleSheet.create({
   feedBack: {
     height: 150,
     backgroundColor: Colors.bag1Bg,
+  },
+  eventSection: {
+    marginVertical: 6,
+    backgroundColor: "White"
+  }, cardHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    height: 30
   }
 
 

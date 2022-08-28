@@ -395,6 +395,7 @@ const ProfileDetailScreen = (props) => {
                 justifyContent: "space-evenly",
                 alignContent: "space-around",
                 flexDirection: "row",
+                
                 flexWrap: 'wrap'
             }}>
                 {tags.map((item, index) => {
