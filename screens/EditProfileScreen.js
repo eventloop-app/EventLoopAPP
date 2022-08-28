@@ -191,6 +191,8 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     formData.append('profileImage', localUri ? { uri: localUri, name: filename, type: type } : null);
     formData.append('memberInfo', JSON.stringify(data));
 
+    console.log(formData)
+
     await eventsService.transferMemberData(formData).then(async res => {
       if(res.status === 200){
         await dispatch(saveUser(JSON.stringify(res.data.member)))

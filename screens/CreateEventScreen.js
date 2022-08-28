@@ -24,6 +24,7 @@ import {platforms} from "react-native/react-native.config";
 import FormData from "form-data";
 import eventsService from "../services/eventsService";
 import {stringify} from "qs";
+import {useIsFocused} from "@react-navigation/native";
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
@@ -44,7 +45,7 @@ const kind = [
 
 ]
 const CreateEventScreen = (props) => {
-
+  const [isLoad, setIsLoad] = useState(true)
   const [coverImage, setCoverImage] = useState(null)
   const [isEditTime, setIsEditTime] = useState(false)
   const [isEndTime, setIsEndTime] = useState(false)
@@ -66,11 +67,38 @@ const CreateEventScreen = (props) => {
   const {user} = useSelector(state => state.user)
   const userData = JSON.parse(user)
   const mapRef = createRef();
+  const isFocused = useIsFocused();
+
+  useEffect(()=> {
+    if (isFocused === false) {
+
+      setEventDetail({
+        type: "ONSITE",
+        tags: [],
+        eventName: 'ชื่อกิจกรรม',
+        startDate: new Date(),
+        endDate: new Date(),
+        location: null,
+        latitude: 0,
+        longitude: 0,
+        description: 'ใส่รายละเอียดกิจกรรม',
+        numberOfPeople: 0,
+        memberId: null
+      })
+      setIsLoad(true)
+      setCoverImage(null)
+      setKinds(kind)
+      setTags(tagss)
+    }else{
+      setIsLoad(false)
+    }
+  },[isFocused])
 
   useEffect(()=> {
     if(userData !== undefined){
       setEventDetail({...eventDetail, memberId: userData.id})
     }
+    setIsLoad(false)
   },[])
 
   useEffect(() => {
@@ -127,7 +155,7 @@ const CreateEventScreen = (props) => {
   }
 
   return (
-    Platform.OS !== 'android' &&
+    (Platform.OS !== 'android' && !isLoad) &&
     <View style={{flex: 1, backgroundColor: Colors.white}}>
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {
@@ -164,7 +192,7 @@ const CreateEventScreen = (props) => {
           <ScrollView showsVerticalScrollIndicator={false}
                       showsHorizontalScrollIndicator={false}>
             <View style={{paddingBottom: 200}}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
                 <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray}
                            style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
                            onChange={(e) => setEventDetail({...eventDetail, eventName: e.nativeEvent.text})}/>
