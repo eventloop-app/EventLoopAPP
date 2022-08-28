@@ -10,7 +10,6 @@ const setup = (store) => {
         config.headers["content-type"] = 'application/json';
       }
     });
-    console.log(config)
     return config;
   }, (error) => {
     return Promise.reject(error);
@@ -33,7 +32,8 @@ const setup = (store) => {
         return await axiosInstance(originalConfig);
       }
     }
-    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response.reason});
+    console.log(err.response)
+    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response});
   });
 };
 export default setup;

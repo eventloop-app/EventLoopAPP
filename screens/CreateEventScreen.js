@@ -23,6 +23,7 @@ import MapView, {Marker} from "react-native-maps";
 import {platforms} from "react-native/react-native.config";
 import FormData from "form-data";
 import eventsService from "../services/eventsService";
+import {stringify} from "qs";
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
@@ -116,7 +117,7 @@ const CreateEventScreen = (props) => {
     const type = match ? `image/${match[1]}` : `image`;
     const data = new FormData();
     data.append('coverImage', coverImage ? { uri: coverImage.uri, name: filename, type: type } : null);
-    data.append('memberInfo', newEventDetail);
+    data.append('eventInfo', JSON.stringify(newEventDetail));
 
     eventsService.createEvent(data).then(res =>{
       console.log(res)

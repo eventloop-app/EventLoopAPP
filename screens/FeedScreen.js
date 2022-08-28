@@ -401,7 +401,7 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
         <ScrollView style={{paddingTop: 100}} >
-          <View>
+          <View style={{paddingBottom: 200}}>
             {renderEventByAttentionSection()}
             {renderEventShortcutSection()}
             {renderAllEventSection()}

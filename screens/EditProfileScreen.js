@@ -68,22 +68,35 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   }, [])
 
   useEffect(()=>{
-    if(userData !== null){
+    let unmount = false
+    let count = 1
+    if(userData !== null && unmount !== true){
       registerForPushNotification().then(token =>{
-        setUserData({...userData, deviceId: token})
+        if(userData.deviceId === undefined){
+          console.log("GET TOKEN: " + token + "|" + count)
+          setUserData({...userData, deviceId: token})
+        }
       }).catch(e =>{
         console.error(e)
       })
     }
+    count++
+    return ()=> {
+      unmount = true
+    }
   },[userData])
 
   const registerForPushNotification = async () => {
-    const {status} = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission to access location was denied');
-      return ;
-    }else{
-      return (await Notifications.getExpoPushTokenAsync()).data
+    console.log(userData.deviceId)
+    if(userData.deviceId === undefined ){
+      const {status} = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return ;
+      }else{
+        console.log("GET deviceId")
+        return (await Notifications.getExpoPushTokenAsync()).data
+      }
     }
   }
 
