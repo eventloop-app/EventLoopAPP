@@ -17,7 +17,6 @@ const setup = (store) => {
   const {dispatch} = store;
 
   axiosInstance.interceptors.response.use((res) => {
-    console.log(res)
     return res;
   }, async (err) => {
     const originalConfig = err.config;
@@ -30,7 +29,6 @@ const setup = (store) => {
         await storages.getDataV2('user').then(res => {
           originalConfig.headers.Authorization = JSON.parse(res).idToken
         })
-        console.log(err.response)
         return await axiosInstance(originalConfig);
       }
     }
