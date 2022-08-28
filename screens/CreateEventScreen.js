@@ -2,7 +2,7 @@ import React, {createRef, useCallback, useEffect, useMemo, useRef, useState} fro
 import {
   Button,
   Dimensions,
-  Image,
+  Image, Platform,
   SafeAreaView,
   ScrollView,
   Text,
@@ -20,8 +20,10 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useSelector} from "react-redux";
 import MapView, {Marker} from "react-native-maps";
+import {platforms} from "react-native/react-native.config";
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
+
 const tagss = [
   {name: 'การเรียน1', isSelect: false},
   {name: 'การเรียน2', isSelect: false},
@@ -90,6 +92,8 @@ const CreateEventScreen = (props) => {
   }
 
   return (
+
+    Platform.OS !== 'android' &&
     <View style={{flex: 1, backgroundColor: Colors.white}}>
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {
@@ -122,8 +126,9 @@ const CreateEventScreen = (props) => {
         padding: 15
       }}>
 
-        <KeyboardAwareScrollView extraScrollHeight={150}>
-          <ScrollView showsVerticalScrollIndicator={false} >
+        <KeyboardAwareScrollView extraScrollHeight={150} >
+          <ScrollView showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false} >
             <View style={{paddingBottom: 200}}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <TextInput placeholder={'จิ้มเพื่อใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray} style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}

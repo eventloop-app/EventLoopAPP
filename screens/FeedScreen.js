@@ -2,8 +2,6 @@ import {FlatList, SafeAreaView, StyleSheet, Text, View} from "react-native";
 import React, {useCallback, useEffect, useState} from "react";
 import EventCard from "../components/EventCard";
 import eventsService from "../services/eventsService";
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import {useFocusEffect} from '@react-navigation/native'
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
@@ -13,7 +11,6 @@ const FeedScreen = ({route, navigation}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [eventId, setEventId] = useState(true)
   const [events, setEvent] = useState([])
-  const [isVisible, setIsVisible] = useState(false)
 
   // useEffect(() => {
   //   const unsubscribe = navigation.addListener('focus', async () => {
@@ -37,7 +34,9 @@ const FeedScreen = ({route, navigation}) => {
 
   //ดึง Event ทั่งหมด
   useEffect(() => {
-    getEvent()
+    setTimeout(()=> {
+      getEvent()
+    }, 1000)
   }, [])
 
   const getEvent = async () => {

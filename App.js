@@ -27,7 +27,6 @@ Notifications.setNotificationHandler({
 
 const App = () => {
   const [LoadFront, setLoadFront] = useState(true)
-  const [expoPushToken, setExpoPushToken] = useState('');
 
   useEffect(() => {
     loadData()
