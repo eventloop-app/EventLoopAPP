@@ -4,12 +4,13 @@ import {refreshToken} from "../actions/auth";
 
 const setup = (store) => {
   axiosInstance.interceptors.request.use(async (config) => {
-    await storages.getDataV2('user').then(res => {
+    await storages.getDataV2('userToken').then(res => {
       if (res !== undefined) {
         config.headers["Authorization"] = JSON.parse(res).idToken;
         config.headers["content-type"] = 'application/json';
       }
     });
+    console.log(config)
     return config;
   }, (error) => {
     return Promise.reject(error);

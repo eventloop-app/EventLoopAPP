@@ -21,6 +21,8 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useSelector} from "react-redux";
 import MapView, {Marker} from "react-native-maps";
 import {platforms} from "react-native/react-native.config";
+import FormData from "form-data";
+import eventsService from "../services/eventsService";
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
@@ -34,13 +36,22 @@ const tagss = [
   {name: 'การเรียน7', isSelect: false},
   {name: 'การเรียน8', isSelect: false},
 ]
+
+const kind = [
+  {name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
+  {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}
+
+]
 const CreateEventScreen = (props) => {
 
   const [coverImage, setCoverImage] = useState(null)
   const [isEditTime, setIsEditTime] = useState(false)
   const [isEndTime, setIsEndTime] = useState(false)
   const [tags, setTags] = useState(tagss)
+  const [kinds, setKinds] = useState(kind)
   const [eventDetail, setEventDetail] = useState({
+    type: "ONSITE",
+    tags: [],
     eventName: 'ชื่อกิจกรรม',
     startDate: new Date(),
     endDate: new Date(),
@@ -49,10 +60,17 @@ const CreateEventScreen = (props) => {
     longitude: 0,
     description: 'ใส่รายละเอียดกิจกรรม',
     numberOfPeople: 0,
+    memberId: null
   })
   const {user} = useSelector(state => state.user)
   const userData = JSON.parse(user)
   const mapRef = createRef();
+
+  useEffect(()=> {
+    if(userData !== undefined){
+      setEventDetail({...eventDetail, memberId: userData.id})
+    }
+  },[])
 
   useEffect(() => {
     if (props.route.params) {
@@ -79,7 +97,7 @@ const CreateEventScreen = (props) => {
       quality: 1,
     });
     if (!result.cancelled) {
-      setCoverImage(result.uri)
+      setCoverImage(result)
     }
   };
 
@@ -87,12 +105,27 @@ const CreateEventScreen = (props) => {
     if (isEndTime) {
 
     } else {
-      setEventDetail({...eventDetail, startDate: date})
+      setEventDetail({...eventDetail, startDate: date, endDate: date})
     }
   }
 
-  return (
+  const onSubmit = async () => {
+    let newEventDetail = {...eventDetail, startDate: moment(eventDetail.startDate).unix() * 1000, endDate: moment(eventDetail.endDate).unix() * 1000}
+    const filename = coverImage.uri.toString().split('/').pop()
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : `image`;
+    const data = new FormData();
+    data.append('coverImage', coverImage ? { uri: coverImage.uri, name: filename, type: type } : null);
+    data.append('memberInfo', newEventDetail);
 
+    eventsService.createEvent(data).then(res =>{
+      console.log(res)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+
+  return (
     Platform.OS !== 'android' &&
     <View style={{flex: 1, backgroundColor: Colors.white}}>
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
@@ -102,7 +135,7 @@ const CreateEventScreen = (props) => {
                               style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
               <Image style={{width: '100%', height: '100%'}}
                      source={{
-                       uri: (coverImage)
+                       uri: (coverImage.uri)
                      }}
               />
             </TouchableOpacity>
@@ -126,12 +159,13 @@ const CreateEventScreen = (props) => {
         padding: 15
       }}>
 
-        <KeyboardAwareScrollView extraScrollHeight={150} >
+        <KeyboardAwareScrollView extraScrollHeight={150}>
           <ScrollView showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={false} >
+                      showsHorizontalScrollIndicator={false}>
             <View style={{paddingBottom: 200}}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TextInput placeholder={'จิ้มเพื่อใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray} style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
+                <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray}
+                           style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
                            onChange={(e) => setEventDetail({...eventDetail, eventName: e.nativeEvent.text})}/>
               </View>
 
@@ -141,15 +175,85 @@ const CreateEventScreen = (props) => {
                   fontSize: FontSize.medium
                 }}>แท็ก
                 </Text>
-                <View style={{flex: 1, height: 80, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+                <View style={{
+                  flex: 1,
+                  height: 80,
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start'
+                }}>
                   {
                     tags.map((item, index) => (
-                        <TouchableOpacity key={index} onPress={() => {
-                          setTags([...tags.slice(0, index), {
-                            ...item,
-                            isSelect: !item.isSelect
-                          }, ...tags.slice(index + 1)])
-                        }} >
+                      <TouchableOpacity key={index} onPress={async () => {
+
+                        await setTags([...tags.slice(0, index), {
+                          ...item,
+                          isSelect: !item.isSelect
+                        }, ...tags.slice(index + 1)])
+
+                        let newTags = [...tags.slice(0, index), {
+                          ...item,
+                          isSelect: !item.isSelect
+                        }, ...tags.slice(index + 1)]
+
+                        newTags = newTags.map(tag => {
+                            if (tag.isSelect) {
+                              return tag.name
+                            }
+                          }
+                        )
+
+                        setEventDetail({...eventDetail, tags: newTags.filter(tag => tag !== undefined)})
+
+                      }}>
+                        <View style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          width: 80,
+                          height: 30,
+                          backgroundColor: (item.isSelect ? Colors.primary : Colors.gray),
+                          margin: 3,
+                          borderRadius: 8,
+                        }}>
+                          <Text style={{
+                            fontFamily: Fonts.primary,
+                            fontSize: FontSize.small
+                          }}>
+                            {item.name}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  }
+                </View>
+              </View>
+
+              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                <View style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 10,
+                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  <Ionicons name={'mail-open-outline'} color={Colors.primary} size={35}/>
+                </View>
+                <View style={{marginLeft: 20}}>
+                  <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                    {
+                      kinds.map((item, index) => (
+                        <TouchableOpacity onPress={() => {
+                          if (index === 0) {
+                            setKinds([  {name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
+                              {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}])
+                          } else {
+                            setKinds([  {name: 'ออนไซต์', en_name: 'ONSITE', isSelect: false},
+                              {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: true}])
+                          }
+                          setEventDetail({...eventDetail, type: item.en_name})
+                        }} key={index}>
                           <View style={{
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -167,8 +271,9 @@ const CreateEventScreen = (props) => {
                             </Text>
                           </View>
                         </TouchableOpacity>
-                    ))
-                  }
+                      ))
+                    }
+                  </View>
                 </View>
               </View>
 
@@ -261,7 +366,10 @@ const CreateEventScreen = (props) => {
                     fontFamily: Fonts.primary,
                     fontSize: FontSize.primary
                   }}>จำนวนผู้เข้าร่วมสูงสุด</Text>
-                  <TextInput keyboardType={"number-pad"} maxLength={2} onChange={(e)=> setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})} style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}} value={eventDetail.numberOfPeople.toString()}/>
+                  <TextInput keyboardType={"number-pad"} maxLength={2}
+                             onChange={(e) => setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})}
+                             style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
+                             value={eventDetail.numberOfPeople.toString()}/>
                 </View>
               </View>
 
@@ -329,6 +437,10 @@ const CreateEventScreen = (props) => {
                              value={eventDetail.description}
                              onChange={(e) => setEventDetail({...eventDetail, description: e.nativeEvent.text})}/>
                 </View>
+              </View>
+
+              <View style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
+                <Button onPress={() => onSubmit()} title={'สร้างกิจกรมม'}/>
               </View>
             </View>
           </ScrollView>

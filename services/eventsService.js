@@ -121,8 +121,9 @@ class eventsService {
     return api.post(`members/hasEmail`, data)
   }
 
-
-
+  async createEvent(data){
+    return api.post(`events/createEvent`, data)
+  }
 }
 
 export default new eventsService();
