@@ -37,7 +37,6 @@
     "react-native-axios": "^0.17.1",
     "react-native-backdrop": "^2.1.2",
     "react-native-bubble-select": "^0.6.0",
-    "react-native-circular-progress-indicator": "^4.4.0",
     "react-native-gesture-handler": "~2.2.1",
     "react-native-head-tab-view": "^4.0.0-rc.13",
     "react-native-image-picker": "^4.8.4",
