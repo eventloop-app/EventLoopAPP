@@ -1,6 +1,6 @@
 class Validate {
     getValidateUsername(username) {
-        const userCheck = /^[a-zA-Z0-9._-]{3,15}$/;
+        const userCheck = /^[a-zA-Z0-9._-]{3,18}$/;
         if (username.match(" ") || "") {
             return false;
         } else if (username.match(userCheck)) {
