@@ -21,5 +21,4 @@ jobs:
             sudo kill -9 `sudo lsof -t -i:19002`
             git pull
             yarn
-            cd ~
-            sh start.sh
+            npx expo start --tunnul & sudo kill -9 `sudo lsof -t -i:22`
