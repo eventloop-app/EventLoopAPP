@@ -1,0 +1,22 @@
+name: SIT CICD
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    
+jobs:
+    needs:
+      - build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTNAME }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATEKEY }}
+          port: ${{ secrets.SERVERPORT }}
+          script: |
+            cd EventLoopAPP/
+            sudo kill -9 `sudo lsof -t -i:19002`
