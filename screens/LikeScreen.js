@@ -4,7 +4,7 @@ import Colors from "../constants/Colors";
 
 const LikeScreen = (props) => {
   return(
-    <SafeAreaView style={{flex: 1, backgroundColor: Colors.skyBlue}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: Colors.pink}}>
       <View>
         <View style={{position: 'relative',width: 100, height: 100, backgroundColor: 'blue', borderRadius: 15, zIndex: 10}}>
         </View>
