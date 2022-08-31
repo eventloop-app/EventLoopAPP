@@ -31,17 +31,17 @@ const EventCard = ({ item, onPress }) => {
           <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
         </View>
         <View style={styles.BookmarkBox}>
-          <Ionicons name={'md-bookmark-outline'} size={25} color={Colors.red} />
+          <Ionicons name={'md-bookmark-outline'} size={24} color={Colors.red} />
         </View>
         <View style={styles.Title}>
           <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
         </View>
         <View style={styles.Date}>
-          <Ionicons name={'calendar-sharp'} size={25} color={Colors.primary} />
+          <Ionicons name={'calendar-sharp'} size={24} color={Colors.primary} />
           <Text style={styles.TextDate}>{eventDate}</Text>
         </View>
         <View style={styles.Time}>
-          <Ionicons name={'ios-time-outline'} size={25} color={Colors.primary} />
+          <Ionicons name={'ios-time-outline'} size={24} color={Colors.primary} />
           <Text style={styles.TextDate}>{eventTime}</Text>
         </View>
         <View style={styles.Location}>
@@ -51,7 +51,6 @@ const EventCard = ({ item, onPress }) => {
       </View>
     </TouchableOpacity>)
 }
-
 const styles = StyleSheet.create({
   Container: {
     position: "relative",

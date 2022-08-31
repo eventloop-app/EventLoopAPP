@@ -4,7 +4,7 @@ import {refreshToken} from "../actions/auth";
 
 const setup = (store) => {
   axiosInstance.interceptors.request.use(async (config) => {
-    await storages.getDataV2('user').then(res => {
+    await storages.getDataV2('userToken').then(res => {
       if (res !== undefined) {
         config.headers["Authorization"] = JSON.parse(res).idToken;
         config.headers["content-type"] = 'application/json';
@@ -26,13 +26,13 @@ const setup = (store) => {
         console.log('Token Exprice')
         originalConfig._retry = true;
         await dispatch(refreshToken())
-        await storages.getDataV2('user').then(res => {
+        await storages.getDataV2('userToken').then(res => {
           originalConfig.headers.Authorization = JSON.parse(res).idToken
         })
         return await axiosInstance(originalConfig);
       }
     }
-    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response.reason});
+    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response});
   });
 };
 export default setup;

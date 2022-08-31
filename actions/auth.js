@@ -8,6 +8,11 @@ import eventsService from "../services/eventsService";
 export const SignIn = (token, codeverifier) => (dispatch) => {
   Auth.onSignIn(token, codeverifier).then(token => {
     const user = decode.jwt(token.idToken)
+        storages.save('userToken', JSON.stringify({
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken,
+          idToken: token.idToken
+        }))
     dispatch({type: SIGN_IN_SUCCESS, payload: {user: user}})
     // eventsService.transferMemberData(user).then( res => {
     //   if(res.status === 200){

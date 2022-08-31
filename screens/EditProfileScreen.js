@@ -49,6 +49,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
   ])
+  const [state, setState] = useState(null)
 
   // useEffect(() => {
   //   if (userToken !== null) {
@@ -65,26 +66,46 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   useEffect(()=>{
     const user = route.params.user
     setUserData(user)
+    setState("GetToken")
+
   }, [])
 
   useEffect(()=>{
-    if(userData !== null){
-      registerForPushNotification().then(token =>{
-        setUserData({...userData, deviceId: token})
+    console.log("Get ToKen")
+    let unmount = false
+    if(userData !== null && unmount !== true && state == "GetToken"){
+      registerForPushNotification().then( async token =>{
+        if(userData.deviceId === undefined && token !== null){
+          await console.log("TOKEN IS: " + token )
+          await setUserData({...userData, deviceId: token})
+        }else {
+          console.log("Can't get token")
+        }
       }).catch(e =>{
         console.error(e)
       })
     }
-  },[userData])
-
-  const registerForPushNotification = async () => {
-    const {status} = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-      console.log('Permission to access location was denied');
-      return ;
-    }else{
-      return (await Notifications.getExpoPushTokenAsync()).data
+    return ()=> {
+      unmount = true
     }
+  },[state])
+
+  const registerForPushNotification =  async () => {
+      if(userData.deviceId === undefined ){
+        const {status} = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Permission to access location was denied');
+          return ;
+        }else{
+          console.log("GET deviceId")
+          try {
+            return (await Notifications.getExpoPushTokenAsync()).data
+          }catch (e) {
+            return null
+           console.log(e)
+          }
+        }
+      }
   }
 
   const pickImage = async () => {
@@ -177,6 +198,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     const formData = new FormData();
     formData.append('profileImage', localUri ? { uri: localUri, name: filename, type: type } : null);
     formData.append('memberInfo', JSON.stringify(data));
+
 
     await eventsService.transferMemberData(formData).then(async res => {
       if(res.status === 200){

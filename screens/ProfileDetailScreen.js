@@ -54,7 +54,6 @@ const ProfileDetailScreen = ({props, navigation}) => {
 
 
   const setData = async () => {
-    console.log(user)
     await setUserData(JSON.parse(user))
   }
 
@@ -77,11 +76,16 @@ const ProfileDetailScreen = ({props, navigation}) => {
 
 
   useEffect(() => {
-    setData()
+    let unmount = false
+    if(!unmount){
+      setData()
+    }
+    return ()=> {
+      unmount = true
+    }
   }, [])
 
   const checkHasUserName = (value) => {
-    console.log(value.nativeEvent.text)
     const username = value.nativeEvent.text
 
     //Validate Username
@@ -486,7 +490,7 @@ const ProfileDetailScreen = ({props, navigation}) => {
                 ? {uri: userData?.profileUrl}
                 : profileImageMock
             }
-            style={{width: 200, height: 200, borderWidth: 4, borderRadius: (200/2), borderColor: Colors.primary}}
+            style={{width: 200, height: 200, borderRadius: 200/2, borderWidth: 4, borderColor: Colors.primary}}
           />
         </View>
 
@@ -560,6 +564,7 @@ const ProfileDetailScreen = ({props, navigation}) => {
               renderTags()
             }
           </View>
+          <Button onPress={() => signOut()} title={'ออกจากระบบ'}/>
         </View>
       </View>
     );
