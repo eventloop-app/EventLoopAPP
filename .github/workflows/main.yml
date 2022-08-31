@@ -17,10 +17,19 @@ jobs:
           key: ${{ secrets.PRIVATEKEY }}
           port: ${{ secrets.SERVERPORT }}
           timeout: 20s
-          command_timeout: 30s
+          command_timeout: 1m
           script: |
             cd EventLoopAPP/
             sudo kill -9 `sudo lsof -t -i:19002`
             git pull
             yarn
             npx expo start --tunnel
+      - uses: sarisia/actions-status-discord@v1
+        if: failure()
+        with:
+          webhook: "https://discord.com/api/webhooks/1014651514054262897/aAlSH2xaOT_ekFd0A88wWc0q4JngR8G5BtJoN9YSVV02posQKM5-5WY8-FpoM0YFmREi"
+          image: "https://www.tarkom-projects.com/api/v1/image/fuck-up.png"
+          title: Deploy Failure
+          color: "0xFF0040"
+          status: success
+        
