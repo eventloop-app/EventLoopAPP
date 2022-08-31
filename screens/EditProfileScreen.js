@@ -49,6 +49,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
   ])
+  const [state, setState] = useState(null)
 
   // useEffect(() => {
   //   if (userToken !== null) {
@@ -65,39 +66,38 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   useEffect(()=>{
     const user = route.params.user
     setUserData(user)
+    setState("GetToken")
   }, [])
 
   useEffect(()=>{
+    console.log("Get ToKen")
     let unmount = false
-    let count = 1
-    if(userData !== null && unmount !== true){
-      registerForPushNotification().then(token =>{
+    if(userData !== null && unmount !== true && state == "GetToken"){
+      registerForPushNotification().then( async token =>{
         if(userData.deviceId === undefined){
-          console.log("GET TOKEN: " + token + "|" + count)
-          setUserData({...userData, deviceId: token})
+          await console.log("TOKEN IS: " + token )
+          await setUserData({...userData, deviceId: token})
         }
       }).catch(e =>{
         console.error(e)
       })
     }
-    count++
     return ()=> {
       unmount = true
     }
-  },[userData])
+  },[state])
 
-  const registerForPushNotification = async () => {
-    console.log(userData.deviceId)
-    if(userData.deviceId === undefined ){
-      const {status} = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        console.log('Permission to access location was denied');
-        return ;
-      }else{
-        console.log("GET deviceId")
-        return (await Notifications.getExpoPushTokenAsync()).data
+  const registerForPushNotification =  async () => {
+      if(userData.deviceId === undefined ){
+        const {status} = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Permission to access location was denied');
+          return ;
+        }else{
+          console.log("GET deviceId")
+          return (await Notifications.getExpoPushTokenAsync()).data
+        }
       }
-    }
   }
 
   const pickImage = async () => {
@@ -191,7 +191,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     formData.append('profileImage', localUri ? { uri: localUri, name: filename, type: type } : null);
     formData.append('memberInfo', JSON.stringify(data));
 
-    console.log(formData)
 
     await eventsService.transferMemberData(formData).then(async res => {
       if(res.status === 200){
