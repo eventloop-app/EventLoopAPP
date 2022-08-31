@@ -26,13 +26,12 @@ const setup = (store) => {
         console.log('Token Exprice')
         originalConfig._retry = true;
         await dispatch(refreshToken())
-        await storages.getDataV2('user').then(res => {
+        await storages.getDataV2('userToken').then(res => {
           originalConfig.headers.Authorization = JSON.parse(res).idToken
         })
         return await axiosInstance(originalConfig);
       }
     }
-    console.log(err.response)
     return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response});
   });
 };

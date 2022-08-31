@@ -67,6 +67,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     const user = route.params.user
     setUserData(user)
     setState("GetToken")
+
   }, [])
 
   useEffect(()=>{
@@ -74,9 +75,11 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     let unmount = false
     if(userData !== null && unmount !== true && state == "GetToken"){
       registerForPushNotification().then( async token =>{
-        if(userData.deviceId === undefined){
+        if(userData.deviceId === undefined && token !== null){
           await console.log("TOKEN IS: " + token )
           await setUserData({...userData, deviceId: token})
+        }else {
+          console.log("Can't get token")
         }
       }).catch(e =>{
         console.error(e)
@@ -95,7 +98,12 @@ const EditProfileScreen = ({ props, route, navigation }) => {
           return ;
         }else{
           console.log("GET deviceId")
-          return (await Notifications.getExpoPushTokenAsync()).data
+          try {
+            return (await Notifications.getExpoPushTokenAsync()).data
+          }catch (e) {
+            return null
+           console.log(e)
+          }
         }
       }
   }
