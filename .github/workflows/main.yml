@@ -16,9 +16,10 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATEKEY }}
           port: ${{ secrets.SERVERPORT }}
+          timeout: 20s
           script: |
             cd EventLoopAPP/
             sudo kill -9 `sudo lsof -t -i:19002`
             git pull
             yarn
-            npx expo start --tunnul & sudo sleep 20 kill -9 `sudo lsof -t -i:22`
+            npx expo start --tunnul
