@@ -69,9 +69,9 @@ const CreateEventScreen = (props) => {
   const mapRef = createRef();
   const isFocused = useIsFocused();
 
+
   useEffect(()=> {
     if (isFocused === false) {
-
       setEventDetail({
         type: "ONSITE",
         tags: [],
@@ -89,16 +89,15 @@ const CreateEventScreen = (props) => {
       setCoverImage(null)
       setKinds(kind)
       setTags(tagss)
-    }else{
-      setIsLoad(false)
     }
   },[isFocused])
 
   useEffect(()=> {
-    if(userData !== undefined){
-      setEventDetail({...eventDetail, memberId: userData.id})
+    if(userData !== undefined && userData !== null){
+      console.log(userData)
+      setEventDetail({...eventDetail, memberId: userData?.id})
+      setIsLoad(false)
     }
-    setIsLoad(false)
   },[])
 
   useEffect(() => {
