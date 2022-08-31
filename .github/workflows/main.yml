@@ -19,3 +19,6 @@ jobs:
           script: |
             cd EventLoopAPP/
             sudo kill -9 `sudo lsof -t -i:19002`
+            git pull
+            yarn
+            npx expo start --tunnel
