@@ -17,6 +17,7 @@ jobs:
           key: ${{ secrets.PRIVATEKEY }}
           port: ${{ secrets.SERVERPORT }}
           timeout: 20s
+          command_timeout: 10s
           script: |
             cd EventLoopAPP/
             sudo kill -9 `sudo lsof -t -i:19002`
