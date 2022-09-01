@@ -1,4 +1,4 @@
-name: SIT CICD
+name: PROD
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
         with:
           webhook: "https://discord.com/api/webhooks/1014651514054262897/aAlSH2xaOT_ekFd0A88wWc0q4JngR8G5BtJoN9YSVV02posQKM5-5WY8-FpoM0YFmREi"
           title: "Deploy Success"
-          image: "https://www.tarkom-projects.com/api/v1/image/hell-yeah.png"
+          image: https://www.engnow.in.th/wp-content/uploads/2022/04/crying-cat-meme-idlememe-5.jpg"
           color: "0x77FF06"
           status: success
           
@@ -35,7 +35,7 @@ jobs:
         if: failure()
         with:
           webhook: "https://discord.com/api/webhooks/1014651514054262897/aAlSH2xaOT_ekFd0A88wWc0q4JngR8G5BtJoN9YSVV02posQKM5-5WY8-FpoM0YFmREi"
-          image: "https://www.tarkom-projects.com/api/v1/image/fuck-up.png"
+          image: "https://www.engnow.in.th/wp-content/uploads/2022/04/crying-cat-meme-idlememe-5.jpg"
           title: Deploy Failure
           color: "0xFF0040"
           status: failure
