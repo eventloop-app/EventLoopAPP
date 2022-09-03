@@ -121,8 +121,17 @@ class eventsService {
     return api.post(`members/hasEmail`, data)
   }
 
-  async createEvent(data){
+  async createEvent(data) {
     return api.post(`events/createEvent`, data)
+  }
+
+
+  async getEventBySearch(keyword) {
+    try {
+      return api.get(`events/getEventByKeyword?keyword=${keyword}&pageNo=0&pageSize=10&sortBy=createAt&orderBy=desc`)
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
   }
 }
 
