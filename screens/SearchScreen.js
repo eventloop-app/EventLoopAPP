@@ -4,10 +4,10 @@ import eventsService from "../services/eventsService";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from '../constants/FontSize';
-import EventCard from "../components/EventCard";
- 
+import EventCardType4 from "../components/EventCardType4";
 
-const SearchScreen = ({route, navigation}) =>  {
+
+const SearchScreen = ({ route, navigation }) => {
   const [filterData, setFilterData] = useState([]);
   const [masterData, setMasterData] = useState([]);
   const [event, setEvent] = useState([])
@@ -21,7 +21,7 @@ const SearchScreen = ({route, navigation}) =>  {
   const getEvent = (keyword) => {
     eventsService.getEventBySearch(keyword).then(res => {
       console.log(res.data.content)
-      // setEvent(res.data.content)
+      setEvent(res.data.content)
     })
   }
 
@@ -30,7 +30,7 @@ const SearchScreen = ({route, navigation}) =>  {
     getEvent(value)
   }
 
- 
+
   const renderAndroid = () => {
     return (
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
@@ -62,7 +62,6 @@ const SearchScreen = ({route, navigation}) =>  {
   }
 
 
-
   return (
     < SafeAreaView style={{ flex: 1 }} >
       <View style={styles.container}>
@@ -74,28 +73,18 @@ const SearchScreen = ({route, navigation}) =>  {
           {renderIos()}
         </View>
 
-        {/* <FlatList
-          data={eventByRegistered}
-          renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
+        <FlatList
+          data={event}
+          renderItem={({ item }) => (<EventCardType4 item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })} />)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
           showsHorizontalScrollIndicator={false}
-          horizontal={true}
-        /> */}
-        {/* <FlatList
-          data={eventByRegistered}
-          renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
-            item: item,
-            name: item.eventName
-          })} />)}
-          keyExtractor={(item) => item.id}
-          extraData={eventId}
-          showsHorizontalScrollIndicator={false}
-          horizontal={true}
-        /> */}
+          horizontal={false}
+        />
+
       </View>
     </SafeAreaView>
 

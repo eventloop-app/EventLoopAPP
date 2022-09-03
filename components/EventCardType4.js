@@ -7,7 +7,7 @@ import Fonts from "../constants/Fonts";
 import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
 import { LinearGradient } from 'expo-linear-gradient';
-const EventCardList = ({ item, onPress }) => {
+const EventCardType4 = ({ item, onPress }) => {
     const eventName = item.eventName
     const [isLoading, setIsLoading] = useState(false)
     const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
@@ -18,50 +18,50 @@ const EventCardList = ({ item, onPress }) => {
     return (
         <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={[styles.shadowsButton]} >
 
-            <LinearGradient colors={[Colors.yellow, Colors.skyBlue, Colors.pink,]} style={{ padding: 6, borderRadius: 15 }}>
 
 
-                <View style={[styles.Container,]}>
-                    <View style={styles.ImageCover}>
-                        <Image
-                            style={styles.Image}
-                            source={{
-                                uri: (ImageCover)
-                            }}
-                        />
-                        <View style={styles.DateBox}>
-                            <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("D")}</Text>
-                            <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
-                        </View>
-                        <View style={styles.BookmarkBox}>
-                            <Ionicons name={'md-bookmark-outline'} size={24} color={Colors.red} />
-                        </View>
+
+            <View style={[styles.Container,]}>
+                <View style={styles.ImageCover}>
+                    <Image
+                        style={styles.Image}
+                        source={{
+                            uri: (ImageCover)
+                        }}
+                    />
+                    <View style={styles.DateBox}>
+                        <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("D")}</Text>
+                        <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
                     </View>
-
-                    <View style={{ width: "100%", height: "35%", paddingHorizontal: 8, paddingTop: 4 }}>
-                        <View >
-                            <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
-                        </View>
-
-                        <View style={{ flexDirection: "row" }}>
-                            <View style={styles.Date} >
-                                <Ionicons name={'calendar-sharp'} size={24} color={Colors.primary} />
-                                <Text style={styles.TextDate}>{eventDate}</Text>
-                            </View>
-                            <View style={styles.Time} >
-                                <Ionicons name={'ios-time-outline'} size={24} color={Colors.primary} />
-                                <Text style={styles.TextDate}>{eventTime}</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.Location} >
-                            <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
-                            <Text numberOfLines={1} style={styles.TextLocation}>{eventLocation}</Text>
-                        </View>
+                    <View style={styles.BookmarkBox}>
+                        <Ionicons name={'md-bookmark-outline'} size={24} color={Colors.red} />
                     </View>
-
                 </View>
-            </LinearGradient>
+
+                <View style={{ width: "100%", height: "35%", paddingHorizontal: 8, paddingTop: 4 }}>
+                    <View >
+                        <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: "row" }}>
+                        <View style={styles.Date} >
+                            <Ionicons name={'calendar-sharp'} size={24} color={Colors.primary} />
+                            <Text style={styles.TextDate}>{eventDate}</Text>
+                        </View>
+                        <View style={styles.Time} >
+                            <Ionicons name={'ios-time-outline'} size={24} color={Colors.primary} />
+                            <Text style={styles.TextDate}>{eventTime}</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.Location} >
+                        <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
+                        <Text numberOfLines={1} style={styles.TextLocation}>{eventLocation}</Text>
+                    </View>
+                </View>
+
+            </View>
+
         </TouchableOpacity >)
 }
 const styles = StyleSheet.create({
@@ -188,4 +188,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default EventCardList;
+export default EventCardType4;
