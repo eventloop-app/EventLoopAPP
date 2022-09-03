@@ -18,9 +18,7 @@ const EventCardType4 = ({ item, onPress }) => {
     return (
         <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={[styles.shadowsButton]} >
 
-
-
-
+ 
             <View style={[styles.Container,]}>
                 <View style={styles.ImageCover}>
                     <Image
@@ -29,13 +27,13 @@ const EventCardType4 = ({ item, onPress }) => {
                             uri: (ImageCover)
                         }}
                     />
-                    <View style={styles.DateBox}>
+                    {/* <View style={styles.DateBox}>
                         <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("D")}</Text>
                         <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
                     </View>
                     <View style={styles.BookmarkBox}>
                         <Ionicons name={'md-bookmark-outline'} size={24} color={Colors.red} />
-                    </View>
+                    </View> */}
                 </View>
 
                 <View style={{ width: "100%", height: "35%", paddingHorizontal: 8, paddingTop: 4 }}>
@@ -66,19 +64,21 @@ const EventCardType4 = ({ item, onPress }) => {
 }
 const styles = StyleSheet.create({
     Container: {
-        width: 350,
-        height: 290,
+        width: "100%",
+        height: 120,
         backgroundColor: Colors.white,
         alignItems: "center",
         overflow: "hidden",
         borderRadius: 15,
-        padding: 8
+        padding: 8,
+        flexDirection: "row",
+        alignItems:"center"
     },
     ImageCover: {
         position: "relative",
         borderRadius: 15,
-        width: 335,
-        height: "65%",
+        width: 100,
+        height: "40%",
         backgroundColor: "white",
         padding: 2
     },
@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        margin: 8,
+        margin: 6,
+        marginVertical: 4,
         borderRadius: 15,
     },
 

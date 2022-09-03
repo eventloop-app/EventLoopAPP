@@ -33,7 +33,7 @@ const SearchScreen = ({ route, navigation }) => {
 
   const renderAndroid = () => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" , backgroundColor: Colors.bag9Bg ,paddingVertical:6}}>
         <TextInput style={[styles.textInputStyle, {}]} onChangeText={(value) => handleSearch(value)} value={searchText} />
         <TouchableOpacity title="clear" Clear style={{ backgroundColor: "lightblue", padding: 6, borderRadius: 30, margin: 2, width: "20%", alignItems: 'center', }} onPress={() => setSearchText("")}>
           <Text>Cancel</Text>
@@ -43,9 +43,9 @@ const SearchScreen = ({ route, navigation }) => {
 
   const renderIos = () => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" , backgroundColor: Colors.bag9Bg ,paddingVertical:6}}>
         <TextInput style={[styles.textInputStyle, {}]} onChangeText={(value) => handleSearch(value)} value={searchText} />
-        <TouchableOpacity title="clear" Clear style={{ backgroundColor: "lightblue", padding: 6, borderRadius: 30, margin: 2, width: "20%", alignItems: 'center', }} onPress={() => setSearchText("")}>
+        <TouchableOpacity title="clear" Clear style={{ backgroundColor: "lightblue", padding: 6, borderRadius: 30, margin: 2,marginLeft:4, width: "20%", alignItems: 'center', }} onPress={() => setSearchText("")}>
           <Text>Cancel</Text>
         </TouchableOpacity>
       </View>)
@@ -93,12 +93,12 @@ const SearchScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
 
-    backgroundColor: 'pink',
+    backgroundColor: Colors.white,
     flex: 1
   },
 
   textInputStyle: {
-    height: 45, backgroundColor: "white", borderRadius: 30, width: "75%", borderWidth: 1, borderColor: "gray", paddingHorizontal: 12,
+    height: 45, backgroundColor: "white", borderRadius: 30, width: "75%",   paddingHorizontal: 12,
     fontFamily: Fonts.primary,
     fontSize: FontSize.small,
   }
