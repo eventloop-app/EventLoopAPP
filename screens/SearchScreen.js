@@ -30,47 +30,30 @@ const SearchScreen = ({ route, navigation }) => {
     getEvent(value)
   }
 
+  const handleClearText = () => {
+    setEvent([])
+    setSearchText("")
+  }
 
-  const renderAndroid = () => {
+  const renderSearchSection = () => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" , backgroundColor: Colors.bag9Bg ,paddingVertical:6}}>
-        <TextInput style={[styles.textInputStyle, {}]} onChangeText={(value) => handleSearch(value)} value={searchText} />
-        <TouchableOpacity title="clear" Clear style={{ backgroundColor: "lightblue", padding: 6, borderRadius: 30, margin: 2, width: "20%", alignItems: 'center', }} onPress={() => setSearchText("")}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: Colors.bag9Bg, paddingVertical: 6 }}>
+        <TextInput style={[styles.textInputStyle, {}]} autoFocus={true} placeholder={"ค้นหากิจกรรม"} placeholderTextColor={Colors.darkGray} onChangeText={(value) => handleSearch(value)} value={searchText} />
+        <TouchableOpacity title="clear" style={{ backgroundColor: Colors.skyBlue, padding: 6, borderRadius: 30, margin: 2, marginLeft: 4, width: "20%", alignItems: 'center', }} onPress={() => handleClearText()}>
           <Text>Cancel</Text>
         </TouchableOpacity>
       </View>)
   }
-
-  const renderIos = () => {
-    return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" , backgroundColor: Colors.bag9Bg ,paddingVertical:6}}>
-        <TextInput style={[styles.textInputStyle, {}]} onChangeText={(value) => handleSearch(value)} value={searchText} />
-        <TouchableOpacity title="clear" Clear style={{ backgroundColor: "lightblue", padding: 6, borderRadius: 30, margin: 2,marginLeft:4, width: "20%", alignItems: 'center', }} onPress={() => setSearchText("")}>
-          <Text>Cancel</Text>
-        </TouchableOpacity>
-      </View>)
-  }
-
-  const itemView = ({ item }) => {
-    return (
-      <View>
-        <Text >
-          {console.log(item.eventName)}
-        </Text>
-      </View>
-    )
-  }
-
-
+  
   return (
     < SafeAreaView style={{ flex: 1 }} >
       <View style={styles.container}>
         <View style={[{ display: Platform.OS === "android" ? "flex" : "none", paddingTop: 24 }]} >
-          {renderAndroid()}
+          {renderSearchSection()}
 
         </View>
         <View style={[{ display: Platform.OS === "ios" ? "flex" : "none" }]} >
-          {renderIos()}
+          {renderSearchSection()}
         </View>
 
         <FlatList
@@ -92,14 +75,13 @@ const SearchScreen = ({ route, navigation }) => {
 };
 const styles = StyleSheet.create({
   container: {
-
     backgroundColor: Colors.white,
     flex: 1
   },
 
   textInputStyle: {
-    height: 45, backgroundColor: "white", borderRadius: 30, width: "75%",   paddingHorizontal: 12,
-    fontFamily: Fonts.primary,
+    height: 42, backgroundColor: "white", borderRadius: 30, width: "75%", paddingHorizontal: 12,
+    fontFamily: Fonts.medium,
     fontSize: FontSize.small,
   }
 }

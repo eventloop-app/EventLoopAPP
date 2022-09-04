@@ -18,7 +18,7 @@ const EventCardType4 = ({ item, onPress }) => {
     return (
         <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={[styles.shadowsButton]} >
 
- 
+
             <View style={[styles.Container,]}>
                 <View style={styles.ImageCover}>
                     <Image
@@ -27,33 +27,24 @@ const EventCardType4 = ({ item, onPress }) => {
                             uri: (ImageCover)
                         }}
                     />
-                    {/* <View style={styles.DateBox}>
-                        <Text style={styles.TextDateBoxNum}>{moment(item.startDate).format("D")}</Text>
-                        <Text style={styles.TextDateBox}>{moment.monthsShort(moment(item.startDate).month())}</Text>
-                    </View>
-                    <View style={styles.BookmarkBox}>
-                        <Ionicons name={'md-bookmark-outline'} size={24} color={Colors.red} />
-                    </View> */}
                 </View>
-
-                <View style={{ width: "100%", height: "35%", paddingHorizontal: 8, paddingTop: 4 }}>
+                
+                <View style={{ width: "100%", height: "100%" ,paddingHorizontal:4 }}>
                     <View >
                         <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
                     </View>
-
                     <View style={{ flexDirection: "row" }}>
                         <View style={styles.Date} >
-                            <Ionicons name={'calendar-sharp'} size={24} color={Colors.primary} />
+                            <Ionicons name={'calendar-sharp'} size={20} color={Colors.primary} />
                             <Text style={styles.TextDate}>{eventDate}</Text>
                         </View>
                         <View style={styles.Time} >
-                            <Ionicons name={'ios-time-outline'} size={24} color={Colors.primary} />
-                            <Text style={styles.TextDate}>{eventTime}</Text>
+                            <Ionicons name={'ios-time-outline'} size={20} color={Colors.primary} />
+                            <Text style={styles.TextTime}>{eventTime}</Text>
                         </View>
                     </View>
-
                     <View style={styles.Location} >
-                        <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
+                        <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={20} color={Colors.primary} />
                         <Text numberOfLines={1} style={styles.TextLocation}>{eventLocation}</Text>
                     </View>
                 </View>
@@ -65,20 +56,20 @@ const EventCardType4 = ({ item, onPress }) => {
 const styles = StyleSheet.create({
     Container: {
         width: "100%",
-        height: 120,
+        height: 100,
         backgroundColor: Colors.white,
         alignItems: "center",
         overflow: "hidden",
         borderRadius: 15,
-        padding: 8,
+        padding: 4,
         flexDirection: "row",
-        alignItems:"center"
+        alignItems: "center"
     },
     ImageCover: {
         position: "relative",
         borderRadius: 15,
         width: 100,
-        height: "40%",
+        height: "90%",
         backgroundColor: "white",
         padding: 2
     },
@@ -133,30 +124,31 @@ const styles = StyleSheet.create({
     },
     TextTitle: {
         fontFamily: Fonts.bold,
-        fontSize: fontSize.medium,
+        fontSize: fontSize.primary,
         color: Colors.black,
-
+        // backgroundColor:"red",
+        width:"70%"
     },
     TextTime: {
         fontFamily: Fonts.primary,
-        fontSize: fontSize.primary,
+        fontSize: fontSize.small,
         color: Colors.black,
         textAlign: 'left',
         marginLeft: 5
     },
     TextDate: {
         fontFamily: Fonts.primary,
-        fontSize: fontSize.primary,
+        fontSize: fontSize.small,
         color: Colors.black,
         textAlign: 'left',
         marginLeft: 5
     },
     TextLocation: {
         fontFamily: Fonts.primary,
-        fontSize: fontSize.primary,
+        fontSize: fontSize.small,
         color: Colors.black,
         marginLeft: 5,
-
+        width:"65%"
     },
     TextDateBoxNum: {
         fontFamily: Fonts.bold,
@@ -181,7 +173,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         margin: 6,
-        marginVertical: 4,
+        marginVertical: 6,
         borderRadius: 15,
     },
 
