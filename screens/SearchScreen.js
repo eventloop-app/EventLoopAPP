@@ -5,6 +5,7 @@ import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from '../constants/FontSize';
 import EventCardType4 from "../components/EventCardType4";
+import { ActivityIndicator } from 'react-native-paper';
 
 
 const SearchScreen = ({ route, navigation }) => {
@@ -13,15 +14,20 @@ const SearchScreen = ({ route, navigation }) => {
   const [event, setEvent] = useState([])
   const [searchText, setSearchText] = useState("")
   const [eventId, setEventId] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const [pageCurrent, setPageCurrent] = useState(1)
 
-  useEffect((() => {
-    // getEvent()
-  }), [])
 
   const getEvent = (keyword) => {
+    setIsLoading(true)
+    console.log(isLoading)
     eventsService.getEventBySearch(keyword).then(res => {
-      console.log(res.data.content)
-      setEvent(res.data.content)
+      if (res.status === 200) {
+        setEvent(res.data.content)
+        setIsLoading(false)
+        console.log(isLoading)
+      } else {
+      }
     })
   }
 
@@ -37,14 +43,23 @@ const SearchScreen = ({ route, navigation }) => {
 
   const renderSearchSection = () => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: Colors.bag9Bg, paddingVertical: 6 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: Colors.bag9Bg, paddingVertical: 4 }}>
         <TextInput style={[styles.textInputStyle, {}]} autoFocus={true} placeholder={"ค้นหากิจกรรม"} placeholderTextColor={Colors.darkGray} onChangeText={(value) => handleSearch(value)} value={searchText} />
         <TouchableOpacity title="clear" style={{ backgroundColor: Colors.skyBlue, padding: 6, borderRadius: 30, margin: 2, marginLeft: 4, width: "20%", alignItems: 'center', }} onPress={() => handleClearText()}>
           <Text>Cancel</Text>
         </TouchableOpacity>
       </View>)
   }
-  
+
+  // const renderFooterCard = () => {
+  //   return (
+  //     isLoading ?
+  //       <View style={[styles.loader,]}>
+  //         <ActivityIndicator size="medium" />
+  //       </View> : null
+  //   )
+  // }
+
   return (
     < SafeAreaView style={{ flex: 1 }} >
       <View style={styles.container}>
@@ -53,10 +68,11 @@ const SearchScreen = ({ route, navigation }) => {
 
         </View>
         <View style={[{ display: Platform.OS === "ios" ? "flex" : "none" }]} >
+
           {renderSearchSection()}
         </View>
 
-        <FlatList
+        {<FlatList
           data={event}
           renderItem={({ item }) => (<EventCardType4 item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
@@ -66,7 +82,8 @@ const SearchScreen = ({ route, navigation }) => {
           extraData={eventId}
           showsHorizontalScrollIndicator={false}
           horizontal={false}
-        />
+
+        />}
 
       </View>
     </SafeAreaView>
@@ -83,6 +100,10 @@ const styles = StyleSheet.create({
     height: 42, backgroundColor: "white", borderRadius: 30, width: "75%", paddingHorizontal: 12,
     fontFamily: Fonts.medium,
     fontSize: FontSize.small,
+  },
+  loader: {
+    marginTop: 10,
+    alignItems: "center"
   }
 }
 

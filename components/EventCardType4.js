@@ -18,7 +18,6 @@ const EventCardType4 = ({ item, onPress }) => {
     return (
         <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={[styles.shadowsButton]} >
 
-
             <View style={[styles.Container,]}>
                 <View style={styles.ImageCover}>
                     <Image
@@ -28,8 +27,7 @@ const EventCardType4 = ({ item, onPress }) => {
                         }}
                     />
                 </View>
-                
-                <View style={{ width: "100%", height: "100%" ,paddingHorizontal:4 }}>
+                <View style={{ width: "100%", height: "100%", paddingHorizontal: 4 }}>
                     <View >
                         <Text numberOfLines={1} style={styles.TextTitle}>{eventName}</Text>
                     </View>
@@ -102,7 +100,6 @@ const styles = StyleSheet.create({
     },
     Title: {
 
-
     },
     Date: {
         marginRight: 10,
@@ -127,7 +124,7 @@ const styles = StyleSheet.create({
         fontSize: fontSize.primary,
         color: Colors.black,
         // backgroundColor:"red",
-        width:"70%"
+        width: "70%"
     },
     TextTime: {
         fontFamily: Fonts.primary,
@@ -148,7 +145,7 @@ const styles = StyleSheet.create({
         fontSize: fontSize.small,
         color: Colors.black,
         marginLeft: 5,
-        width:"65%"
+        width: "65%"
     },
     TextDateBoxNum: {
         fontFamily: Fonts.bold,
@@ -173,7 +170,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         margin: 6,
-        marginVertical: 6,
+        marginVertical: 3,
         borderRadius: 15,
     },
 
