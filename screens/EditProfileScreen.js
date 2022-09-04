@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text, View, TextInput, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  View,
+  TextInput,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Platform
+} from "react-native";
 import { Surface, Button } from 'react-native-paper';
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
@@ -336,14 +346,14 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   }
 
   return (
-    <SafeAreaView style={{ height: "100%", backgroundColor: "white" }}>
+    <SafeAreaView style={{ height: "100%", backgroundColor: "white"}}>
       {
         isLoad ?
           <Text style={styles.CenterScreenText}>
             Loading...
           </Text>
           :
-          (<View style={{ flex: 1, height: "100%", width: "100%", }}>
+          (<View style={{ flex: 1, height: "100%", width: "100%", marginTop: (Platform.OS === "android" ? 50 : null)}}>
             <ProgressSteps labelFontFamily={Fonts.primary} topOffset={20} marginBottom={30} >
               <ProgressStep nextBtnDisabled={(username ? false : true)} nextBtnText={'ต่อไป'} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="เพิ่มข้อมูล" onNext={checkTextInput} errors={isError} >
                 <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>

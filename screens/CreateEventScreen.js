@@ -42,8 +42,8 @@ const tagss = [
 const kind = [
   {name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
   {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}
-
 ]
+
 const CreateEventScreen = (props) => {
   const [isLoad, setIsLoad] = useState(true)
   const [coverImage, setCoverImage] = useState(null)
@@ -69,8 +69,7 @@ const CreateEventScreen = (props) => {
   const mapRef = createRef();
   const isFocused = useIsFocused();
 
-
-  useEffect(()=> {
+  useEffect(() => {
     if (isFocused === false) {
       setEventDetail({
         type: "ONSITE",
@@ -90,15 +89,16 @@ const CreateEventScreen = (props) => {
       setKinds(kind)
       setTags(tagss)
     }
-  },[isFocused])
+  }, [isFocused])
 
-  useEffect(()=> {
-    if(userData !== undefined && userData !== null){
-      console.log(userData)
+  useEffect(() => {
+    if (userData !== undefined && userData !== null && isFocused) {
       setEventDetail({...eventDetail, memberId: userData?.id})
-      setIsLoad(false)
     }
-  },[])
+    setTimeout(() => {
+      setIsLoad(false)
+    }, 1000)
+  }, [isFocused])
 
   useEffect(() => {
     if (props.route.params) {
@@ -130,31 +130,30 @@ const CreateEventScreen = (props) => {
   };
 
   const changeDateTime = (event, date) => {
-    if (isEndTime) {
-
-    } else {
       setEventDetail({...eventDetail, startDate: date, endDate: date})
-    }
   }
 
   const onSubmit = async () => {
-    let newEventDetail = {...eventDetail, startDate: moment(eventDetail.startDate).unix() * 1000, endDate: moment(eventDetail.endDate).unix() * 1000}
+    let newEventDetail = {
+      ...eventDetail,
+      startDate: moment(eventDetail.startDate).unix() * 1000,
+      endDate: moment(eventDetail.endDate).unix() * 1000
+    }
     const filename = coverImage.uri.toString().split('/').pop()
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : `image`;
     const data = new FormData();
-    data.append('coverImage', coverImage ? { uri: coverImage.uri, name: filename, type: type } : null);
+    data.append('coverImage', coverImage ? {uri: coverImage.uri, name: filename, type: type} : null);
     data.append('eventInfo', JSON.stringify(newEventDetail));
 
-    eventsService.createEvent(data).then(res =>{
+    eventsService.createEvent(data).then(res => {
       console.log(res)
     }).catch(error => {
       console.log(error)
     })
   }
 
-  return (
-    (Platform.OS !== 'android' && !isLoad) &&
+  const renderUI = () => (
     <View style={{flex: 1, backgroundColor: Colors.white}}>
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {
@@ -169,7 +168,7 @@ const CreateEventScreen = (props) => {
             </TouchableOpacity>
             : <TouchableOpacity onPress={() => pickImage()}
                                 style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <View style={{backgroundColor: 'rgba(255,255,255,0.7)', padding: 10, borderRadius: '100'}}>
+              <View style={{backgroundColor: 'rgba(255,255,255,0.7)', padding: 10, borderRadius: 100}}>
                 <Ionicons color={Colors.black} name={'image-outline'} size={40}/>
               </View>
             </TouchableOpacity>
@@ -274,10 +273,10 @@ const CreateEventScreen = (props) => {
                       kinds.map((item, index) => (
                         <TouchableOpacity onPress={() => {
                           if (index === 0) {
-                            setKinds([  {name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
+                            setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
                               {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}])
                           } else {
-                            setKinds([  {name: 'ออนไซต์', en_name: 'ONSITE', isSelect: false},
+                            setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: false},
                               {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: true}])
                           }
                           setEventDetail({...eventDetail, type: item.en_name})
@@ -474,7 +473,7 @@ const CreateEventScreen = (props) => {
           </ScrollView>
         </KeyboardAwareScrollView>
         {
-          ((isEditTime && !isEndTime) &&
+          ((isEditTime && !isEndTime && Platform.OS !== "android") &&
             <View
               style={{
                 position: 'absolute',
@@ -493,10 +492,16 @@ const CreateEventScreen = (props) => {
                 textAlign: 'center',
                 color: Colors.white
               }}>กำหนดวันเวลาเริ่มกิจกรรม</Text>
-              <RNDateTimePicker minimumDate={new Date()} style={{height: 100, fontFamily: Fonts.primary}}
-                                textColor={Colors.primary}
-                                display="spinner" locale={'th'} mode="datetime" value={eventDetail.startDate}
-                                onChange={(event, date) => changeDateTime(event, date)}/>
+
+              <RNDateTimePicker
+                minimumDate={new Date()}
+                style={{height: 100, fontFamily: Fonts.primary}}
+                textColor={Colors.primary}
+                display="spinner" locale={'th'}
+                mode="datetime"
+                value={eventDetail.startDate}
+                onChange={(event, date) => changeDateTime(event, date)}/>
+
               <TouchableOpacity onPress={() => setIsEndTime(!isEndTime)} style={{marginTop: 5}}>
                 <Text style={{
                   fontFamily: Fonts.bold,
@@ -512,25 +517,25 @@ const CreateEventScreen = (props) => {
         }
 
         {
-          (isEndTime &&
-            <View
-              style={{
-                position: 'absolute',
-                display: 'flex',
-                width: '100%',
-                height: 'auto',
-                bottom: 170,
-                left: 15,
-                padding: 10,
-                borderRadius: 15,
-                backgroundColor: 'rgba(000,000,000,0.8)'
-              }}>
+          ((isEndTime && Platform.OS !== "android") &&
+            <View style={{
+              position: 'absolute',
+              display: 'flex',
+              width: '100%',
+              height: 'auto',
+              bottom: 170,
+              left: 15,
+              padding: 10,
+              borderRadius: 15,
+              backgroundColor: 'rgba(000,000,000,0.8)'
+            }}>
               <Text style={{
                 fontFamily: Fonts.primary,
                 fontSize: FontSize.primary,
                 color: Colors.white,
                 textAlign: 'center'
-              }}>กำหนดเวลาสิ้นสุดกิจกรรม</Text>
+              }}>กำหนดเวลาสิ้นสุดกิจกรรม
+              </Text>
               <RNDateTimePicker style={{height: 100, fontFamily: Fonts.primary}} textColor={Colors.primary}
                                 display="spinner"
                                 locale={'th'}
@@ -553,8 +558,64 @@ const CreateEventScreen = (props) => {
             </View>
           )
         }
+
+        {
+          ((isEditTime && !isEndTime && Platform.OS === "android") &&
+            <View>
+              <RNDateTimePicker
+                minimumDate={new Date()}
+                style={{height: 100, fontFamily: Fonts.primary}}
+                textColor={Colors.primary}
+                display="default"
+                locale={'th'}
+                mode="date"
+                value={eventDetail.startDate}
+                onChange={(event, date) => {
+                  if(event.type !== "dismissed"){
+                    changeDateTime(event, date)
+                    setIsEndTime(!isEndTime)
+                  }
+                }}
+              />
+            </View>
+          )
+        }
+
+        {
+          ((isEndTime && Platform.OS === "android") &&
+            <View>
+              <RNDateTimePicker
+                minimumDate={new Date()}
+                style={{height: 100, fontFamily: Fonts.primary}}
+                textColor={Colors.primary}
+                display="default"
+                locale={'th'}
+                mode="time"
+                value={eventDetail.startDate}
+                onChange={(event, date) => {
+                  console.log(date)
+                  if(event.type !== "dismissed"){
+                    setEventDetail({...eventDetail, endDate: date})
+                    setIsEditTime(!isEditTime)
+                    setIsEndTime(!isEndTime)
+                  }
+                }}
+              />
+            </View>
+          )
+        }
       </View>
     </View>
+  )
+
+  return (
+    (isLoad ?
+        <SafeAreaView>
+          <View>
+            <Text> Load...</Text>
+          </View>
+        </SafeAreaView> : renderUI()
+    )
   )
 };
 

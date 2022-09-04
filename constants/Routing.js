@@ -21,6 +21,7 @@ import ManageEventScreen from "../screens/ManageEventScreen";
 import ReviewEventScreen from "../screens/ReviewEventScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import MapScreen from "../screens/MapScreen";
+import ErrorScreen from "../screens/ErrorScreen";
 const Routing = () => {
 
     const Stack = createNativeStackNavigator();
@@ -76,6 +77,8 @@ const Routing = () => {
             <Stack.Navigator>
                 <Stack.Screen name={'Home'} component={HomeScreen}
                               options={{headerShown: false, tabBarShowLabel: false}}/>
+              <Stack.Screen name={'Error'} component={ErrorScreen}
+                            options={{headerShown: false, tabBarShowLabel: false}}/>
                 <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route,navigation}) => ({
                     headerShown: true,
                     headerTransparent: true,
