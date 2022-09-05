@@ -16,19 +16,49 @@ const SearchScreen = ({ route, navigation }) => {
   const [eventId, setEventId] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
   const [pageCurrent, setPageCurrent] = useState(1)
+  const [platform, setPlatform] = useState(["microsoft", "google", "discord", "zoom"])
+
+
+
 
 
   const getEvent = (keyword) => {
-    setIsLoading(true)
-    console.log(isLoading)
+
     eventsService.getEventBySearch(keyword).then(res => {
       if (res.status === 200) {
-        setEvent(res.data.content)
-        setIsLoading(false)
-        console.log(isLoading)
+        let newEvent = res.data.content
+        newEvent.map((item, index) => {
+          if (typeof (item.location?.name) === "string") {
+            platform.map((platformItem) => {
+              if (item.location?.name.includes(platformItem)) {
+                switch (platformItem) {
+                  case 'google':
+                    return newEvent[index].location.name = "Google Meet"
+                  case 'zoom':
+                    return newEvent[index].location.name = "Zoom"
+                  case 'discord':
+                    return newEvent[index].location.name = "Discord"
+                  case 'microsoft':
+                    return newEvent[index].location.name = "Microsoft Team"
+                  default:
+                    return null
+                }
+              }
+            })
+
+          }
+        }
+        )
+        setEvent(newEvent)
+        setIsLoading(true)
       } else {
       }
     })
+  }
+
+
+  const matchPlatform = () => {
+
   }
 
   const handleSearch = (value) => {
