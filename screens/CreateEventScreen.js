@@ -26,7 +26,7 @@ import eventsService from "../services/eventsService";
 import {stringify} from "qs";
 import {useIsFocused} from "@react-navigation/native";
 import InputLabel from "react-native-paper/src/components/TextInput/Label/InputLabel";
-
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
 const tagss = [
@@ -50,6 +50,9 @@ const CreateEventScreen = (props) => {
   const [coverImage, setCoverImage] = useState(null)
   const [isEditTime, setIsEditTime] = useState(false)
   const [isEndTime, setIsEndTime] = useState(false)
+  const [isAnEditDate, setIsAnEditDate] = useState(false)
+  const [isAnEditTime, setIsAnEditTime] = useState(false)
+  const [isAnEndTime, setIsAnEndTime] = useState(false)
   const [tags, setTags] = useState(tagss)
   const [kinds, setKinds] = useState(kind)
   const [eventDetail, setEventDetail] = useState({
@@ -57,7 +60,7 @@ const CreateEventScreen = (props) => {
     tags: [],
     eventName: 'ชื่อกิจกรรม',
     startDate: new Date(),
-    endDate: new Date(),
+    endDate: new Date( new Date().setHours(new Date().getHours() + 1)),
     location: null,
     latitude: 0,
     longitude: 0,
@@ -72,30 +75,31 @@ const CreateEventScreen = (props) => {
   const input_num = useRef()
   const input_loc = useRef()
 
-  useEffect(() => {
-    if (isFocused === false) {
-      setEventDetail({
-        type: "ONSITE",
-        tags: [],
-        eventName: 'ชื่อกิจกรรม',
-        startDate: new Date(),
-        endDate: new Date(),
-        location: null,
-        latitude: 0,
-        longitude: 0,
-        description: 'ใส่รายละเอียดกิจกรรม',
-        numberOfPeople: 0,
-        memberId: null
-      })
-      setIsLoad(true)
-      setCoverImage(null)
-      setKinds(kind)
-      setTags(tagss)
-    }
-  }, [isFocused])
+  // useEffect(() => {
+  //   if (isFocused === false) {
+  //     setEventDetail({
+  //       type: "ONSITE",
+  //       tags: [],
+  //       eventName: 'ชื่อกิจกรรม',
+  //       startDate: new Date(),
+  //       endDate: new Date(),
+  //       location: null,
+  //       latitude: 0,
+  //       longitude: 0,
+  //       description: 'ใส่รายละเอียดกิจกรรม',
+  //       numberOfPeople: 0,
+  //       memberId: null
+  //     })
+  //     setIsLoad(true)
+  //     setCoverImage(null)
+  //     setKinds(kind)
+  //     setTags(tagss)
+  //   }
+  // }, [isFocused])
 
   useEffect(() => {
     if (userData !== undefined && userData !== null && isFocused) {
+      console.log("set memberId")
       setEventDetail({...eventDetail, memberId: userData?.id})
     }
     setTimeout(() => {
@@ -133,7 +137,7 @@ const CreateEventScreen = (props) => {
   };
 
   const changeDateTime = (event, date) => {
-    setEventDetail({...eventDetail, startDate: date, endDate: date})
+    setEventDetail({...eventDetail, startDate: date})
   }
 
   const onSubmit = async () => {
@@ -142,15 +146,39 @@ const CreateEventScreen = (props) => {
       startDate: moment(eventDetail.startDate).unix() * 1000,
       endDate: moment(eventDetail.endDate).unix() * 1000
     }
-    const filename = coverImage.uri.toString().split('/').pop()
+    const filename = coverImage?.uri.toString().split('/').pop()
     const match = /\.(\w+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : `image`;
     const data = new FormData();
     data.append('coverImage', coverImage ? {uri: coverImage.uri, name: filename, type: type} : null);
     data.append('eventInfo', JSON.stringify(newEventDetail));
 
+    console.log(newEventDetail)
     eventsService.createEvent(data).then(res => {
       console.log(res)
+      if(res.status === 200) {
+        setEventDetail({
+          type: "ONSITE",
+          tags: [],
+          eventName: 'ชื่อกิจกรรม',
+          startDate: new Date(),
+          endDate: new Date(),
+          location: null,
+          latitude: 0,
+          longitude: 0,
+          description: 'ใส่รายละเอียดกิจกรรม',
+          numberOfPeople: 0,
+          memberId: null
+        })
+        setIsLoad(true)
+        setCoverImage(null)
+        setKinds(kind)
+        setTags(tagss)
+
+        setTimeout(()=>{
+          props.navigation.navigate('Feed')
+        },1500)
+      }
     }).catch(error => {
       console.log(error)
     })
@@ -358,7 +386,10 @@ const CreateEventScreen = (props) => {
               </View>
 
               <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <TouchableOpacity onPress={() => setIsEditTime(!isEditTime)} style={{
+                <TouchableOpacity onPress={() => {
+                  setIsEditTime(!isEditTime)
+                  setIsAnEditDate(!isAnEditDate)
+                }} style={{
                   width: 50,
                   height: 50,
                   borderRadius: 10,
@@ -431,25 +462,28 @@ const CreateEventScreen = (props) => {
                           fontFamily: Fonts.primary,
                           fontSize: FontSize.primary
                         }}>ลิงค์ในการเข้าร่วมกิจกรรม</Text>
-                        <TextInput id={'number_people'} keyboardType={"web-search"} maxLength={2}
+                        <TextInput id={'number_people'} keyboardType={"web-search"}
                                    placeholder={"https://google.meet/acb/"}
                                    ref={input_loc}
-                                   onChange={(e) => setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})}
+                                   onChange={(e) => setEventDetail({
+                                     ...eventDetail, location:  e.nativeEvent.text
+                                   })}
                                    style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
                         />
                       </View>
-                      :   <Text numberOfLines={1}
-                                   style={{
-                                     fontFamily: Fonts.primary,
-                                     fontSize: FontSize.primary
-                                   }}>{(eventDetail.location === null ? 'สถานที่จัดกิจกรรม' : eventDetail.location)}</Text>)
+                      : <Text numberOfLines={1}
+                              style={{
+                                fontFamily: Fonts.primary,
+                                fontSize: FontSize.primary
+                              }}>{(eventDetail.location === null ? 'สถานที่จัดกิจกรรม' : eventDetail.location)}
+                      </Text>)
                   }
 
                 </View>
               </View>
 
               {
-                (eventDetail?.location !== null &&
+                ((eventDetail?.location !== null && eventDetail.type === "ONSITE") &&
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                     <MapView
                       scrollDuringRotateOrZoomEnabled={false}
@@ -485,7 +519,7 @@ const CreateEventScreen = (props) => {
                 </Text>
                 <View style={{display: 'flex', width: '95%', marginTop: 5}}>
                   <TextInput style={{fontFamily: Fonts.primary}} multiline={true}
-                             // value={eventDetail.description}
+                    // value={eventDetail.description}
                              placeholder={"ใส่รายละเอียดกิจกรรม"}
                              onChange={(e) => setEventDetail({...eventDetail, description: e.nativeEvent.text})}/>
                 </View>
@@ -585,31 +619,45 @@ const CreateEventScreen = (props) => {
         }
 
         {
-          ((isEditTime && !isEndTime && Platform.OS === "android") &&
+          ((isAnEditDate && !isAnEditTime && !isAnEndTime && Platform.OS === "android") &&
             <View>
+              <Text style={{
+                fontFamily: Fonts.primary,
+                fontSize: FontSize.primary,
+                color: Colors.white,
+                textAlign: 'center',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 50
+              }}>กำหนดเวลาสิ้นสุดกิจกรรม
+              </Text>
               <RNDateTimePicker
                 minimumDate={new Date()}
-                style={{height: 100, fontFamily: Fonts.primary}}
-                textColor={Colors.primary}
+                textColor={Colors.pink}
                 display="default"
+                style={{background: Colors.primary}}
                 locale={'th'}
                 mode="date"
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
                   if (event.type !== "dismissed") {
+                    console.log(date)
                     changeDateTime(event, date)
-                    setIsEndTime(!isEndTime)
+                    setIsAnEditTime(!isAnEditTime)
                   }
-                }}
+                }
+                }
               />
             </View>
           )
         }
 
         {
-          ((isEndTime && Platform.OS === "android") &&
+          ((isAnEditDate && isAnEditTime && !isAnEndTime && Platform.OS === "android") &&
             <View>
               <RNDateTimePicker
+                positiveButtonLabel="ตกลง"
                 minimumDate={new Date()}
                 style={{height: 100, fontFamily: Fonts.primary}}
                 textColor={Colors.primary}
@@ -618,11 +666,33 @@ const CreateEventScreen = (props) => {
                 mode="time"
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
-                  console.log(date)
-                  if (event.type !== "dismissed") {
+                  if (event.type === "set") {
+                    setEventDetail({...eventDetail, startDate: date})
+                    setTimeout(() => {
+                      setIsAnEndTime(!isAnEndTime)
+                    }, 500)
+                  }
+                }}
+              />
+            </View>
+          )
+        }
+
+        {
+          ((isAnEditDate && isAnEditTime && isAnEndTime && Platform.OS === "android") &&
+            <View>
+              <RNDateTimePicker
+                minimumDate={new Date()}
+                display="default"
+                locale={'th'}
+                mode="time"
+                value={new Date( new Date(eventDetail.startDate).setHours( new Date(eventDetail.startDate).getHours() +1))}
+                onChange={(event, date) => {
+                  if (event.type === "set" && event.nativeEvent.timestamp !== null) {
                     setEventDetail({...eventDetail, endDate: date})
-                    setIsEditTime(!isEditTime)
-                    setIsEndTime(!isEndTime)
+                    setIsAnEditTime(false)
+                    setIsAnEditDate(false)
+                    setIsAnEndTime(false)
                   }
                 }}
               />

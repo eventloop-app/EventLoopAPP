@@ -136,7 +136,13 @@ class eventsService {
   }
 
   async createEvent(data){
-    return api.post(`events/createEvent`, data)
+    return axios({
+      method: "post",
+      url: `${config.APP_API}events/createEvent`,
+      data: data,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    // return api.post(`events/createEvent`, data)
   }
 }
 
