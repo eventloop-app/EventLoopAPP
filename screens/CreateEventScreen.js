@@ -25,6 +25,7 @@ import FormData from "form-data";
 import eventsService from "../services/eventsService";
 import {stringify} from "qs";
 import {useIsFocused} from "@react-navigation/native";
+import InputLabel from "react-native-paper/src/components/TextInput/Label/InputLabel";
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
@@ -60,14 +61,16 @@ const CreateEventScreen = (props) => {
     location: null,
     latitude: 0,
     longitude: 0,
-    description: 'ใส่รายละเอียดกิจกรรม',
-    numberOfPeople: 0,
+    description: '',
+    numberOfPeople: '',
     memberId: null
   })
   const {user} = useSelector(state => state.user)
   const userData = JSON.parse(user)
   const mapRef = createRef();
   const isFocused = useIsFocused();
+  const input_num = useRef()
+  const input_loc = useRef()
 
   useEffect(() => {
     if (isFocused === false) {
@@ -130,7 +133,7 @@ const CreateEventScreen = (props) => {
   };
 
   const changeDateTime = (event, date) => {
-      setEventDetail({...eventDetail, startDate: date, endDate: date})
+    setEventDetail({...eventDetail, startDate: date, endDate: date})
   }
 
   const onSubmit = async () => {
@@ -186,11 +189,11 @@ const CreateEventScreen = (props) => {
         padding: 15
       }}>
 
-        <KeyboardAwareScrollView extraScrollHeight={150}>
+        <KeyboardAwareScrollView extraScrollHeight={200}>
           <ScrollView showsVerticalScrollIndicator={false}
                       showsHorizontalScrollIndicator={false}>
             <View style={{paddingBottom: 200}}>
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
+              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 30}}>
                 <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray}
                            style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
                            onChange={(e) => setEventDetail({...eventDetail, eventName: e.nativeEvent.text})}/>
@@ -378,7 +381,7 @@ const CreateEventScreen = (props) => {
               </View>
 
               <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <TouchableOpacity style={{
+                <TouchableOpacity onPress={() => input_num.current.focus()} style={{
                   width: 50,
                   height: 50,
                   borderRadius: 10,
@@ -393,16 +396,20 @@ const CreateEventScreen = (props) => {
                     fontFamily: Fonts.primary,
                     fontSize: FontSize.primary
                   }}>จำนวนผู้เข้าร่วมสูงสุด</Text>
-                  <TextInput keyboardType={"number-pad"} maxLength={2}
+
+                  <TextInput id={'number_people'} keyboardType={"number-pad"} maxLength={2}
+                             placeholder={"10"}
+                             ref={input_num}
                              onChange={(e) => setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})}
                              style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
-                             value={eventDetail.numberOfPeople.toString()}/>
+                    // value={eventDetail.numberOfPeople.toString()}
+                  />
                 </View>
               </View>
 
               <View style={{display: 'flex', width: '80%', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                 <TouchableOpacity onPress={() => {
-                  props.navigation.navigate('GoogleMap')
+                  (eventDetail.type === "ONSITE" ? props.navigation.navigate('GoogleMap') : input_loc.current.focus())
                 }} style={{
                   width: 50,
                   height: 50,
@@ -411,16 +418,33 @@ const CreateEventScreen = (props) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}>
-                  <Ionicons name={'ios-location-outline'}
+                  <Ionicons name={(eventDetail.type === "ONSITE" ? 'ios-location-outline' : 'laptop-outline')}
                             size={35}
                             color={Colors.primary}/>
                 </TouchableOpacity>
                 <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
-                  <Text numberOfLines={1}
-                        style={{
+
+                  {
+                    (eventDetail.type !== "ONSITE" ?
+                      <View>
+                        <Text style={{
                           fontFamily: Fonts.primary,
                           fontSize: FontSize.primary
-                        }}>{(eventDetail.location === null ? 'สถานที่จัดกิจกรรม' : eventDetail.location)}</Text>
+                        }}>ลิงค์ในการเข้าร่วมกิจกรรม</Text>
+                        <TextInput id={'number_people'} keyboardType={"web-search"} maxLength={2}
+                                   placeholder={"https://google.meet/acb/"}
+                                   ref={input_loc}
+                                   onChange={(e) => setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})}
+                                   style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
+                        />
+                      </View>
+                      :   <Text numberOfLines={1}
+                                   style={{
+                                     fontFamily: Fonts.primary,
+                                     fontSize: FontSize.primary
+                                   }}>{(eventDetail.location === null ? 'สถานที่จัดกิจกรรม' : eventDetail.location)}</Text>)
+                  }
+
                 </View>
               </View>
 
@@ -461,7 +485,8 @@ const CreateEventScreen = (props) => {
                 </Text>
                 <View style={{display: 'flex', width: '95%', marginTop: 5}}>
                   <TextInput style={{fontFamily: Fonts.primary}} multiline={true}
-                             value={eventDetail.description}
+                             // value={eventDetail.description}
+                             placeholder={"ใส่รายละเอียดกิจกรรม"}
                              onChange={(e) => setEventDetail({...eventDetail, description: e.nativeEvent.text})}/>
                 </View>
               </View>
@@ -571,7 +596,7 @@ const CreateEventScreen = (props) => {
                 mode="date"
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
-                  if(event.type !== "dismissed"){
+                  if (event.type !== "dismissed") {
                     changeDateTime(event, date)
                     setIsEndTime(!isEndTime)
                   }
@@ -594,7 +619,7 @@ const CreateEventScreen = (props) => {
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
                   console.log(date)
-                  if(event.type !== "dismissed"){
+                  if (event.type !== "dismissed") {
                     setEventDetail({...eventDetail, endDate: date})
                     setIsEditTime(!isEditTime)
                     setIsEndTime(!isEndTime)
