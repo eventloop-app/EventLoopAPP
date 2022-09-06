@@ -58,8 +58,18 @@ const FeedScreen = ({route, navigation}) => {
 
   // get Event
   const getEvent = async () => {
+    console.log("Get Event")
+    const  timeout = setTimeout(()=>{
+      console.log("TimeOut !")
+      navigation.navigate("Error")
+    }, 5000)
     eventsService.getAllEvent().then(res => {
-      setAllEvent(res.data.content)
+      if(res.status === 200){
+        clearTimeout(timeout);
+        setAllEvent(res.data.content)
+      }else {
+        console.log(res.status)
+      }
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
       alert('ผิดพลาดดด \n' + error.message)
@@ -73,9 +83,7 @@ const FeedScreen = ({route, navigation}) => {
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
     })
-
     await setIsLoading(false)
-
   }
 
   const getEventByAttention = async () => {
