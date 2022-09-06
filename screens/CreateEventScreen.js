@@ -20,13 +20,9 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import {useSelector} from "react-redux";
 import MapView, {Marker} from "react-native-maps";
-import {platforms} from "react-native/react-native.config";
 import FormData from "form-data";
 import eventsService from "../services/eventsService";
-import {stringify} from "qs";
 import {useIsFocused} from "@react-navigation/native";
-import InputLabel from "react-native-paper/src/components/TextInput/Label/InputLabel";
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
 const tagss = [

@@ -144,6 +144,10 @@ class eventsService {
     })
     // return api.post(`events/createEvent`, data)
   }
+
+  async getEventById(id){
+    return api.get(`events/${id}` )
+  }
 }
 
 export default new eventsService();
