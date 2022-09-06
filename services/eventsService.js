@@ -126,9 +126,9 @@ class eventsService {
   }
 
 
-  async getEventBySearch(keyword, pageCurrent, pageSize, pageNo) {
+  async getEventBySearch(keyword, pageNo=0) {
     try {
-      return api.get(`events/getEventByKeyword?keyword=${keyword}&pageNo=0&pageSize=100&sortBy=createAt&orderBy=desc`)
+      return api.get(`events/getEventByKeyword?keyword=${keyword}&pageNo=${pageNo}&pageSize=10&sortBy=createAt&orderBy=desc`)
     } catch (e) {
       return new Promise(reject => reject(e))
     }

@@ -18,15 +18,18 @@ const SearchScreen = ({ route, navigation }) => {
   const [pageCurrent, setPageCurrent] = useState(1)
   const [platform, setPlatform] = useState(["microsoft", "google", "discord", "zoom"])
 
-
-
+  const [onLoadData, setLoadData] = useState(false)
+  const [page, setPage] = useState(0)
+  const [totalPage, setTotalPage] = useState(0)
 
 
   const getEvent = (keyword) => {
-
+    setPage(0)
     eventsService.getEventBySearch(keyword).then(res => {
       if (res.status === 200) {
         let newEvent = res.data.content
+        console.log(res.data.totalPages)
+        setTotalPage(res.data.totalPages)
         newEvent.map((item, index) => {
           if (typeof (item.location?.name) === "string") {
             platform.map((platformItem) => {
@@ -49,6 +52,7 @@ const SearchScreen = ({ route, navigation }) => {
           }
         }
         )
+
         setEvent(newEvent)
         setIsLoading(true)
       } else {
@@ -57,8 +61,45 @@ const SearchScreen = ({ route, navigation }) => {
   }
 
 
-  const matchPlatform = () => {
+  const getNewEvent = (keyword = "", newPage) => {
+    setLoadData(true)
+    eventsService.getEventBySearch(keyword, newPage).then(res => {
+      if (res.status === 200) {
+        setLoadData(false)
+        let newEvent = res.data.content
+        let currentData = event.concat(newEvent)
 
+        currentData.map((item, index) => {
+          if (typeof (item.location?.name) === "string") {
+            platform.map((platformItem) => {
+              if (item.location?.name.includes(platformItem)) {
+                switch (platformItem) {
+                  case 'google':
+                    return currentData[index].location.name = "Google Meet"
+                  case 'zoom':
+                    return currentData[index].location.name = "Zoom"
+                  case 'discord':
+                    return currentData[index].location.name = "Discord"
+                  case 'microsoft':
+                    return currentData[index].location.name = "Microsoft Team"
+                  default:
+                    return null
+                }
+              }
+            })
+
+          }
+        }
+        )
+
+
+        setEvent(currentData)
+        setIsLoading(true)
+        setLoadData(false)
+      } else {
+        setLoadData(false)
+      }
+    })
   }
 
   const handleSearch = (value) => {
@@ -90,6 +131,26 @@ const SearchScreen = ({ route, navigation }) => {
   //   )
   // }
 
+  const renderFooter = () => {
+    if (!onLoadData) return null;
+    return (
+      <ActivityIndicator
+        style={{ color: '#000' }}
+      />
+    );
+  }
+
+  const handleLoadMore = () => {
+    let newPage = page;
+    if (!onLoadData && newPage <= totalPage) {
+      newPage = page + 1
+      getNewEvent(searchText, newPage);
+      setPage(newPage)
+      console.log(newPage)
+
+    }
+  }
+
   return (
     < SafeAreaView style={{ flex: 1 }} >
       <View style={styles.container}>
@@ -102,18 +163,21 @@ const SearchScreen = ({ route, navigation }) => {
           {renderSearchSection()}
         </View>
 
-        {<FlatList
+        <FlatList
           data={event}
           renderItem={({ item }) => (<EventCardType4 item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })} />)}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => index.toString()}
           extraData={eventId}
           showsHorizontalScrollIndicator={false}
           horizontal={false}
 
-        />}
+          ListFooterComponent={renderFooter}
+          onEndReachedThreshold={0.2}
+          onEndReached={handleLoadMore}
+        />
 
       </View>
     </SafeAreaView>
