@@ -107,6 +107,44 @@ const FeedScreen = ({ route, navigation }) => {
   }
 
 
+    const getEvent = (keyword) => {
+    if (keyword !== "") {
+      setPage(0)
+      eventsService.getEventBySearch(keyword).then(res => {
+        if (res.status === 200) {
+          let newEvent = res.data.content
+          setTotalPage(res.data.totalPages)
+          newEvent.map((item, index) => {
+            if (typeof (item.location?.name) === "string") {
+              platform.map((platformItem) => {
+                if (item.location?.name.includes(platformItem)) {
+                  switch (platformItem) {
+                    case 'google':
+                      return newEvent[index].location.name = "Google Meet"
+                    case 'zoom':
+                      return newEvent[index].location.name = "Zoom"
+                    case 'discord':
+                      return newEvent[index].location.name = "Discord"
+                    case 'microsoft':
+                      return newEvent[index].location.name = "Microsoft Team"
+                    default:
+                      return null
+                  }
+                }
+              })
+            }
+          }
+          )
+          setEvent(newEvent)
+          setIsLoading(true)
+        } else {
+        }
+      })
+    } else {
+      handleClearText()
+    }
+  }
+
   const renderEventShortcutSection = () => {
     return (
       <View style={[styles.shadowsCard, { backgroundColor: Colors.bag9Bg, alignItems: "center" }]}>
@@ -114,97 +152,48 @@ const FeedScreen = ({ route, navigation }) => {
         <View>
           <View style={{ paddingVertical: 10, flexDirection: "row", flexWrap: "wrap", width: "100%", alignItems: "center", }}>
 
-            <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "กำลังมาแรง", data: eventByAttention })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
+            <TouchableOpacity style={[styles.shortcutBtn, { display: eventByAttention ? "flex" : "none" }]} onPress={() => navigation.navigate('ListSelectedEvent', { name: "กำลังมาแรง", data: eventByAttention })}>
+              <View style={styles.subShortcutBtn}>
                 <MaterialCommunityIcons color={"red"} name={"fire"} size={30} />
               </View>
               <Text>มาแรง</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "กิจกรรมที่เหมาะกับคุณ", data: eventByTag })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
+              <View style={styles.subShortcutBtn}>
                 <Ionicons color={"black"} name={"pricetag"} size={30} />
               </View>
               <Text>ความสนใจ</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "บุ๊กมาร์ก", })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
+              <View style={styles.subShortcutBtn}>
                 <Ionicons color={"black"} name={"bookmark"} size={30} />
               </View>
               <Text>บุ๊กมาร์ก</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "ใกล้ฉัน" })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
+              <View style={styles.subShortcutBtn}>
                 <Ionicons color={"black"} name={"md-location-sharp"} size={30} />
               </View><Text>ใกล้ฉัน</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "กำลังจะเริ่ม" })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
+              <View style={styles.subShortcutBtn}>
                 <MaterialCommunityIcons color={"black"} name={"calendar-clock"} size={30} />
               </View>
               <Text>กำลังจะเริ่ม</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "ที่ลงทะเบียน", data: eventByRegistered })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
+              <View style={styles.subShortcutBtn}>
                 <AntDesign color={"black"} name={"form"} size={30} />
               </View><Text>ที่ลงทะเบียน</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', { name: "ทั้งหมด", data: allEvents })}>
-              <View style={{
-                backgroundColor: Colors.white,
-                borderRadius: 30,
-                height: 50,
-                width: 50,
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
+              <View style={styles.subShortcutBtn}>
                 <Ionicons color={"black"} name={"ios-layers"} size={30} />
               </View><Text>ทั้งหมด</Text>
             </TouchableOpacity>
@@ -481,6 +470,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: 80, marginVertical: 3
+  },
+  subShortcutBtn: {
+    backgroundColor: Colors.white,
+    borderRadius: 30,
+    height: 50,
+    width: 50,
+    alignItems: "center",
+    justifyContent: "center"
   }
 
 

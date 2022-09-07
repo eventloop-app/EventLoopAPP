@@ -12,7 +12,6 @@ const ListEventScreen = ({ route, navigation }) => {
     return (
         < SafeAreaView style={{ flex: 1 }} >
             <View style={styles.container}>
- 
                 <FlatList
                     style={{ paddingBottom: 20 }}
                     data={event}
