@@ -29,7 +29,6 @@ const SearchScreen = ({ route, navigation }) => {
       eventsService.getEventBySearch(keyword).then(res => {
         if (res.status === 200) {
           let newEvent = res.data.content
-          console.log(res.data.totalPages)
           setTotalPage(res.data.totalPages)
           newEvent.map((item, index) => {
             if (typeof (item.location?.name) === "string") {
@@ -49,7 +48,6 @@ const SearchScreen = ({ route, navigation }) => {
                   }
                 }
               })
-
             }
           }
           )
@@ -94,8 +92,6 @@ const SearchScreen = ({ route, navigation }) => {
           }
         }
         )
-
-
         setEvent(currentData)
         setIsLoading(true)
         setLoadData(false)
