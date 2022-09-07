@@ -24,40 +24,43 @@ const SearchScreen = ({ route, navigation }) => {
 
 
   const getEvent = (keyword) => {
-    setPage(0)
-    eventsService.getEventBySearch(keyword).then(res => {
-      if (res.status === 200) {
-        let newEvent = res.data.content
-        console.log(res.data.totalPages)
-        setTotalPage(res.data.totalPages)
-        newEvent.map((item, index) => {
-          if (typeof (item.location?.name) === "string") {
-            platform.map((platformItem) => {
-              if (item.location?.name.includes(platformItem)) {
-                switch (platformItem) {
-                  case 'google':
-                    return newEvent[index].location.name = "Google Meet"
-                  case 'zoom':
-                    return newEvent[index].location.name = "Zoom"
-                  case 'discord':
-                    return newEvent[index].location.name = "Discord"
-                  case 'microsoft':
-                    return newEvent[index].location.name = "Microsoft Team"
-                  default:
-                    return null
+    if (keyword !== "") {
+      setPage(0)
+      eventsService.getEventBySearch(keyword).then(res => {
+        if (res.status === 200) {
+          let newEvent = res.data.content
+          console.log(res.data.totalPages)
+          setTotalPage(res.data.totalPages)
+          newEvent.map((item, index) => {
+            if (typeof (item.location?.name) === "string") {
+              platform.map((platformItem) => {
+                if (item.location?.name.includes(platformItem)) {
+                  switch (platformItem) {
+                    case 'google':
+                      return newEvent[index].location.name = "Google Meet"
+                    case 'zoom':
+                      return newEvent[index].location.name = "Zoom"
+                    case 'discord':
+                      return newEvent[index].location.name = "Discord"
+                    case 'microsoft':
+                      return newEvent[index].location.name = "Microsoft Team"
+                    default:
+                      return null
+                  }
                 }
-              }
-            })
+              })
 
+            }
           }
+          )
+          setEvent(newEvent)
+          setIsLoading(true)
+        } else {
         }
-        )
-
-        setEvent(newEvent)
-        setIsLoading(true)
-      } else {
-      }
-    })
+      })
+    } else {
+      handleClearText()
+    }
   }
 
 

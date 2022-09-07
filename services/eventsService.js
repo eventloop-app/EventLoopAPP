@@ -126,7 +126,7 @@ class eventsService {
   }
 
 
-  async getEventBySearch(keyword, pageNo=0) {
+  async getEventBySearch(keyword, pageNo = 0) {
     try {
       return api.get(`events/getEventByKeyword?keyword=${keyword}&pageNo=${pageNo}&pageSize=10&sortBy=createAt&orderBy=desc`)
     } catch (e) {
