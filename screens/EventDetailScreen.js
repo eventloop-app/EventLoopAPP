@@ -91,7 +91,7 @@ const EventDetailScreen = (props) => {
     eventsService.getEventById(evId).then(res => {
       if (res.status === 200) {
         setEvent(res.data)
-        console.log(res.data.location)
+        console.log(res.data)
       }
     })
     await setIsLoading(false)

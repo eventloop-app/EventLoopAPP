@@ -8,7 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Platform
+  Platform, ActivityIndicator
 } from "react-native";
 import { Surface, Button } from 'react-native-paper';
 import Fonts from "../constants/Fonts";
@@ -41,7 +41,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
   const { userToken, userError } = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
-  const [isLoad, setIsLoad] = useState(false)
+  const [isLoad, setIsLoad] = useState(true)
   const [toolTipVisible, setToolTipVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState([])
   const [userInfo, setUserInfo] = useState({})
@@ -60,6 +60,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
   ])
   const [state, setState] = useState(null)
+  const [waitSub, setWaitSub] = useState(false)
 
   // useEffect(() => {
   //   if (userToken !== null) {
@@ -77,7 +78,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     const user = route.params.user
     setUserData(user)
     setState("GetToken")
-
   }, [])
 
   useEffect(()=>{
@@ -88,6 +88,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
         if(userData.deviceId === undefined && token !== null){
           await console.log("TOKEN IS: " + token )
           await setUserData({...userData, deviceId: token})
+          await setIsLoad(false)
         }else {
           console.log("Can't get token")
         }
@@ -140,7 +141,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
       eventsService.hasUsername(username).then(res => {
         //Check response status.
         if (res.status === 200) {
-
           //check has current username in database. 
           if (res.data.hasUsername) {
             console.log(res.data.hasUsername)
@@ -157,7 +157,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
           alert("server error : " + res.status)
         }
       })
-
     } else {
       setIsError(true)
       SetIsShowValidateMessage("ชื่อผู้ใช้ต้องมีความยาวระหว่าง 3-15 ตัวอักษร\nต้องประกอบด้วยตัวอักษรหรือตัวเลขเท่านั้น")
@@ -209,17 +208,23 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     formData.append('profileImage', localUri ? { uri: localUri, name: filename, type: type } : null);
     formData.append('memberInfo', JSON.stringify(data));
 
-
-    await eventsService.transferMemberData(formData).then(async res => {
-      if(res.status === 200){
-        await dispatch(saveUser(JSON.stringify(res.data.member)))
-        setTimeout(()=>{
-          navigation.navigate('Profile')
-        }, 500)
-      }
-    }).catch(e => {
-      console.error(e)
-    })
+    console.log(data)
+    setWaitSub(true)
+    try {
+      await eventsService.transferMemberData(formData).then(async res => {
+        if(res.status === 200){
+          await dispatch(saveUser(JSON.stringify(res.data.member)))
+          setTimeout(()=>{
+            navigation.navigate('Profile')
+          }, 500)
+        }else{
+          navigation.navigate('Error')
+        }
+      })
+    }catch (e) {
+      navigation.navigate('Error')
+      console.log(e)
+    }
   }
 
   const handlePushTag = () => {
@@ -345,15 +350,16 @@ const EditProfileScreen = ({ props, route, navigation }) => {
       </View>)
   }
 
-  return (
-    <SafeAreaView style={{ height: "100%", backgroundColor: "white"}}>
+  return (isLoad ? <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size={'large'} color={Colors.primary} />
+      </SafeAreaView> :
+    <SafeAreaView style={{ flex:1, backgroundColor: Color.white}}>
       {
-        isLoad ?
-          <Text style={styles.CenterScreenText}>
-            Loading...
-          </Text>
-          :
-          (<View style={{ flex: 1, height: "100%", width: "100%", marginTop: (Platform.OS === "android" ? 50 : null)}}>
+        ( waitSub && <SafeAreaView style={{position: "absolute", flex: 1, width:"100%", height: (Platform.OS === 'ios' ? "120%" : '100%'), top:0, left:0, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(0,0,0,0.25)",zIndex: 50}}>
+          <ActivityIndicator size={75} color={Colors.primary} />
+        </SafeAreaView>)
+      }
+      <View style={{ flex: 1, height: "100%", width: "100%", marginTop: (Platform.OS === "android" ? 50 : null)}}>
             <ProgressSteps labelFontFamily={Fonts.primary} topOffset={20} marginBottom={30} >
               <ProgressStep nextBtnDisabled={(username ? false : true)} nextBtnText={'ต่อไป'} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="เพิ่มข้อมูล" onNext={checkTextInput} errors={isError} >
                 <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>
@@ -376,8 +382,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
                 </View>
               </ProgressStep>
             </ProgressSteps>
-          </View>)
-      }
+          </View>
     </SafeAreaView >
   )
 }

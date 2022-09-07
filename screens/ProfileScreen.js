@@ -65,6 +65,7 @@ const ProfileScreen = ({navigation}) => {
                     title="Sign in"
                     onPress={() => promptAsync()}
                 />
+                <Button onPress={() => navigation.navigate('ManageEvent')} title={'จัดการกิจกรรม'}/>
             </View>
         </SafeAreaView>
     )

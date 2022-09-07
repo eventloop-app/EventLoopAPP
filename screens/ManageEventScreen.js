@@ -1,4 +1,4 @@
-import {Button, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Button, Image,  StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
 import ReactNativeParallaxHeader from "react-native-parallax-header";
 import Fonts from "../constants/Fonts";
@@ -14,7 +14,7 @@ import decode from "../services/decode";
 const ManageEventScreen = (props) => {
     const [event, setEvent] = useState(null)
     const bottomSheetModalRef = useRef(null);
-    const { userToken, userError } = useSelector(state => state.user)
+    const {user} = useSelector(state => state.user)
     const snapPoints = useMemo(() => ['20%', '50%'], []);
     const [userData, setUserData] = useState(null)
     const [code, setCode] = useState(null)
@@ -27,19 +27,21 @@ const ManageEventScreen = (props) => {
     }, []);
 
     useEffect(() => {
-        setEvent(props.route.params.item)
+      console.log("Hello")
+      console.log(user)
+        // setEvent(props?.route.params.item)
     }, [])
 
-    useEffect( () => {
-        if (userToken !== null) {
-            const idToken = JSON.parse(userToken).idToken
-            const user = decode.jwt(idToken)
-            setUserData(user)
-        }
-        if (userError){
-            console.log("userTokenErrorr : " + userError)
-        }
-    }, [userToken])
+    // useEffect( () => {
+    //     if (userToken !== null) {
+    //         const idToken = JSON.parse(userToken).idToken
+    //         const user = decode.jwt(idToken)
+    //         setUserData(user)
+    //     }
+    //     if (userError){
+    //         console.log("userTokenErrorr : " + userError)
+    //     }
+    // }, [userToken])
 
     const onCheckIn = () => {
         if(code === null){
