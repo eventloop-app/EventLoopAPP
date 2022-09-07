@@ -418,9 +418,9 @@ const FeedScreen = ({ route, navigation }) => {
           (
             <View style={[styles.iphoneHeaderBar, { paddingTop: 30, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
               <View style={{ flexDirection: "row", marginLeft: 16 }}>
-                <Image source={imageProfile ? { uri: imageProfile } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: "red", borderRadius: 30, borderWidth: 1, borderColor: "white" }} />
+                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: "red", borderRadius: 30, borderWidth: 1, borderColor: "white" }} />
                 <View style={{ backgroundColor: "white", alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
-                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData ? userData.username : "Login"}</Text>
+                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData?.username ? userData?.username : "Login"}</Text>
                 </View>
               </View>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, padding: 6, margin: 6, marginTop: 12, marginRight: 16, alignItems: "center", justifyContent: "center" }}>
@@ -432,18 +432,18 @@ const FeedScreen = ({ route, navigation }) => {
           (
             <View style={[styles.iphoneHeaderBar, { paddingTop: 30, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
               <View style={{ flexDirection: "row", marginLeft: 16 }}>
-                <Image source={imageProfile ? { uri: imageProfile } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: "red", borderRadius: 30, borderWidth: 1, borderColor: "white" }} />
+                {console.log(user)}
+                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: "red", borderRadius: 30, borderWidth: 1, borderColor: "white" }} />
                 <View style={{ backgroundColor: "white", alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
-                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData ? userData.username : "Login"}</Text>
+                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData?.username ? userData?.username : "Login"}</Text>
                 </View>
-                <TouchableOpacity style={{ display: userData ? "flex" : "none", backgroundColor: "white", alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
+                {/* <TouchableOpacity style={{ display: userData ? "flex" : "none", backgroundColor: "white", alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
                   <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}> "Login" </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <View style={{ backgroundColor: Colors.white, borderRadius: 30, padding: 6, margin: 6, marginTop: 12, marginRight: 16, alignItems: "center", justifyContent: "center" }}>
                 <Feather name={"bell"} size={24} color="black" />
               </View>
-
             </View>
           )
 
