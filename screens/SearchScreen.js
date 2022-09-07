@@ -145,7 +145,7 @@ const SearchScreen = ({ route, navigation }) => {
       newPage = page + 1
       getNewEvent(searchText, newPage);
       setPage(newPage)
-      console.log(newPage)
+ 
 
     }
   }
