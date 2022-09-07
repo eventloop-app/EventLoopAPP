@@ -1,6 +1,6 @@
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Colors from "./Colors";
 import FeedScreen from "../screens/FeedScreen";
@@ -8,7 +8,7 @@ import SearchScreen from "../screens/SearchScreen";
 import CreateEventScreen from "../screens/CreateEventScreen";
 import LikeScreen from "../screens/LikeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import {Platform, StatusBar, TouchableOpacity} from "react-native";
+import { Platform, StatusBar, TouchableOpacity } from "react-native";
 import EventDetailScreen from "../screens/EventDetailScreen";
 import Fonts from "./Fonts";
 import fontSize from "./FontSize";
@@ -19,18 +19,20 @@ import CreatedEventListScreen from "../screens/CreatedEventListScreen";
 import ScannerScreen from "../screens/ScannerScreen";
 import ManageEventScreen from "../screens/ManageEventScreen";
 import ReviewEventScreen from "../screens/ReviewEventScreen";
-import {NavigationContainer} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import MapScreen from "../screens/MapScreen";
 import ErrorScreen from "../screens/ErrorScreen";
+import ListEventScreen from '../screens/ListEventScreen';
+
 const Routing = () => {
 
     const Stack = createNativeStackNavigator();
     const Tab = createBottomTabNavigator();
 
     const HomeScreen = () => {
-        return(
-            <Tab.Navigator screenOptions={({route}) => ({
-                tabBarIcon: ({focused, color, size}) => {
+        return (
+            <Tab.Navigator screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
                     switch (route.name) {
                         case 'Feed':
@@ -49,7 +51,7 @@ const Routing = () => {
                             iconName = focused ? 'ios-person' : 'ios-person-outline';
                             break;
                     }
-                    return <Ionicons name={iconName} size={size + 5} color={color}/>;
+                    return <Ionicons name={iconName} size={size + 5} color={color} />;
                 },
                 tabBarActiveTintColor: Colors.primary,
                 tabBarInactiveTintColor: 'gray',
@@ -57,15 +59,15 @@ const Routing = () => {
                 <Tab.Screen
                     name={'Feed'}
                     component={FeedScreen}
-                    options={{headerShown: false, tabBarShowLabel: false}}
+                    options={{ headerShown: false, tabBarShowLabel: false }}
                 />
-                <Tab.Screen name={'Search'} component={SearchScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+                <Tab.Screen name={'Search'} component={SearchScreen} options={{ headerShown: false, tabBarShowLabel: false }} />
                 <Tab.Screen name={'CreateEvent'} component={CreateEventScreen}
-                            options={{headerShown: false, tabBarShowLabel: false}}/>
-                <Tab.Screen name={'Like'} component={LikeScreen} options={{headerShown: false, tabBarShowLabel: false}}/>
+                    options={{ headerShown: false, tabBarShowLabel: false }} />
+                <Tab.Screen name={'Like'} component={LikeScreen} options={{ headerShown: false, tabBarShowLabel: false }} />
                 <Tab.Screen name={'Profile'}
-                            component={ProfileScreen}
-                            options={{headerShown: false, tabBarShowLabel: false}}
+                    component={ProfileScreen}
+                    options={{ headerShown: false, tabBarShowLabel: false }}
                 />
             </Tab.Navigator>
         )
@@ -73,13 +75,13 @@ const Routing = () => {
 
     return (
         <NavigationContainer>
-            <StatusBar hidden={Platform.OS === "android" ? true : false}/>
+            <StatusBar hidden={Platform.OS === "android" ? true : false} />
             <Stack.Navigator>
                 <Stack.Screen name={'Home'} component={HomeScreen}
-                              options={{headerShown: false, tabBarShowLabel: false}}/>
-              <Stack.Screen name={'Error'} component={ErrorScreen}
-                            options={{headerShown: false, tabBarShowLabel: false}}/>
-                <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={ ({route,navigation}) => ({
+                    options={{ headerShown: false, tabBarShowLabel: false }} />
+                <Stack.Screen name={'Error'} component={ErrorScreen}
+                    options={{ headerShown: false, tabBarShowLabel: false }} />
+                <Stack.Screen name={'EventDetail'} component={EventDetailScreen} options={({ route, navigation }) => ({
                     headerShown: true,
                     headerTransparent: true,
                     tabBarShowLabel: false,
@@ -107,9 +109,9 @@ const Routing = () => {
                             <Ionicons name="arrow-back-outline" size={25} color={Colors.black} />
                         </TouchableOpacity>
                     )
-                })}/>
+                })} />
 
-                <Stack.Screen name={'EventList'} component={RegisterEventListScreen} options={ ({route}) => ({
+                <Stack.Screen name={'EventList'} component={RegisterEventListScreen} options={({ route }) => ({
                     headerShown: true,
                     headerTransparent: true,
                     tabBarShowLabel: false,
@@ -121,9 +123,9 @@ const Routing = () => {
                     },
                     headerBackTitle: '',
                     title: route.params.name
-                })}/>
+                })} />
 
-                <Stack.Screen  name={'EditProfile'} component={EditProfileScreen} options={ ({route,navigation}) => ({
+                <Stack.Screen name={'EditProfile'} component={EditProfileScreen} options={({ route, navigation }) => ({
                     headerShown: true,
                     headerTransparent: true,
                     tabBarShowLabel: false,
@@ -149,25 +151,25 @@ const Routing = () => {
                     },
                     headerBackTitle: '',
                     title: 'โปรไฟล์',
-                  headerLeft: () => (
-                    <TouchableOpacity
-                      style={{
-                        paddingLeft: 10,
-                        borderRadius: 100,
-                        backgroundColor: 'rgba(255,255,255,0.8)',
-                        width: 50,
-                        height: 30,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}
-                      onPress={() => navigation.navigate('Feed')}
-                    >
-                      <Ionicons name="arrow-back-outline" size={25} color={Colors.black} />
-                    </TouchableOpacity>
-                  )
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            style={{
+                                paddingLeft: 10,
+                                borderRadius: 100,
+                                backgroundColor: 'rgba(255,255,255,0.8)',
+                                width: 50,
+                                height: 30,
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}
+                            onPress={() => navigation.navigate('Feed')}
+                        >
+                            <Ionicons name="arrow-back-outline" size={25} color={Colors.black} />
+                        </TouchableOpacity>
+                    )
                 })} />
 
-                <Stack.Screen  name={'CreatedEventList'} component={CreatedEventListScreen} options={ ({route}) => ({
+                <Stack.Screen name={'CreatedEventList'} component={CreatedEventListScreen} options={({ route }) => ({
                     headerShown: true,
                     headerTransparent: false,
                     tabBarShowLabel: false,
@@ -178,12 +180,28 @@ const Routing = () => {
                         color: Colors.black,
                     },
                     headerBackTitle: '',
-                    title: 'รายการกิจกรรมที่สร้าง'
-                })}/>
+                    title: 'รายการกิจกรรมที่สร้าง',
+                })} />
 
-                <Stack.Screen name={'Scanner'} component={ScannerScreen} options={{ headerShown:false}}/>
-                <Stack.Group screenOptions={{ presentation: 'fullScreenModal'}}>
-                    <Stack.Screen name={'ManageEvent'} component={ManageEventScreen} options={ ({route,navigation}) => ({
+
+                <Stack.Screen name={'ListSelectedEvent'} component={ListEventScreen} options={({ route }) => ({
+                    headerShown: true,
+                    headerTransparent: false,
+                    tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    headerTitleStyle: {
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.black,
+                    },
+                    headerBackTitle: '',
+                    title: route.params.name
+                })} />
+
+
+                <Stack.Screen name={'Scanner'} component={ScannerScreen} options={{ headerShown: false }} />
+                <Stack.Group screenOptions={{ presentation: 'fullScreenModal' }}>
+                    <Stack.Screen name={'ManageEvent'} component={ManageEventScreen} options={({ route, navigation }) => ({
                         headerShown: true,
                         headerTransparent: true,
                         tabBarShowLabel: false,
@@ -226,9 +244,9 @@ const Routing = () => {
                                 <Ionicons name="md-create-outline" size={25} color={Colors.black} />
                             </TouchableOpacity>
                         )
-                    })}/>
+                    })} />
 
-                    <Stack.Screen name={'ReviewEvent'} component={ReviewEventScreen} options={ ({route,navigation}) => ({
+                    <Stack.Screen name={'ReviewEvent'} component={ReviewEventScreen} options={({ route, navigation }) => ({
                         headerShown: true,
                         headerTransparent: true,
                         tabBarShowLabel: false,
@@ -256,37 +274,37 @@ const Routing = () => {
                                 <Ionicons name="md-close" size={25} color={Colors.black} />
                             </TouchableOpacity>
                         )
-                    })}/>
+                    })} />
 
-                  <Stack.Screen name={'GoogleMap'} component={MapScreen} options={ ({route,navigation}) => ({
-                    headerShown: true,
-                    headerTransparent: true,
-                    tabBarShowLabel: false,
-                    headerTitleAlign: 'center',
-                    headerTitleStyle: {
-                      fontFamily: Fonts.bold,
-                      fontSize: fontSize.primary,
-                      color: Colors.black,
-                    },
-                    title: "เลือกสถานที่",
-                    headerTintColor: Colors.white,
-                    headerBackTitle: '',
-                    headerLeft: () => (
-                      <TouchableOpacity
-                        style={{
-                          borderRadius: 100,
-                          backgroundColor: 'rgba(255,255,255,0.8)',
-                          width: 30,
-                          height: 30,
-                          justifyContent: 'center',
-                          alignItems: 'center'
-                        }}
-                        onPress={() => navigation.pop()}
-                      >
-                        <Ionicons name="md-close" size={25} color={Colors.black} />
-                      </TouchableOpacity>
-                    )
-                  })}/>
+                    <Stack.Screen name={'GoogleMap'} component={MapScreen} options={({ route, navigation }) => ({
+                        headerShown: true,
+                        headerTransparent: true,
+                        tabBarShowLabel: false,
+                        headerTitleAlign: 'center',
+                        headerTitleStyle: {
+                            fontFamily: Fonts.bold,
+                            fontSize: fontSize.primary,
+                            color: Colors.black,
+                        },
+                        title: "เลือกสถานที่",
+                        headerTintColor: Colors.white,
+                        headerBackTitle: '',
+                        headerLeft: () => (
+                            <TouchableOpacity
+                                style={{
+                                    borderRadius: 100,
+                                    backgroundColor: 'rgba(255,255,255,0.8)',
+                                    width: 30,
+                                    height: 30,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}
+                                onPress={() => navigation.pop()}
+                            >
+                                <Ionicons name="md-close" size={25} color={Colors.black} />
+                            </TouchableOpacity>
+                        )
+                    })} />
                 </Stack.Group>
             </Stack.Navigator>
         </NavigationContainer>
