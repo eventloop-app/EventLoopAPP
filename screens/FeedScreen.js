@@ -456,7 +456,7 @@ const FeedScreen = ({ route, navigation }) => {
             {renderEventShortcutSection()}
             {renderAllEventSection()}
             {renderEventByTagSection()}
-            {renderRegisteredEventSection()}
+             {renderRegisteredEventSection()}
             <View style={{ display: hasFeedBack ? "flex" : "none" }}>
               {renderRemindFeedback()}
             </View>
