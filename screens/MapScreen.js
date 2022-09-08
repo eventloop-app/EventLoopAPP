@@ -13,8 +13,8 @@ const MapScreen = (props) => {
   const [location] = useState({
     latitude: 13.655195982451191,
     longitude: 100.49923007148183,
-    latitudeDelta: 0.6616193304764995,
-    longitudeDelta: 0.34865230321884155
+    latitudeDelta: 0.0616193304764995,
+    longitudeDelta: 0.04865230321884155
   })
 
   const mapRef = createRef();

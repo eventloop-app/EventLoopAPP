@@ -50,7 +50,6 @@ const FeedScreen = ({route, navigation}) => {
 
   // get Event
   const getEvent = async () => {
-    console.log("Get Event")
     const timeout = setTimeout(() => {
       console.log("TimeOut !")
       navigation.navigate("Error")
@@ -106,7 +105,6 @@ const FeedScreen = ({route, navigation}) => {
       alert('ผิดพลาดดด \n' + error.message)
     })
   }
-
 
   const renderEventShortcutSection = () => {
     return (
