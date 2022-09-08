@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, FlatList, Image, Platform, SafeAreaView, Text, TouchableOpacity, View} from "react-native";
+import {
+  ActivityIndicator, Button,
+  FlatList,
+  Image,
+  Modal,
+  Platform,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import eventsService from "../services/eventsService";
 import {useSelector} from "react-redux";
 import Fonts from "../constants/Fonts";
@@ -14,6 +24,9 @@ const ManageEventDetailScreen = (props) => {
   const [evntId, setEventId] = useState(null)
   const [userJoin, setUserJoin] = useState({})
   const [isLoad, setIsLoad] = useState(true)
+  const [showQr, setShowQr] = useState(false)
+  const [checkInData, setCheckInData] = useState({qr : null, code: null})
+
   useEffect(() => {
     setEventId(props.route.params.id)
   }, [])
@@ -45,6 +58,18 @@ const ManageEventDetailScreen = (props) => {
     </View>
   )
 
+  const onCheckIn = () => {
+    setIsLoad(true)
+    eventsService.getCodeCheckIn(userData.id, evntId).then( res => {
+      console.log(res.data)
+      if(res.status === 200){
+        setCheckInData({qr: res.data.base64CheckInCode, code: res.data.checkInCode})
+        setShowQr(true)
+        setIsLoad(false)
+      }
+    })
+  }
+
   return (isLoad ?
       <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator size={'large'} color={Colors.primary}/>
@@ -62,11 +87,32 @@ const ManageEventDetailScreen = (props) => {
           />
         </View>
         <TouchableOpacity
+          style={{position: "absolute", width: "100%", bottom: 150, justifyContent: 'center', alignItems: 'center'}}
+          onPress={() => onCheckIn()}>
+          <Text style={{textAlign: 'center'}}>เช็คอิน</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={{position: "absolute", width: "100%", bottom: 100, justifyContent: 'center', alignItems: 'center'}}
           onPress={() => props.navigation.pop()}>
           <Text style={{textAlign: 'center'}}>ปิดหน้าต่าง</Text>
         </TouchableOpacity>
+        {
+          (showQr &&
+            <View style={{position: "absolute", width: 300, height:300, borderRadius: 12, top: "30%", left: "10%", }}>
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                {
+                  console.log(`data:image/jpeg;base64,${checkInData.qr}`)
+                }
+                <Image source={{uri: `data:image/jpeg;base64,${checkInData.qr}`}}
+                       style={{width: 230, height: 230, borderRadius: 12}}/>
+
+                <Button onPress={()=> setShowQr(false)} title={'ปิด'}/>
+              </View>
+
+          </View>)
+        }
       </SafeAreaView>
+
   );
 };
 

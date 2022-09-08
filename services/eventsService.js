@@ -150,7 +150,6 @@ class eventsService {
 
   async getMemberRegistedEvent(id, eveId){
     const data = {eventId: eveId, memberId : id  }
-    console.log(data)
     return api.post(`/events/getRegisterMember`, data)
   }
 }
