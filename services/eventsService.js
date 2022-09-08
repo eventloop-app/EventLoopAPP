@@ -30,7 +30,7 @@ class eventsService {
 
   async getEventByAttention(pageNo = 0) {
     try {
-      return api.get(`events/attention?pageNo=${pageNo}&pageSize=0`)
+      return api.get(`events/attention?pageNo=${pageNo}&pageSize=10`)
     } catch (e) {
       return new Promise(reject => reject(e))
     }
