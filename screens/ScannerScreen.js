@@ -12,8 +12,14 @@ const ScannerScreen = (props) => {
     // })
     useEffect(() => {
         (async () => {
-            const {status} = await BarCodeScanner.requestPermissionsAsync();
-            setHasPermission(status === 'granted');
+            let unmount = false
+            if(unmount !== true){
+                const {status} = await BarCodeScanner.requestPermissionsAsync();
+                setHasPermission(status === 'granted');
+            }
+            return ()=> {
+                unmount = true
+            }
         })();
     }, []);
 
