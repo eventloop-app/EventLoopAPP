@@ -39,11 +39,7 @@ const ProfileScreen = (props, {navigation}) => {
   useEffect(() => {
     if (props.route.params !== undefined) {
       setIsLoad(true)
-      console.log(props.route.params.user)
       setUserData(props.route.params.user)
-      setTimeout(() => {
-        setIsLoad(false)
-      }, 500)
     }
   }, [props])
 
@@ -55,23 +51,24 @@ const ProfileScreen = (props, {navigation}) => {
 
   useEffect(() => {
     setIsLoad(true)
-    console.log("-----------------------------------")
     if (userData !== null && userData !== undefined) {
       console.log("Has user " + userData.id)
     }
-    setIsLoad(false)
+    setTimeout(()=>{
+      setIsLoad(false)
+    },1000)
   }, [userData])
 
   useEffect(() => {
+    setIsLoad(true)
     if (authData !== null && authData !== undefined) {
       eventsService.checkEmail(authData.user.email).then(async res => {
         if (!res.data.hasEmail) {
           setIsLoad(false)
           props.navigation.navigate('EditProfile', {user: authData.user})
         } else {
-          setTimeout(() => {
-            dispatch(saveUser(JSON.stringify(res.data.member)))
-          }, 200)
+          dispatch(saveUser(JSON.stringify(res.data.member)))
+          setUserData(res.data.member)
         }
       })
     } else {
@@ -125,9 +122,12 @@ const ProfileScreen = (props, {navigation}) => {
   }
 
   const signOut = async () => {
+    setIsLoad(true)
     await dispatch(SignOut())
     setTimeout(() => {
       try {
+        setUserData(null)
+        setIsLoad(false)
         navigation.navigate("Profile")
       } catch (e) {
         return;
@@ -136,7 +136,7 @@ const ProfileScreen = (props, {navigation}) => {
   }
 
   return (
-    user ?
+    userData ?
       <SafeAreaView style={{flex: 1, width: "100%", height: "100%", backgroundColor: Colors.white}}>
         {
           (isLoad ?

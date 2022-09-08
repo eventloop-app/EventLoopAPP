@@ -25,7 +25,7 @@ import FormData from "form-data";
 import eventsService from "../services/eventsService";
 import {useIsFocused} from "@react-navigation/native";
 import fontSize from "../constants/FontSize";
-import {forEach} from "react-native-axios/lib/utils";
+
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
@@ -225,7 +225,6 @@ const CreateEventScreen = (props) => {
             if(count === 0){
               setError({...error, all: false})
             }else{
-              console.log(count)
               setError({...error, all: true})
             }
             setIsLoad(false)
@@ -272,9 +271,9 @@ const CreateEventScreen = (props) => {
 
     console.log(newEventDetail)
     setWaitSub(true)
-    eventsService.createEvent(data).then(res => {
+    eventsService.createEvent(data).then( async res => {
       if (res.status === 200) {
-        setEventDetail({
+        await setEventDetail({
           type: "ONSITE",
           tags: [],
           eventName: 'ชื่อกิจกรรม',
@@ -287,14 +286,23 @@ const CreateEventScreen = (props) => {
           numberOfPeople: 0,
           memberId: null
         })
-        setIsLoad(true)
-        setCoverImage(null)
-        setKinds(kind)
-        setTags(tagss)
-        setWaitSub(false)
-        setTimeout(() => {
-          props.navigation.navigate('Feed')
-        }, 1500)
+        await setCoverImage(null)
+        await setKinds(kind)
+        await setTags(tagss)
+        await setWaitSub(false)
+        await setIsLoad(true)
+        await setError({
+          eventName: null,
+          startDate: null,
+          tags: null,
+          numberOfPeople: null,
+          location: null,
+          description: null,
+          all: true
+        })
+
+        await props.navigation.navigate('Feed')
+
       }
     }).catch(error => {
       console.log(error)
@@ -919,7 +927,7 @@ const CreateEventScreen = (props) => {
   return (isLoad ?
       <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator size={'large'} color={Colors.primary} />
-      </SafeAreaView> : renderUI()
+      </SafeAreaView> : (user ? renderUI() : <SafeAreaView></SafeAreaView>)
   )
 };
 
