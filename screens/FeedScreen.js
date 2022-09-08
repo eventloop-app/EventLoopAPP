@@ -24,10 +24,10 @@ import { Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons, En
 const FeedScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [eventId, setEventId] = useState(true)
-  const [allEvents, setAllEvent] = useState("")
-  const [eventByTag, setEventByTag] = useState("")
-  const [eventByRegistered, setEventByRegistered] = useState("")
-  const [eventByAttention, setEventByAttention] = useState("")
+  const [allEvents, setAllEvent] = useState([])
+  const [eventByTag, setEventByTag] = useState([])
+  const [eventByRegistered, setEventByRegistered] = useState([])
+  const [eventByAttention, setEventByAttention] = useState([])
   const [isVisible, setIsVisible] = useState(false)
   const [title, setTitle] = useState("กิจกรรมที่กำลังจะเริ่มเร็วๆนี้")
   const [feedbackImageCover, setFeedbackImageCover] = useState("https://cdn.zipeventapp.com/blog/2020/09/2020-09-09_04-59-46_zip-onlineevent.png")
@@ -39,6 +39,7 @@ const FeedScreen = ({ route, navigation }) => {
 
   const [onLoadData, setLoadData] = useState(false)
   const [page, setPage] = useState(0)
+  const [totalPage, setTotalPage] = useState(0)
 
   // useFocusEffect(
   //   useCallback(() => {
