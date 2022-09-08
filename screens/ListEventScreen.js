@@ -10,7 +10,7 @@ const ListEventScreen = ({ route, navigation }) => {
     const [eventId, setEventId] = useState(true)
 
     return (
-        < SafeAreaView style={{ flex: 1 }} >
+        < SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }} >
             <View style={styles.container}>
                 <FlatList
                     style={{ paddingBottom: 20 }}
