@@ -22,6 +22,7 @@ import ReviewEventScreen from "../screens/ReviewEventScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import MapScreen from "../screens/MapScreen";
 import ErrorScreen from "../screens/ErrorScreen";
+import ManageEventDetailScreen from "../screens/ManageEventDetailScreen";
 
 const Routing = () => {
 
@@ -75,7 +76,7 @@ const Routing = () => {
   return (
     <NavigationContainer>
       <StatusBar hidden={Platform.OS === "android" ? true : false}/>
-      <Stack.Navigator>
+      <Stack.Navigator >
         <Stack.Screen name={'Home'} component={HomeScreen}
                       options={{headerShown: false, tabBarShowLabel: false}}/>
         <Stack.Screen name={'Error'} component={ErrorScreen}
@@ -196,7 +197,7 @@ const Routing = () => {
               fontSize: fontSize.primary,
               color: Colors.black,
             },
-            title: "",
+            title: "จัดการกิจกรรม",
             headerTintColor: Colors.white,
             headerBackTitle: '',
             headerLeft: () => (
@@ -214,22 +215,23 @@ const Routing = () => {
                 <Ionicons name="md-close" size={25} color={Colors.black}/>
               </TouchableOpacity>
             ),
-            headerRight: () => (
-              <TouchableOpacity
-                style={{
-                  borderRadius: 100,
-                  backgroundColor: 'rgba(255,255,255,0.8)',
-                  width: 30,
-                  height: 30,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-                onPress={() => console.log('Edit Event')}
-              >
-                <Ionicons name="md-create-outline" size={25} color={Colors.black}/>
-              </TouchableOpacity>
-            )
+            // headerRight: () => (
+            //   <TouchableOpacity
+            //     style={{
+            //       borderRadius: 100,
+            //       backgroundColor: 'rgba(255,255,255,0.8)',
+            //       width: 30,
+            //       height: 30,
+            //       justifyContent: 'center',
+            //       alignItems: 'center'
+            //     }}
+            //     onPress={() => console.log('Edit Event')}
+            //   >
+            //     <Ionicons name="md-create-outline" size={25} color={Colors.black}/>
+            //   </TouchableOpacity>
+            // )
           })}/>
+
 
           <Stack.Screen name={'ReviewEvent'} component={ReviewEventScreen} options={({route, navigation}) => ({
             headerShown: true,
@@ -289,6 +291,54 @@ const Routing = () => {
                 <Ionicons name="md-close" size={25} color={Colors.black}/>
               </TouchableOpacity>
             )
+          })}/>
+        </Stack.Group>
+
+        <Stack.Group screenOptions={{presentation: 'modal',gestureEnabled: false}} >
+          <Stack.Screen name={'ManageEventDetail'} component={ManageEventDetailScreen} options={({route, navigation}) => ({
+            headerShown: true,
+            headerTransparent: true,
+            tabBarShowLabel: false,
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              fontFamily: Fonts.bold,
+              fontSize: fontSize.medium,
+              color: Colors.black,
+            },
+            title: route.params.name,
+            headerTintColor: Colors.white,
+            headerBackTitle: '',
+            headerBackVisible: false
+            // headerLeft: () => (
+            //   <TouchableOpacity
+            //     style={{
+            //       borderRadius: 100,
+            //       backgroundColor: 'rgba(255,255,255,0.8)',
+            //       width: 30,
+            //       height: 30,
+            //       justifyContent: 'center',
+            //       alignItems: 'center'
+            //     }}
+            //     onPress={() => navigation.pop()}
+            //   >
+            //     <Ionicons name="md-close" size={25} color={Colors.black}/>
+            //   </TouchableOpacity>
+            // ),
+            // headerRight: () => (
+            //   <TouchableOpacity
+            //     style={{
+            //       borderRadius: 100,
+            //       backgroundColor: 'rgba(255,255,255,0.8)',
+            //       width: 30,
+            //       height: 30,
+            //       justifyContent: 'center',
+            //       alignItems: 'center'
+            //     }}
+            //     onPress={() => console.log('Edit Event')}
+            //   >
+            //     <Ionicons name="md-create-outline" size={25} color={Colors.black}/>
+            //   </TouchableOpacity>
+            // )
           })}/>
         </Stack.Group>
       </Stack.Navigator>

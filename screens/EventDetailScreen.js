@@ -13,7 +13,7 @@ import MapView, {Marker} from "react-native-maps";
 import {wrap} from "@babel/runtime/helpers/regeneratorRuntime";
 
 const EventDetailScreen = (props) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [event, setEvent] = useState(null)
   const [isLogin, setIsLogin] = useState(false)
   const [userData, setUserData] = useState(null)
@@ -25,6 +25,7 @@ const EventDetailScreen = (props) => {
   const [CheckInCode, setCheckInCode] = useState(null)
   const [isOwner, setIsOwner] = useState(false)
   const mapRef = createRef();
+
   useEffect(() => {
     if (props.route.params.QRcode) {
       console.log('QRCODE')
@@ -35,9 +36,16 @@ const EventDetailScreen = (props) => {
   }, [props])
 
   useEffect(() => {
-    console.log('EventDetail')
-    getEvent()
+    if(user !== undefined && user !== null){
+      setUserData(user)
+      getEvent()
+    }
   }, [])
+
+  // useEffect(()=>{
+  //   console.log('EventDetail')
+  //   getEvent()
+  // },[])
 
   useEffect(() => {
     if (userData !== null && event !== null) {
@@ -46,14 +54,13 @@ const EventDetailScreen = (props) => {
       }).catch(e => {
         console.log("CheckUserRegisterEventError:", e.message)
       })
-
       if (userData.email === event.email) {
         console.log('Is owner event')
         setIsOwner(true)
       }
       CheckUserCheckIn()
     }
-  }, [userData])
+  }, [event])
 
   useEffect(() => {
     if (user !== null) {
@@ -91,10 +98,9 @@ const EventDetailScreen = (props) => {
     eventsService.getEventById(evId).then(res => {
       if (res.status === 200) {
         setEvent(res.data)
-        console.log(res.data)
       }
     })
-    await setIsLoading(false)
+    setIsLoading(false)
   }
 
   const hideAlert = () => {
@@ -114,7 +120,7 @@ const EventDetailScreen = (props) => {
   }
 
   const onRegisterEvent = async () => {
-    await eventsService.registerEvent(userData.memberId, event.id).then(res => {
+    await eventsService.registerEvent(userData.id, event.id).then(res => {
       if (res.status === 200) {
         setIsRegister(true)
       }
@@ -150,7 +156,7 @@ const EventDetailScreen = (props) => {
         <TouchableOpacity activeOpacity={0.8} disabled={!isLogin}
                           onPress={() => props.navigation.navigate('ReviewEvent')}>
           <View style={{
-            width: 340,
+            width: 360,
             height: 60,
             backgroundColor: (isLogin ? Colors.primary : Colors.gray),
             borderRadius: 12,
@@ -415,7 +421,7 @@ const EventDetailScreen = (props) => {
                 (isRegister && !isCheckIn) ?
                   <View style={{marginTop: 20, justifyContent: 'center', alignItems: 'center'}}>
                     <TouchableOpacity activeOpacity={0.8} disabled={!isLogin}
-                                      onPress={() => console.log(props.navigation.navigate('Scanner', {event: event}))}>
+                                      onPress={() => props.navigation.navigate('Scanner', {event: event})}>
                       <View style={{
                         width: 340,
                         height: 60,
@@ -488,6 +494,59 @@ const EventDetailScreen = (props) => {
           }}
           onConfirmPressed={() => {
             onUnregisterEvent()
+          }}
+        />
+
+        <AwesomeAlert
+          show={showRegisterEvent}
+          showProgress={false}
+          messageStyle={{
+            textAlign: 'center',
+            fontFamily: Fonts.primary,
+            fontSize: FontSize.small,
+          }}
+          titleStyle={{
+            textAlign: 'center',
+            fontFamily: Fonts.bold,
+            fontSize: FontSize.primary,
+          }}
+          title="เข้าร่วมกิจกรรม"
+          message={`คุณแน่ใจที่จะเข้าร่วมกิจกรรม \n${event?.eventName}\n หรือไม่`}
+          closeOnTouchOutside={true}
+          closeOnHardwareBackPress={false}
+          showCancelButton={true}
+          showConfirmButton={true}
+          cancelText="ยกเลิก"
+          confirmText="ตกลง"
+          cancelButtonColor={Colors.red}
+          confirmButtonColor={Colors.primary}
+          cancelButtonStyle={{
+            flex: 1,
+            width: 70,
+            height: 35,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+          confirmButtonStyle={{
+            flex: 1,
+            width: 70,
+            height: 35,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          confirmButtonTextStyle={{
+            fontFamily: Fonts.primary,
+            fontSize: FontSize.primary,
+          }}
+          cancelButtonTextStyle={{
+            fontFamily: Fonts.primary,
+            fontSize: FontSize.primary,
+          }}
+          onCancelPressed={() => {
+            hideAlert();
+          }}
+          onConfirmPressed={() => {
+            onRegisterEvent()
           }}
         />
 
