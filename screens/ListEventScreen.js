@@ -10,10 +10,10 @@ const ListEventScreen = ({ route, navigation }) => {
     const [eventId, setEventId] = useState(true)
 
     return (
-        < SafeAreaView style={{ flex: 1, backgroundColor: Colors.white }} >
+        < SafeAreaView style={{ flex: 1, backgroundColor: Colors.white  }} >
             <View style={styles.container}>
                 <FlatList
-                    style={{ paddingBottom: 20 }}
+                    style={{ marginBottom: -30 }}
                     data={event}
                     renderItem={({ item }) => (<EventCardType4 item={item} onPress={() => navigation.navigate('EventDetail', {
                         item: item,
@@ -31,7 +31,8 @@ const ListEventScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.white,
-        flex: 1
+        flex: 1,
+        
     },
 })
 export default ListEventScreen
