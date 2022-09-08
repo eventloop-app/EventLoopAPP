@@ -36,6 +36,10 @@ const FeedScreen = ({ route, navigation }) => {
   const [feedBack, setFeedBack] = useState("")
   const [hasFeedBack, setHasFeedBack] = useState(false)
   const [stepReward, setStepReward] = useState(0);
+
+  const [onLoadData, setLoadData] = useState(false)
+  const [page, setPage] = useState(0)
+
   // useFocusEffect(
   //   useCallback(() => {
   //     setIsVisible(true)
@@ -106,44 +110,66 @@ const FeedScreen = ({ route, navigation }) => {
     await setIsLoading(false)
   }
 
+//-----------------------------------------------------------
+  const getNewEvent = (keyword = "", newPage) => {
+    setLoadData(true)
+    eventsService.getEventBySearch(keyword, newPage).then(res => {
+      if (res.status === 200) {
+        setLoadData(false)
+        let newEvent = res.data.content
+        let currentData = event.concat(newEvent) 
 
-    const getEvent = (keyword) => {
-    if (keyword !== "") {
-      setPage(0)
-      eventsService.getEventBySearch(keyword).then(res => {
-        if (res.status === 200) {
-          let newEvent = res.data.content
-          setTotalPage(res.data.totalPages)
-          newEvent.map((item, index) => {
-            if (typeof (item.location?.name) === "string") {
-              platform.map((platformItem) => {
-                if (item.location?.name.includes(platformItem)) {
-                  switch (platformItem) {
-                    case 'google':
-                      return newEvent[index].location.name = "Google Meet"
-                    case 'zoom':
-                      return newEvent[index].location.name = "Zoom"
-                    case 'discord':
-                      return newEvent[index].location.name = "Discord"
-                    case 'microsoft':
-                      return newEvent[index].location.name = "Microsoft Team"
-                    default:
-                      return null
-                  }
+        currentData.map((item, index) => {
+          if (typeof (item.location?.name) === "string") {
+            platform.map((platformItem) => {
+              if (item.location?.name.includes(platformItem)) {
+                switch (platformItem) {
+                  case 'google':
+                    return currentData[index].location.name = "Google Meet"
+                  case 'zoom':
+                    return currentData[index].location.name = "Zoom"
+                  case 'discord':
+                    return currentData[index].location.name = "Discord"
+                  case 'microsoft':
+                    return currentData[index].location.name = "Microsoft Team"
+                  default:
+                    return null
                 }
-              })
-            }
+              }
+            })
+
           }
-          )
-          setEvent(newEvent)
-          setIsLoading(true)
-        } else {
         }
-      })
-    } else {
-      handleClearText()
+        )
+        setEvent(currentData)
+        setIsLoading(true)
+        setLoadData(false)
+      } else {
+        setLoadData(false)
+      }
+    })
+  }
+
+  const renderFooter = () => {
+    if (!onLoadData) return null;
+    return (
+      <ActivityIndicator
+        style={{ color: '#000' }}
+      />
+    );
+  }
+
+  const handleLoadMore = () => {
+    if (!onLoadData) {
+
+      let newPage = page + 1; // increase page by 1
+      getNewEvent(searchText, newPage); // method for API call 
+      setPage(newPage)
+      console.log(newPage)
     }
   }
+//-----------------------------------------------------------------
+
 
   const renderEventShortcutSection = () => {
     return (
@@ -347,6 +373,10 @@ const FeedScreen = ({ route, navigation }) => {
           extraData={eventId}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
+
+          ListFooterComponent={renderFooter}
+          onEndReachedThreshold={0.2}
+          onEndReached={handleLoadMore}
         />
       </View>
     )
