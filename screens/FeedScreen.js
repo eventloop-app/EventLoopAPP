@@ -364,6 +364,7 @@ const FeedScreen = ({ route, navigation }) => {
           </View>
         </View>
         <FlatList
+        
           data={eventByAttention}
           renderItem={({ item }) => (<EventCardHorizon item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,

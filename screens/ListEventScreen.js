@@ -13,6 +13,7 @@ const ListEventScreen = ({ route, navigation }) => {
         < SafeAreaView style={{ flex: 1, backgroundColor: Colors.white  }} >
             <View style={styles.container}>
                 <FlatList
+                    contentContainerStyle={{ paddingBottom: 20}}
                     style={{ marginBottom: -30 }}
                     data={event}
                     renderItem={({ item }) => (<EventCardType4 item={item} onPress={() => navigation.navigate('EventDetail', {
