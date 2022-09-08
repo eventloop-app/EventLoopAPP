@@ -7,13 +7,13 @@ import "moment/locale/th"
 import moment from "moment/moment";
 import { LogBox } from 'react-native';
 import Routing from "./constants/Routing";
-import * as Notifications from 'expo-notifications'
 moment().locale('th')
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
   'EventEmitter.removeListener',
   'Can\'t perform a React state update on an unmounted component'
 ]);
+import * as Notifications from 'expo-notifications'
 setupInterceptors(configureStore)
 
 Notifications.setNotificationHandler({
@@ -30,6 +30,18 @@ const App = () => {
 
   useEffect(() => {
     loadData()
+
+    registerForPushNotification().then(token =>{
+      console.log(token)
+    }).catch(e =>{
+      console.log(e)
+    })
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+
   }, [])
 
   useEffect( () =>{
@@ -43,6 +55,18 @@ const App = () => {
       // console.log(notification)
     });
   },[])
+
+  const registerForPushNotification = async () => {
+    const {status} = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return ;
+    }else{
+      return (await Notifications.getExpoPushTokenAsync()).data
+    }
+
+
+  }
 
   const loadData = async () => {
     await Font.loadAsync({
