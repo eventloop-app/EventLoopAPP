@@ -31,8 +31,14 @@ const setup = (store) => {
         })
         return await axiosInstance(originalConfig);
       }
+      if(err.response.status === 400){
+        console.log("===400===")
+        console.log(err.response.data)
+        console.log("===400===")
+      }
     }
-    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status + err.response});
+
+    return Promise.reject({message: 'มีบางอย่างผิดพลาด' + err.response.status});
   });
 };
 export default setup;

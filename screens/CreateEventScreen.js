@@ -1,5 +1,6 @@
 import React, {createRef, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
+  ActivityIndicator,
   Button,
   Dimensions,
   Image, Platform,
@@ -58,8 +59,8 @@ const CreateEventScreen = (props) => {
     startDate: new Date(),
     endDate: new Date( new Date().setHours(new Date().getHours() + 1)),
     location: null,
-    latitude: 0,
-    longitude: 0,
+    latitude: -1,
+    longitude: -1,
     description: '',
     numberOfPeople: '',
     memberId: null
@@ -70,7 +71,7 @@ const CreateEventScreen = (props) => {
   const isFocused = useIsFocused();
   const input_num = useRef()
   const input_loc = useRef()
-
+  const [waitSub, setWaitSub] = useState(false)
   // useEffect(() => {
   //   if (isFocused === false) {
   //     setEventDetail({
@@ -133,7 +134,7 @@ const CreateEventScreen = (props) => {
   };
 
   const changeDateTime = (event, date) => {
-    setEventDetail({...eventDetail, startDate: date})
+    setEventDetail({...eventDetail, startDate: date, endDate: new Date( new Date(date).setHours(new Date(date).getHours() + 1))})
   }
 
   const onSubmit = async () => {
@@ -150,8 +151,8 @@ const CreateEventScreen = (props) => {
     data.append('eventInfo', JSON.stringify(newEventDetail));
 
     console.log(newEventDetail)
+    setWaitSub(true)
     eventsService.createEvent(data).then(res => {
-      console.log(res)
       if(res.status === 200) {
         setEventDetail({
           type: "ONSITE",
@@ -170,7 +171,7 @@ const CreateEventScreen = (props) => {
         setCoverImage(null)
         setKinds(kind)
         setTags(tagss)
-
+        setWaitSub(false)
         setTimeout(()=>{
           props.navigation.navigate('Feed')
         },1500)
@@ -182,6 +183,11 @@ const CreateEventScreen = (props) => {
 
   const renderUI = () => (
     <View style={{flex: 1, backgroundColor: Colors.white}}>
+      {
+        ( waitSub && <SafeAreaView style={{position: "absolute", flex: 1, width:"100%", height: (Platform.OS === 'ios' ? "120%" : '100%'), top:0, left:0, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(0,0,0,0.25)",zIndex: 50}}>
+          <ActivityIndicator size={75} color={Colors.primary} />
+        </SafeAreaView>)
+      }
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {
           coverImage ?
@@ -682,7 +688,7 @@ const CreateEventScreen = (props) => {
                 display="default"
                 locale={'th'}
                 mode="time"
-                value={new Date( new Date(eventDetail.startDate).setHours( new Date(eventDetail.startDate).getHours() +1))}
+                value={eventDetail.endDate}
                 onChange={(event, date) => {
                   if (event.type === "set" && event.nativeEvent.timestamp !== null) {
                     setEventDetail({...eventDetail, endDate: date})
@@ -700,13 +706,7 @@ const CreateEventScreen = (props) => {
   )
 
   return (
-    (isLoad ?
-        <SafeAreaView>
-          <View>
-            <Text> Load...</Text>
-          </View>
-        </SafeAreaView> : renderUI()
-    )
+    renderUI()
   )
 };
 

@@ -36,7 +36,6 @@ class eventsService {
     }
   }
 
-
   async getAllRegisteredEvent() {
     try {
       return api.get('members/82c85d89-570d-4630-a463-7d1e3247dfc6/registerEvent?pageSize=1&pageNo=0')
@@ -147,6 +146,11 @@ class eventsService {
 
   async getEventById(id){
     return api.get(`events/${id}` )
+  }
+
+  async getMemberRegistedEvent(id, eveId){
+    const data = {eventId: eveId, memberId : id  }
+    return api.post(`/events/getRegisterMember`, data)
   }
 }
 

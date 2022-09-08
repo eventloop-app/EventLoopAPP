@@ -8,11 +8,12 @@ import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
 
 const EventCard = ({ item, onPress }) => {
-  const eventName = item.eventName
+
+  const eventName = item?.eventName
   const [isLoading, setIsLoading] = useState(false)
-  const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
-  const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item.location?.name
+  const eventDate = toBuddhistYear(moment(item?.startDate), "DD/MM/YYYY")
+  const eventTime = moment(item?.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
+  const eventLocation = item?.location?.name
   const ImageCover = item?.coverImageUrl
 
   return (
@@ -45,7 +46,7 @@ const EventCard = ({ item, onPress }) => {
           <Text style={styles.TextDate}>{eventTime}</Text>
         </View>
         <View style={styles.Location}>
-          <Ionicons name={item.type === 'ONSITE' ? 'ios-location-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
+          <Ionicons name={item.type === 'ONSITE' ? 'ios-map-outline' : 'laptop-outline'} size={25} color={Colors.primary} />
           <Text numberOfLines={1} style={styles.TextLocation}>{eventLocation}</Text>
         </View>
       </View>
@@ -121,8 +122,8 @@ const styles = StyleSheet.create({
     left: 9,
   },
   Location: {
-    width:"91.5%",
     position: "absolute",
+    display: "flex",
     bottom: 5,
     flexDirection: "row",
     justifyContent: "flex-start",

@@ -565,10 +565,22 @@ const ProfileDetailScreen = ({props, navigation}) => {
             }
           </View>
           <Button onPress={() => signOut()} title={'ออกจากระบบ'}/>
+
+          <Button onPress={() =>  manageEvent()} title={'จัดการกิจกรรม'}/>
         </View>
       </View>
     );
   };
+
+  const manageEvent = async () => {
+    setTimeout(() => {
+      try {
+        navigation.navigate("ManageEvent")
+      } catch (e) {
+        return;
+      }
+    }, 1000)
+  }
 
   const signOut = async () => {
     await dispatch(SignOut())

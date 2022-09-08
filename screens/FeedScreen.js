@@ -7,7 +7,7 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Button
+  Button, ActivityIndicator
 } from "react-native";
 import React, {useCallback, useEffect, useState,} from "react";
 import EventCard from "../components/EventCard";
@@ -24,18 +24,13 @@ import {Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons, Ent
 const FeedScreen = ({route, navigation}) => {
   const [isLoading, setIsLoading] = useState(true)
   const [eventId, setEventId] = useState(true)
-  const [allEvents, setAllEvent] = useState("")
-  const [eventByTag, setEventByTag] = useState("")
-  const [eventByRegistered, setEventByRegistered] = useState("")
-  const [eventByAttention, setEventByAttention] = useState("")
-  const [isVisible, setIsVisible] = useState(false)
-  const [title, setTitle] = useState("กิจกรรมที่กำลังจะเริ่มเร็วๆนี้")
-  const [feedbackImageCover, setFeedbackImageCover] = useState("https://cdn.zipeventapp.com/blog/2020/09/2020-09-09_04-59-46_zip-onlineevent.png")
+  const [allEvents, setAllEvent] = useState(null)
+  const [eventByTag, setEventByTag] = useState(null)
+  const [eventByRegistered, setEventByRegistered] = useState(null)
+  const [eventByAttention, setEventByAttention] = useState(null)
   const [feedbackTitle, setFeedbackTitle] = useState("ราชสีมาวิทยาลัย")
   const [selectedTag, setSelectedTag] = useState(["บันเทิง", "การศึกษา", "อาหาร", "กีฬา", "ท่องเที่ยว"])
-  const [feedBack, setFeedBack] = useState("")
   const [hasFeedBack, setHasFeedBack] = useState(false)
-  const [stepReward, setStepReward] = useState(0);
   // useFocusEffect(
   //   useCallback(() => {
   //     setIsVisible(true)
@@ -50,67 +45,72 @@ const FeedScreen = ({route, navigation}) => {
   //ดึง Event ทั้งหมด
   useEffect(() => {
     getEvent()
-    getEventByTag()
-    getEventByAttention()
-    getRegisterEvent()
   }, [])
 
 
   // get Event
   const getEvent = async () => {
     console.log("Get Event")
-    const  timeout = setTimeout(()=>{
+    const timeout = setTimeout(() => {
       console.log("TimeOut !")
       navigation.navigate("Error")
     }, 5000)
-    eventsService.getAllEvent().then(res => {
-      if(res.status === 200){
-        clearTimeout(timeout);
-        setAllEvent(res.data.content)
-      }else {
+    eventsService.getAllEvent().then(async res => {
+      if (res.status === 200) {
+        await clearTimeout(timeout);
+        await setAllEvent(res.data.content)
+        await getEventByTag()
+      } else {
         console.log(res.status)
+      }
+    }).catch(error => {
+      console.log('get_all_event: ' + error.message)
+      // alert('ผิดพลาดดด \n' + error.message)
+    })
+  }
+
+  const getEventByTag = async () => {
+    eventsService.getEventByTag(selectedTag).then( async (res) => {
+      if(res.status === 200){
+        await setEventByTag(res.data.content)
+        await getEventByAttention()
+      }else{
+        console.log("TagsError")
+      }
+    }).catch(error => {
+      console.log('get_all_event: ' + error.message)
+    })
+  }
+
+  const getEventByAttention = async () => {
+    eventsService.getEventByAttention().then(async res => {
+      if(res.status === 200){
+        await setEventByAttention(res.data.content)
+        await getRegisterEvent()
+      }
+
+    }).catch(error => {
+      console.log('get_all_event: ' + error.message)
+      alert('ผิดพลาดดด \n' + error.message)
+    })
+  }
+
+  const getRegisterEvent = async () => {
+    eventsService.getAllRegisteredEvent().then(async res => {
+      if(res.status === 200){
+        await setEventByRegistered(res.data.content)
+        await setIsLoading(false)
       }
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
       alert('ผิดพลาดดด \n' + error.message)
     })
-    await setIsLoading(false)
-  }
-
-  const getEventByTag = async () => {
-    eventsService.getEventByTag(selectedTag).then((res) => {
-      setEventByTag(res.data.content)
-    }).catch(error => {
-      console.log('get_all_event: ' + error.message)
-    })
-    await setIsLoading(false)
-  }
-
-  const getEventByAttention = async () => {
-    eventsService.getEventByAttention().then(res => {
-      setEventByAttention(res.data.content)
-    }).catch(error => {
-      console.log('get_all_event: ' + error.message)
-      alert('ผิดพลาดดด \n' + error.message)
-    })
-    await setIsLoading(false)
-  }
-
-  const getRegisterEvent = async () => {
-    eventsService.getAllRegisteredEvent().then(res => {
-      setEventByRegistered(res.data.content)
-    }).catch(error => {
-      console.log('get_all_event: ' + error.message)
-      alert('ผิดพลาดดด \n' + error.message)
-    })
-    await setIsLoading(false)
   }
 
 
   const renderEventShortcutSection = () => {
     return (
       <View style={[styles.shadowsCard, {backgroundColor: Colors.bag9Bg, alignItems: "center"}]}>
-
         <View>
           <View
             style={{paddingVertical: 10, flexDirection: "row", flexWrap: "wrap", width: "100%", alignItems: "center",}}>
@@ -208,8 +208,6 @@ const FeedScreen = ({route, navigation}) => {
                 <Ionicons color={"black"} name={"ios-layers"} size={30}/>
               </View><Text>ทั้งหมด</Text>
             </TouchableOpacity>
-
-
           </View>
         </View>
       </View>
@@ -317,12 +315,11 @@ const FeedScreen = ({route, navigation}) => {
         </View>
         <FlatList
           data={eventByTag}
-          renderItem={({item}) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
+          renderItem={({item}) => (<EventCard  item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })}/>)}
           keyExtractor={(item) => item.id}
-          extraData={eventId}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
@@ -401,27 +398,30 @@ const FeedScreen = ({route, navigation}) => {
   }
 
 
-  return (
-    <View style={{flex: 1}}>
-      <View style={{flex: 1, backgroundColor: Colors.white}}>
+  return (isLoading ?
+      <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size={'large'} color={Colors.primary} />
+      </SafeAreaView> :
+      <View style={{flex: 1}}>
+        <View style={{flex: 1, backgroundColor: Colors.white}}>
           <View style={styles.header}>
             {/*something*/}
           </View>
-        {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
-        <ScrollView style={{paddingTop: 100}} >
-          <View style={{paddingBottom: 200}}>
-            {renderEventByAttentionSection()}
-            {renderEventShortcutSection()}
-            {renderAllEventSection()}
-            {renderEventByTagSection()}
-            {renderRegisteredEventSection()}
-            <View style={{display: hasFeedBack ? "flex" : "none"}}>
-              {renderRemindFeedback()}
+          {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
+          <ScrollView style={{paddingTop: 100}}>
+            <View style={{paddingBottom: 200}}>
+              {renderEventByAttentionSection()}
+              {renderEventShortcutSection()}
+              {renderAllEventSection()}
+              {renderEventByTagSection()}
+              {renderRegisteredEventSection()}
+              <View style={{display: hasFeedBack ? "flex" : "none"}}>
+                {renderRemindFeedback()}
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
-    </View>
   )
 }
 const styles = StyleSheet.create({
