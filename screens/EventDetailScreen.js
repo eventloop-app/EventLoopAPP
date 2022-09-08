@@ -1,5 +1,15 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
@@ -36,10 +46,9 @@ const EventDetailScreen = (props) => {
   }, [props])
 
   useEffect(() => {
-    if(user !== undefined && user !== null){
+      console.log("Check User")
       setUserData(user)
       getEvent()
-    }
   }, [])
 
   // useEffect(()=>{
@@ -96,11 +105,19 @@ const EventDetailScreen = (props) => {
     const evId = props.route.params.item.id
     // await setEvent(props.route.params.item)
     eventsService.getEventById(evId).then(res => {
+      console.log("get event")
       if (res.status === 200) {
         setEvent(res.data)
+        setTimeout(()=>{
+          setIsLoading(false)
+        },1000)
       }
+    }).catch(e =>{
+      console.log(e)
+      props.navigation.navigate('Error')
     })
-    setIsLoading(false)
+
+    return;
   }
 
   const hideAlert = () => {
@@ -194,10 +211,19 @@ const EventDetailScreen = (props) => {
   }
 
   return (
-    isLoading ? <SafeAreaView>
-        <Text>LOADING</Text>
-      </SafeAreaView> :
       <View style={styles.container}>
+        {(isLoading && <SafeAreaView style={{position: 'absolute', flex: 1, width: '100%', height: "100%", zIndex: 50}}>
+          <View style={{flex: 1, backgroundColor: Colors.white, justifyContent: 'center', zIndex: 50}}>
+            <ActivityIndicator size={'large'} color={Colors.primary}/>
+            <Text style={{
+              textAlign: 'center',
+              fontFamily: Fonts.primary,
+              fontSize: fontSize.primary,
+              color: Colors.black,
+              marginTop: 20
+            }}>กำลังโหลดข้อมูลกิจกรรม</Text>
+          </View>
+        </SafeAreaView>)}
         <View style={styles.imageCover}>
           <Image style={styles.image}
                  source={{

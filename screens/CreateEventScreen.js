@@ -24,17 +24,21 @@ import MapView, {Marker} from "react-native-maps";
 import FormData from "form-data";
 import eventsService from "../services/eventsService";
 import {useIsFocused} from "@react-navigation/native";
+import fontSize from "../constants/FontSize";
+import {forEach} from "react-native-axios/lib/utils";
+
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
 const tagss = [
-  {name: 'การเรียน1', isSelect: false},
-  {name: 'การเรียน2', isSelect: false},
-  {name: 'การเรียน3', isSelect: false},
-  {name: 'การเรียน4', isSelect: false},
-  {name: 'การเรียน5', isSelect: false},
-  {name: 'การเรียน6', isSelect: false},
-  {name: 'การเรียน7', isSelect: false},
-  {name: 'การเรียน8', isSelect: false},
+  {name: "ดนตรี", icon: "music", source: "Feather", isSelect: false},
+  {name: "กีฬา", icon: "football", source: "Ionicons", isSelect: false},
+  {name: "บันเทิง", icon: "movie", source: "MaterialIcons", isSelect: false},
+  {name: "ศิลปะ", icon: "draw", source: "MaterialCommunityIcons", isSelect: false},
+  {name: "เกม", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false},
+  {name: "ท่องเที่ยว", icon: "briefcase", source: "Feather", isSelect: false},
+  {name: "การศึกษา", icon: "book-outline", source: "Ionicons", isSelect: false},
+  {name: "สุขภาพ", icon: "md-heart", source: "Ionicons", isSelect: false},
+  {name: "อาหาร", icon: "fast-food-outline", source: "Ionicons", isSelect: false},
 ]
 
 const kind = [
@@ -55,14 +59,14 @@ const CreateEventScreen = (props) => {
   const [eventDetail, setEventDetail] = useState({
     type: "ONSITE",
     tags: [],
-    eventName: 'ชื่อกิจกรรม',
+    eventName: null,
     startDate: new Date(),
-    endDate: new Date( new Date().setHours(new Date().getHours() + 1)),
+    endDate: new Date(new Date().setHours(new Date().getHours() + 1)),
     location: null,
     latitude: -1,
     longitude: -1,
-    description: '',
-    numberOfPeople: '',
+    description: null,
+    numberOfPeople: 2,
     memberId: null
   })
   const {user} = useSelector(state => state.user)
@@ -72,6 +76,15 @@ const CreateEventScreen = (props) => {
   const input_num = useRef()
   const input_loc = useRef()
   const [waitSub, setWaitSub] = useState(false)
+  const [error, setError] = useState({
+    eventName: null,
+    startDate: null,
+    tags: null,
+    numberOfPeople: null,
+    location: null,
+    description: null,
+    all: true
+  })
   // useEffect(() => {
   //   if (isFocused === false) {
   //     setEventDetail({
@@ -96,12 +109,8 @@ const CreateEventScreen = (props) => {
 
   useEffect(() => {
     if (userData !== undefined && userData !== null && isFocused) {
-      console.log("set memberId")
       setEventDetail({...eventDetail, memberId: userData?.id})
     }
-    setTimeout(() => {
-      setIsLoad(false)
-    }, 1000)
   }, [isFocused])
 
   useEffect(() => {
@@ -121,6 +130,113 @@ const CreateEventScreen = (props) => {
     }
   }, [props])
 
+  useEffect(() => {
+      let count = 1
+      for (const [key, value] of Object.entries(eventDetail)) {
+        switch (key) {
+          case "eventName":
+            if (value === '' || value === undefined || value === null) {
+              count += 1
+              setError({...error, eventName: "ชื่อกิจกรรมต้องไม่เป็นช่องว่าง", all: true})
+            } else {
+              count -= 1
+              if(count === 0){
+                setError({...error, all: false, eventName: null})
+              }else{
+                setError({...error, all: true, eventName: null})
+              }
+            }
+
+            break
+          case "startDate":
+            if (new Date(value).getDate() <= new Date().getDate() + 3) {
+              count += 1
+              setError({...error, startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน", all: true})
+            } else if (new Date(value).getHours() > new Date(eventDetail.endDate).getHours()) {
+              count += 1
+              setError({...error, startDate: "เวลาสิ้นสุดกิจกรรมต้องมากกว่าเวลาเริ่มต้นกิจกรรม", all: true})
+            } else {
+              count -= 1
+              if(count === 0){
+                setError({...error, all: false, startDate: null})
+              }else{
+                setError({...error, all: true , startDate: null})
+              }
+            }
+            break
+          case "tags":
+            if (value.length === 0) {
+              count += 1
+              setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก", all: true})
+            } else {
+              count -= 1
+              if(count === 0){
+                setError({...error, all: false, tags: null})
+              }else{
+                setError({...error, all: true, tags: null})
+              }
+            }
+            break
+          case "numberOfPeople":
+            if (value < 2) {
+              count += 1
+              setError({...error, numberOfPeople: "จำนวนผู้เข้าร่วมต้องมีอย่างน้อย 2 คน", all: true})
+            } else {
+              count -= 1
+              if(count === 0){
+                setError({...error, all: false,numberOfPeople: null})
+              }else{
+                setError({...error, all: true,numberOfPeople: null})
+              }
+            }
+            break
+          case "location":
+            if (value === '' || value === undefined || value === null) {
+              count += 1
+              setError({
+                ...error,
+                location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง"),
+                all: true
+              })
+            } else {
+              count -= 1
+              if(count === 0){
+                setError({...error, all: false, location: null})
+              }else{
+                setError({...error, all: true, location: null})
+              }
+            }
+            break
+          case "description":
+            if (value === '' || value === undefined || value === null) {
+              count += 1
+              setError({...error, description: "รายละเอียดกิจกรรมต้องไม่เป็นช่องว่าง", all: true})
+            } else {
+              count -= 1
+              if(count === 0){
+                setError({...error, all: false,description: null})
+              }else{
+                setError({...error, all: true,description: null})
+              }
+            }
+            break
+          default:
+            count += 1
+            if(count === 0){
+              setError({...error, all: false})
+            }else{
+              console.log(count)
+              setError({...error, all: true})
+            }
+            setIsLoad(false)
+            break
+        }
+      }
+    }
+    ,
+    [eventDetail]
+  )
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -134,7 +250,11 @@ const CreateEventScreen = (props) => {
   };
 
   const changeDateTime = (event, date) => {
-    setEventDetail({...eventDetail, startDate: date, endDate: new Date( new Date(date).setHours(new Date(date).getHours() + 1))})
+    setEventDetail({
+      ...eventDetail,
+      startDate: date,
+      endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))
+    })
   }
 
   const onSubmit = async () => {
@@ -153,7 +273,7 @@ const CreateEventScreen = (props) => {
     console.log(newEventDetail)
     setWaitSub(true)
     eventsService.createEvent(data).then(res => {
-      if(res.status === 200) {
+      if (res.status === 200) {
         setEventDetail({
           type: "ONSITE",
           tags: [],
@@ -172,9 +292,9 @@ const CreateEventScreen = (props) => {
         setKinds(kind)
         setTags(tagss)
         setWaitSub(false)
-        setTimeout(()=>{
+        setTimeout(() => {
           props.navigation.navigate('Feed')
-        },1500)
+        }, 1500)
       }
     }).catch(error => {
       console.log(error)
@@ -184,8 +304,19 @@ const CreateEventScreen = (props) => {
   const renderUI = () => (
     <View style={{flex: 1, backgroundColor: Colors.white}}>
       {
-        ( waitSub && <SafeAreaView style={{position: "absolute", flex: 1, width:"100%", height: (Platform.OS === 'ios' ? "120%" : '100%'), top:0, left:0, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(0,0,0,0.25)",zIndex: 50}}>
-          <ActivityIndicator size={75} color={Colors.primary} />
+        (waitSub && <SafeAreaView style={{
+          position: "absolute",
+          flex: 1,
+          width: "100%",
+          height: (Platform.OS === 'ios' ? "120%" : '100%'),
+          top: 0,
+          left: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: "rgba(0,0,0,0.25)",
+          zIndex: 50
+        }}>
+          <ActivityIndicator size={75} color={Colors.primary}/>
         </SafeAreaView>)
       }
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
@@ -219,15 +350,27 @@ const CreateEventScreen = (props) => {
         padding: 15
       }}>
 
-        <KeyboardAwareScrollView extraScrollHeight={200}>
+        <KeyboardAwareScrollView
+          extraScrollHeight={200}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}>
           <ScrollView showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={false}>
+                      contentContainerStyle={{paddingBottom: 100}}
+          >
             <View style={{paddingBottom: 200}}>
               <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 30}}>
-                <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.gray}
+                <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.lightgray}
                            style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
                            onChange={(e) => setEventDetail({...eventDetail, eventName: e.nativeEvent.text})}/>
               </View>
+              {(error.eventName &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.small,
+                    color: Colors.red
+                  }}>{error.eventName}</Text>
+                </View>)}
 
               <View style={{marginTop: 10}}>
                 <Text style={{
@@ -237,11 +380,11 @@ const CreateEventScreen = (props) => {
                 </Text>
                 <View style={{
                   flex: 1,
-                  height: 80,
+                  height: 110,
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                   justifyContent: 'flex-start',
-                  alignItems: 'flex-start'
+                  alignItems: 'flex-start',
                 }}>
                   {
                     tags.map((item, index) => (
@@ -265,20 +408,20 @@ const CreateEventScreen = (props) => {
                         )
 
                         setEventDetail({...eventDetail, tags: newTags.filter(tag => tag !== undefined)})
-
                       }}>
                         <View style={{
                           justifyContent: 'center',
                           alignItems: 'center',
                           width: 80,
                           height: 30,
-                          backgroundColor: (item.isSelect ? Colors.primary : Colors.gray),
+                          backgroundColor: (item.isSelect ? Colors.primary : Colors.lightgray),
                           margin: 3,
                           borderRadius: 8,
                         }}>
                           <Text style={{
                             fontFamily: Fonts.primary,
-                            fontSize: FontSize.small
+                            fontSize: FontSize.small,
+                            color: (item.isSelect ? Colors.white : Colors.black)
                           }}>
                             {item.name}
                           </Text>
@@ -288,6 +431,14 @@ const CreateEventScreen = (props) => {
                   }
                 </View>
               </View>
+              {(error.tags &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.small,
+                    color: Colors.red
+                  }}>{error.tags}</Text>
+                </View>)}
 
               <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                 <View style={{
@@ -298,7 +449,8 @@ const CreateEventScreen = (props) => {
                   justifyContent: 'center',
                   alignItems: 'center'
                 }}>
-                  <Ionicons name={'mail-open-outline'} color={Colors.primary} size={35}/>
+                  <Ionicons name={(eventDetail.type === "ONSITE" ? 'ios-home-outline' : 'ios-globe-outline')}
+                            color={Colors.primary} size={35}/>
                 </View>
                 <View style={{marginLeft: 20}}>
                   <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
@@ -319,13 +471,14 @@ const CreateEventScreen = (props) => {
                             alignItems: 'center',
                             width: 80,
                             height: 30,
-                            backgroundColor: (item.isSelect ? Colors.primary : Colors.gray),
+                            backgroundColor: (item.isSelect ? Colors.primary : Colors.lightgray),
                             margin: 3,
                             borderRadius: 8,
                           }}>
                             <Text style={{
                               fontFamily: Fonts.primary,
-                              fontSize: FontSize.small
+                              fontSize: FontSize.small,
+                              color: (item.isSelect ? Colors.white : Colors.black)
                             }}>
                               {item.name}
                             </Text>
@@ -401,7 +554,8 @@ const CreateEventScreen = (props) => {
                 }}>
                   <Ionicons name={'calendar-sharp'} color={Colors.primary} size={35}/>
                 </TouchableOpacity>
-                <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+                <View
+                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
                   <Text style={{
                     fontFamily: Fonts.primary,
                     fontSize: FontSize.primary
@@ -412,6 +566,15 @@ const CreateEventScreen = (props) => {
                   }}>{weekdays[(moment(eventDetail.startDate).day())] + ', ' + moment(eventDetail.startDate).format("HH:mm A") + ' - ' + moment(eventDetail.endDate).format("HH:mm A")}</Text>
                 </View>
               </View>
+
+              {(error.startDate &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.small,
+                    color: Colors.red
+                  }}>{error.startDate}</Text>
+                </View>)}
 
               <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                 <TouchableOpacity onPress={() => input_num.current.focus()} style={{
@@ -424,7 +587,8 @@ const CreateEventScreen = (props) => {
                 }}>
                   <Ionicons name={'people-sharp'} color={Colors.primary} size={35}/>
                 </TouchableOpacity>
-                <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+                <View
+                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
                   <Text style={{
                     fontFamily: Fonts.primary,
                     fontSize: FontSize.primary
@@ -432,6 +596,7 @@ const CreateEventScreen = (props) => {
 
                   <TextInput id={'number_people'} keyboardType={"number-pad"} maxLength={2}
                              placeholder={"10"}
+                             placeholderTextColor={Colors.lightgray}
                              ref={input_num}
                              onChange={(e) => setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})}
                              style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
@@ -439,6 +604,14 @@ const CreateEventScreen = (props) => {
                   />
                 </View>
               </View>
+              {(error.numberOfPeople &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.small,
+                    color: Colors.red
+                  }}>{error.numberOfPeople}</Text>
+                </View>)}
 
               <View style={{display: 'flex', width: '80%', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                 <TouchableOpacity onPress={() => {
@@ -455,7 +628,8 @@ const CreateEventScreen = (props) => {
                             size={35}
                             color={Colors.primary}/>
                 </TouchableOpacity>
-                <View style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+                <View
+                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
 
                   {
                     (eventDetail.type !== "ONSITE" ?
@@ -466,9 +640,11 @@ const CreateEventScreen = (props) => {
                         }}>ลิงค์ในการเข้าร่วมกิจกรรม</Text>
                         <TextInput id={'number_people'} keyboardType={"web-search"}
                                    placeholder={"https://google.meet/acb/"}
+                                   value={eventDetail.location}
+                                   placeholderTextColor={Colors.lightgray}
                                    ref={input_loc}
                                    onChange={(e) => setEventDetail({
-                                     ...eventDetail, location:  e.nativeEvent.text
+                                     ...eventDetail, location: e.nativeEvent.text
                                    })}
                                    style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
                         />
@@ -483,9 +659,17 @@ const CreateEventScreen = (props) => {
 
                 </View>
               </View>
+              {(error.location &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.small,
+                    color: Colors.red
+                  }}>{error.location}</Text>
+                </View>)}
 
               {
-                ((eventDetail?.location !== null && eventDetail.type === "ONSITE") &&
+                ((eventDetail?.location !== null && eventDetail?.latitude !== -1 && eventDetail.type === "ONSITE") &&
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                     <MapView
                       scrollDuringRotateOrZoomEnabled={false}
@@ -520,15 +704,42 @@ const CreateEventScreen = (props) => {
                   รายระเอียดกิจกรรม
                 </Text>
                 <View style={{display: 'flex', width: '95%', marginTop: 5}}>
-                  <TextInput style={{fontFamily: Fonts.primary}} multiline={true}
+                  <TextInput style={{fontFamily: Fonts.primary, fontSize: fontSize.small}} multiline={true}
                     // value={eventDetail.description}
                              placeholder={"ใส่รายละเอียดกิจกรรม"}
+                             placeholderTextColor={Colors.lightgray}
                              onChange={(e) => setEventDetail({...eventDetail, description: e.nativeEvent.text})}/>
                 </View>
               </View>
+              {(error.description &&
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.primary,
+                    fontSize: FontSize.small,
+                    color: Colors.red
+                  }}>{error.description}</Text>
+                </View>)}
 
-              <View style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
-                <Button onPress={() => onSubmit()} title={'สร้างกิจกรมม'}/>
+              <View style={{position: 'absolute', bottom: 100, display: 'flex', flexDirection: 'column', zIndex: 55}}>
+                {/*<Button  title={'สร้างกิจกรมม'}/>*/}
+                <TouchableOpacity activeOpacity={0.8}
+                                  disabled={error.all}
+                                  onPress={() => onSubmit()}>
+                  <View style={{
+                    width: 340,
+                    height: 60,
+                    backgroundColor: (error.all ? Colors.gray : Colors.primary),
+                    borderRadius: 12,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Text style={{
+                      fontFamily: Fonts.bold,
+                      fontSize: fontSize.primary,
+                      color: Colors.white
+                    }}>สร้างกิจกรรม</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
@@ -705,8 +916,10 @@ const CreateEventScreen = (props) => {
     </View>
   )
 
-  return (
-    renderUI()
+  return (isLoad ?
+      <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size={'large'} color={Colors.primary} />
+      </SafeAreaView> : renderUI()
   )
 };
 

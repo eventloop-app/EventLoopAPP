@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   Text,
@@ -10,24 +10,24 @@ import {
   Dimensions,
   Platform, ActivityIndicator
 } from "react-native";
-import { Surface, Button } from 'react-native-paper';
+import {Surface, Button} from 'react-native-paper';
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import Color from "../constants/Colors";
-import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
-import { Ionicons, Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {ProgressSteps, ProgressStep} from 'react-native-progress-steps';
+import {Ionicons, Feather, MaterialIcons, MaterialCommunityIcons} from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
-import { Camera, CameraType } from 'expo-camera';
+import {Camera, CameraType} from 'expo-camera';
 import Validate from '../services/Validate';
 import eventsService from '../services/eventsService';
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Colors from '../constants/Colors';
 import FormData from 'form-data';
 import * as Notifications from 'expo-notifications'
 import storages from "../services/storages";
 import {saveUser} from "../actions/user";
 
-const EditProfileScreen = ({ props, route, navigation }) => {
+const EditProfileScreen = ({props, route, navigation}) => {
   //declare variable
   const [username, onChangeUsername] = useState(null);
   const [firstName, onChangeFirstName] = useState(null);
@@ -39,7 +39,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   const [type, setType] = useState(CameraType.back);
   const [isError, setIsError] = useState(false)
   const [isShowValidateMessage, SetIsShowValidateMessage] = useState("")
-  const { userToken, userError } = useSelector(state => state.user)
+  const {userToken, userError} = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
   const [toolTipVisible, setToolTipVisible] = useState(false);
@@ -48,16 +48,15 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   const [hasUser, setHasUser] = useState(false)
   const dispatch = useDispatch();
   const [tags, setTags] = useState([
-    { title: "Music", icon: "music", source: "Feather", isSelect: false },
-    { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
-    { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
-    { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
-    { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
-    { title: "Music", icon: "music", source: "Feather", isSelect: false },
-    { title: "Sport", icon: "football", source: "Ionicons", isSelect: false },
-    { title: "Movie", icon: "movie", source: "MaterialIcons", isSelect: false },
-    { title: "Art", icon: "draw", source: "MaterialCommunityIcons", isSelect: false },
-    { title: "Game", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false },
+    {title: "ดนตรี", icon: "music", source: "Feather", isSelect: false},
+    {title: "กีฬา", icon: "football", source: "Ionicons", isSelect: false},
+    {title: "บันเทิง", icon: "movie", source: "MaterialIcons", isSelect: false},
+    {title: "ศิลปะ", icon: "draw", source: "MaterialCommunityIcons", isSelect: false},
+    {title: "เกม", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false},
+    {title: "ท่องเที่ยว", icon: "briefcase", source: "Feather", isSelect: false},
+    {title: "การศึกษา", icon: "book-outline", source: "Ionicons", isSelect: false},
+    {title: "สุขภาพ", icon: "md-heart", source: "Ionicons", isSelect: false},
+    {title: "อาหาร", icon: "fast-food-outline", source: "Ionicons", isSelect: false},
   ])
   const [state, setState] = useState(null)
   const [waitSub, setWaitSub] = useState(false)
@@ -74,49 +73,49 @@ const EditProfileScreen = ({ props, route, navigation }) => {
   //   setIsLoad(false)
   // }, [userToken])
 
-  useEffect(()=>{
+  useEffect(() => {
     const user = route.params.user
     setUserData(user)
     setState("GetToken")
   }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log("Get ToKen")
     let unmount = false
-    if(userData !== null && unmount !== true && state == "GetToken"){
-      registerForPushNotification().then( async token =>{
-        if(userData.deviceId === undefined && token !== null){
-          await console.log("TOKEN IS: " + token )
+    if (userData !== null && unmount !== true && state == "GetToken") {
+      registerForPushNotification().then(async token => {
+        if (userData.deviceId === undefined && token !== null) {
+          await console.log("TOKEN IS: " + token)
           await setUserData({...userData, deviceId: token})
           await setIsLoad(false)
-        }else {
+        } else {
           console.log("Can't get token")
         }
-      }).catch(e =>{
+      }).catch(e => {
         console.error(e)
       })
     }
-    return ()=> {
+    return () => {
       unmount = true
     }
-  },[state])
+  }, [state])
 
-  const registerForPushNotification =  async () => {
-      if(userData.deviceId === undefined ){
-        const {status} = await Notifications.requestPermissionsAsync();
-        if (status !== 'granted') {
-          console.log('Permission to access location was denied');
-          return ;
-        }else{
-          console.log("GET deviceId")
-          try {
-            return (await Notifications.getExpoPushTokenAsync()).data
-          }catch (e) {
-            return null
-           console.log(e)
-          }
+  const registerForPushNotification = async () => {
+    if (userData.deviceId === undefined) {
+      const {status} = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      } else {
+        console.log("GET deviceId")
+        try {
+          return (await Notifications.getExpoPushTokenAsync()).data
+        } catch (e) {
+          return null
+          console.log(e)
         }
       }
+    }
   }
 
   const pickImage = async () => {
@@ -127,7 +126,6 @@ const EditProfileScreen = ({ props, route, navigation }) => {
       aspect: [1, 1],
       quality: 1,
     });
-    console.log(result);
     if (!result.cancelled) {
       setProfileImage(result.uri);
     }
@@ -198,30 +196,29 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     let data = {
       username: username,
       firstName: userData.name.split(' ').slice(0, -1).join(' ').toLowerCase(),
-      lastName:  userData.name.split(' ').slice(-1).join(' ').toLowerCase(),
+      lastName: userData.name.split(' ').slice(-1).join(' ').toLowerCase(),
       email: userData.email,
       memberId: userData.memberId,
       tags: selectedTag,
       deviceId: userData.deviceId
     }
     const formData = new FormData();
-    formData.append('profileImage', localUri ? { uri: localUri, name: filename, type: type } : null);
+    formData.append('profileImage', localUri ? {uri: localUri, name: filename, type: type} : null);
     formData.append('memberInfo', JSON.stringify(data));
 
-    console.log(data)
     setWaitSub(true)
     try {
       await eventsService.transferMemberData(formData).then(async res => {
-        if(res.status === 200){
+        if (res.status === 200) {
           await dispatch(saveUser(JSON.stringify(res.data.member)))
-          setTimeout(()=>{
-            navigation.navigate('Profile')
+          setTimeout(() => {
+            navigation.navigate('Profile', {user: res.data.member})
           }, 500)
-        }else{
+        } else {
           navigation.navigate('Error')
         }
       })
-    }catch (e) {
+    } catch (e) {
       navigation.navigate('Error')
       console.log(e)
     }
@@ -231,7 +228,7 @@ const EditProfileScreen = ({ props, route, navigation }) => {
     setSelectedTag([])
     tags.map((item, index) => {
       if (item.isSelect === true) {
-         selectedTag.push(item.title)
+        selectedTag.push(item.title)
       }
     })
   }
@@ -272,23 +269,35 @@ const EditProfileScreen = ({ props, route, navigation }) => {
 
     return (
       <View style={{}}>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ width: "83%", }}>ชื่อผู้ใช้</Text>
-          <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}> {isShowValidateMessage}</Text>
-          <TextInput style={[styles.input, { borderColor: isShowValidateMessage ? "red" : "#CBCBCB" }]} onChangeText={(value) => onChangeUsername(value)} value={username} onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"} placeholder="ชื่อผู้ใช้ของคุณ" />
+        <View style={{alignItems: "center"}}>
+          <Text style={{fontFamily:Fonts.primary, fontSize: FontSize.primary,width: "83%",}}>ชื่อผู้ใช้</Text>
+          <Text style={{
+            width: "83%",
+            fontFamily: Fonts.primary,
+            color: "red",
+            marginTop: 5,
+            display: isShowValidateMessage ? "flex" : "none"
+          }}> {isShowValidateMessage}</Text>
+          <TextInput style={[styles.input, {borderColor: isShowValidateMessage ? "red" : "#CBCBCB", }]}
+                     onChangeText={(value) => onChangeUsername(value)} value={username}
+                     onEndEditing={(value) => checkHasUserName(value)} placeholderTextColor={"gray"}
+                     placeholder="ชื่อผู้ใช้ของคุณ"/>
           {/* <Text style={{ alignSelf: "flex-start", marginLeft: 35, color: "red", display: isShowValidateMessage ? "flex" : "none" }}>{`${username} is used !`}{isShowValidateMessage}</Text> */}
         </View>
-        <View style={{ alignItems: "center", }}>
-          <Text style={{ width: "83%", }}>ชื่อ</Text>
-          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeFirstName} value={firstName} editable={false} placeholderTextColor={"gray"} placeholder="Last name" />
+        <View style={{alignItems: "center",}}>
+          <Text style={{fontFamily:Fonts.primary, fontSize: FontSize.primary,width: "83%",}}>ชื่อ</Text>
+          <TextInput style={[styles.input, {backgroundColor: "#E3E3E3"}]} onChangeText={onChangeFirstName}
+                     value={firstName} editable={false} placeholderTextColor={"gray"} placeholder="Last name"/>
         </View>
-        <View style={{ alignItems: "center", }}>
-          <Text style={{ width: "83%", }}>นามสกุล</Text>
-          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeLastName} value={lastName} editable={false} placeholder="First name" placeholderTextColor={"gray"} />
+        <View style={{alignItems: "center",}}>
+          <Text style={{fontFamily:Fonts.primary, fontSize: FontSize.primary,width: "83%",}}>นามสกุล</Text>
+          <TextInput style={[styles.input, {backgroundColor: "#E3E3E3"}]} onChangeText={onChangeLastName}
+                     value={lastName} editable={false} placeholder="First name" placeholderTextColor={"gray"}/>
         </View>
-        <View style={{ alignItems: "center", }}>
-          <Text style={{ width: "83%", }}>อีเมล</Text>
-          <TextInput style={[styles.input, { backgroundColor: "#E3E3E3" }]} onChangeText={onChangeEmail} value={userData?.email} editable={false} placeholder="Email" placeholderTextColor={"gray"} />
+        <View style={{alignItems: "center",}}>
+          <Text style={{fontFamily:Fonts.primary, fontSize: FontSize.primary,width: "83%",}}>อีเมล</Text>
+          <TextInput style={[styles.input, {backgroundColor: "#E3E3E3"}]} onChangeText={onChangeEmail}
+                     value={userData?.email} editable={false} placeholder="Email" placeholderTextColor={"gray"}/>
         </View>
       </View>
     )
@@ -296,12 +305,18 @@ const EditProfileScreen = ({ props, route, navigation }) => {
 
   const formStep2 = () => {
     return (
-      <View style={{ alignItems: 'center', marginTop: 100 }}>
-        <TouchableOpacity style={{justifyContent: 'center', borderRadius: 150, borderColor: (imageProfile ? Colors.primary : Colors.gray), borderWidth: 4 }} onPress={pickImage}>
-          <Image source={imageProfile ? { uri: imageProfile } : require('../assets/images/profileImage.jpg')} style={{ width: 200, height: 200, borderRadius: 150 }} />
+      <View style={{alignItems: 'center', marginTop: 100}}>
+        <TouchableOpacity style={{
+          justifyContent: 'center',
+          borderRadius: 150,
+          borderColor: (imageProfile ? Colors.primary : Colors.gray),
+          borderWidth: 4
+        }} onPress={pickImage}>
+          <Image source={imageProfile ? {uri: imageProfile} : require('../assets/images/profileImage.jpg')}
+                 style={{width: 200, height: 200, borderRadius: 150}}/>
         </TouchableOpacity>
-        <View style={{ paddingTop: 8 }}>
-          <Button mode="contained" color={Colors.gray} onPress={pickImage} style={{ borderRadius: 20, }}>
+        <View style={{paddingTop: 8}}>
+          <Button mode="contained" color={Colors.gray} onPress={pickImage} style={{borderRadius: 20,}}>
             Upload
           </Button>
         </View>
@@ -311,79 +326,173 @@ const EditProfileScreen = ({ props, route, navigation }) => {
 
   const formStep3 = () => {
     return (
-      <View style={{ width: "90%", height: "100%", justifyContent: "space-evenly", alignContent: "space-around", flexDirection: "row", flexWrap: 'wrap' }}>
+      <View style={{
+        flex: 1,
+        width: "90%",
+        height: "100%",
+        marginTop: 50,
+        justifyContent: "space-evenly",
+        alignContent: "space-around",
+        flexDirection: "row",
+        flexWrap: 'wrap',
+      }}>
         {tags.map((item, index) => {
           if (item.source == "Feather") {
             return (
-              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center', }}>
-                  <Feather style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
-                  <Text style={{}} >{item.title}</Text>
+              <TouchableOpacity key={index} style={{
+                backgroundColor: Colors.white,
+                height: 100,
+                width: 90,
+                marginVertical: 2,
+                flexDirection: "column",
+                borderWidth: 3,
+                borderColor: item.isSelect ? Colors.primary : Colors.white,
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.18,
+                shadowRadius: 1.00,
+                elevation: 1,
+                borderRadius: 8
+              }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+                <View style={{height: "100%", justifyContent: 'center', alignItems: 'center'}}>
+                  <Feather style={{alignSelf: "center"}} name={item.icon} size={36} color="black"/>
+                  <Text style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}>{item.title}</Text>
                 </View>
-              </Button>)
+              </TouchableOpacity>)
           } else if (item.source == "Ionicons") {
             return (
-              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center' }}>
-                  <Ionicons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
-                  <Text>{item.title}</Text>
+              <TouchableOpacity key={index} style={{
+                backgroundColor: Colors.white,
+                height: 100,
+                width: 90,
+                marginVertical: 2,
+                flexDirection: "column",
+                borderWidth: 3,
+                borderColor: item.isSelect ? Colors.primary : Colors.white,
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.18,
+                shadowRadius: 1.00,
+                elevation: 1,
+                borderRadius: 8
+              }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+                <View style={{height: "100%", justifyContent: 'center', alignItems: 'center'}}>
+                  <Ionicons style={{alignSelf: "center"}} name={item.icon} size={36} color="black"/>
+                  <Text style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}>{item.title}</Text>
                 </View>
-              </Button>)
+              </TouchableOpacity>)
           } else if (item.source == "MaterialIcons") {
             return (
-              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center' }}>
-                  <MaterialIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
-                  <Text>{item.title}</Text>
+              <TouchableOpacity key={index} style={{
+                backgroundColor: Colors.white,
+                height: 100,
+                width: 90,
+                marginVertical: 2,
+                flexDirection: "column",
+                borderWidth: 3,
+                borderColor: item.isSelect ? Colors.primary : Colors.white,
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.18,
+                shadowRadius: 1.00,
+                elevation: 1,
+                borderRadius: 8
+              }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+                <View style={{height: "100%", justifyContent: 'center', alignItems: 'center'}}>
+                  <MaterialIcons style={{alignSelf: "center"}} name={item.icon} size={36} color="black"/>
+                  <Text style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}>{item.title}</Text>
                 </View>
-              </Button>)
+              </TouchableOpacity>)
           } else if (item.source == "MaterialCommunityIcons") {
             return (
-              <Button key={index} style={{ backgroundColor: Colors.white, height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: item.isSelect ? "red" : Colors.white }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
-                <View style={{ height: "100%", justifyContent: 'center' }}>
-                  <MaterialCommunityIcons style={{ alignSelf: "center" }} name={item.icon} size={36} color="black" />
-                  <Text>{item.title}</Text>
+              <TouchableOpacity key={index} style={{
+                backgroundColor: Colors.white,
+                height: 100,
+                width: 90,
+                marginVertical: 2,
+                flexDirection: "column",
+                borderWidth: 3,
+                borderColor: item.isSelect ? Colors.primary : Colors.white,
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                shadowOpacity: 0.18,
+                shadowRadius: 1.00,
+                elevation: 1,
+                borderRadius: 8
+              }} mode="contained" onPress={() => handleOnSelectTags(index, item)}>
+                <View style={{height: "100%", justifyContent: 'center', alignItems: 'center'}}>
+                  <MaterialCommunityIcons style={{alignSelf: "center"}} name={item.icon} size={36} color="black"/>
+                  <Text style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}>{item.title}</Text>
                 </View>
-              </Button>)
+              </TouchableOpacity>)
           }
         })}
       </View>)
   }
 
   return (isLoad ? <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size={'large'} color={Colors.primary} />
+        <ActivityIndicator size={'large'} color={Colors.primary}/>
       </SafeAreaView> :
-    <SafeAreaView style={{ flex:1, backgroundColor: Color.white}}>
-      {
-        ( waitSub && <SafeAreaView style={{position: "absolute", flex: 1, width:"100%", height: (Platform.OS === 'ios' ? "120%" : '100%'), top:0, left:0, justifyContent: 'center', alignItems: 'center', backgroundColor: "rgba(0,0,0,0.25)",zIndex: 50}}>
-          <ActivityIndicator size={75} color={Colors.primary} />
-        </SafeAreaView>)
-      }
-      <View style={{ flex: 1, height: "100%", width: "100%", marginTop: (Platform.OS === "android" ? 50 : null)}}>
-            <ProgressSteps labelFontFamily={Fonts.primary} topOffset={20} marginBottom={30} >
-              <ProgressStep nextBtnDisabled={(username ? false : true)} nextBtnText={'ต่อไป'} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="เพิ่มข้อมูล" onNext={checkTextInput} errors={isError} >
-                <View style={{ alignItems: 'center', height: "100%", marginTop: 26 }}>
-                  <View style={{ width: "100%" }}>
-                    {formStep1()}
-                  </View>
+      <SafeAreaView style={{flex: 1, backgroundColor: Color.white}}>
+        {
+          (waitSub && <SafeAreaView style={{
+            position: "absolute",
+            flex: 1,
+            width: "100%",
+            height: (Platform.OS === 'ios' ? "120%" : '100%'),
+            top: 0,
+            left: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: "rgba(0,0,0,0.25)",
+            zIndex: 50
+          }}>
+            <ActivityIndicator size={75} color={Colors.primary}/>
+          </SafeAreaView>)
+        }
+        <View style={{flex: 1, height: "100%", width: "100%", marginTop: (Platform.OS === "android" ? 50 : null)}}>
+          <ProgressSteps labelFontFamily={Fonts.primary} topOffset={20} marginBottom={30}>
+            <ProgressStep nextBtnDisabled={(username ? false : true)} nextBtnText={'ต่อไป'}
+                          nextBtnTextStyle={{fontFamily: Fonts.primary}} label="เพิ่มข้อมูล" onNext={checkTextInput}
+                          errors={isError}>
+              <View style={{alignItems: 'center', height: "100%", marginTop: 26}}>
+                <View style={{width: "100%"}}>
+                  {formStep1()}
                 </View>
-              </ProgressStep>
-              <ProgressStep previousBtnText={'ย้อนกลับ'} nextBtnText={'ต่อไป'} previousBtnTextStyle={{ fontFamily: Fonts.primary }} nextBtnTextStyle={{ fontFamily: Fonts.primary }}  label="ตั้งค่ารูปโปรไฟล์" >
-                <View style={{ flex: 1, height: "100%", width: "100%",}}>
-                    {formStep2()}
-                </View>
-              </ProgressStep>
-              <ProgressStep onSubmit={()=> handleSubmitForm()} previousBtnText={'ย้อนกลับ'} finishBtnText={'ยืนยัน'} previousBtnTextStyle={{ fontFamily: Fonts.primary }} nextBtnTextStyle={{ fontFamily: Fonts.primary }} label="สิ่งที่คุณสนใจ" >
-                <View style={{ flex: 1, height: "100%", width: "100%", alignItems: "center" }}>
-                  {
-                    formStep3()
-                  }
-                  <Text style={{fontFamily: Fonts.primary, color: "green" }}>[สามารถกลับมาเลือกภายหลังได้]</Text>
-                </View>
-              </ProgressStep>
-            </ProgressSteps>
-          </View>
-    </SafeAreaView >
+              </View>
+            </ProgressStep>
+            <ProgressStep previousBtnText={'ย้อนกลับ'} nextBtnText={'ต่อไป'}
+                          previousBtnTextStyle={{fontFamily: Fonts.primary}}
+                          nextBtnTextStyle={{fontFamily: Fonts.primary}} label="ตั้งค่ารูปโปรไฟล์">
+              <View style={{flex: 1, height: "100%", width: "100%",}}>
+                {formStep2()}
+              </View>
+            </ProgressStep>
+            <ProgressStep onSubmit={() => handleSubmitForm()} previousBtnText={'ย้อนกลับ'} finishBtnText={'ยืนยัน'}
+                          previousBtnTextStyle={{fontFamily: Fonts.primary}}
+                          nextBtnTextStyle={{fontFamily: Fonts.primary}} label="สิ่งที่คุณสนใจ">
+              <View style={{flex: 1, height: "100%", width: "100%", alignItems: "center"}}>
+                {
+                  formStep3()
+                }
+                <Text style={{fontFamily: Fonts.bold, color: Colors.yellow, marginTop: 20}}>[สามารถกลับมาเลือกภายหลังได้]</Text>
+              </View>
+            </ProgressStep>
+          </ProgressSteps>
+        </View>
+      </SafeAreaView>
   )
 }
 const styles = StyleSheet.create({
@@ -395,7 +504,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     borderWidth: 2,
     padding: 10,
-    borderRadius: 15,
+    borderRadius: 8,
     borderColor: "#CBCBCB",
     alignSelf: "center",
     fontFamily: Fonts.medium,
@@ -447,7 +556,13 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   buttonFormStep3: {
-    backgroundColor: "pink", height: 100, width: 90, marginVertical: 2, flexDirection: "column", borderWidth: 3, borderColor: "red"
+    backgroundColor: "pink",
+    height: 100,
+    width: 90,
+    marginVertical: 2,
+    flexDirection: "column",
+    borderWidth: 3,
+    borderColor: "red"
   }
 });
 
