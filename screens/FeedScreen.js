@@ -374,9 +374,7 @@ const FeedScreen = ({ route, navigation }) => {
           showsHorizontalScrollIndicator={false}
           horizontal={true}
 
-          ListFooterComponent={renderFooter}
-          onEndReachedThreshold={0.2}
-          onEndReached={handleLoadMore}
+  
         />
       </View>
     )
