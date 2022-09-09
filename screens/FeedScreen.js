@@ -7,19 +7,21 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Button, ActivityIndicator
+  Button, ActivityIndicator,
+  Platform
 } from "react-native";
-import React, {useCallback, useEffect, useState,} from "react";
+import React, { useCallback, useEffect, useState, } from "react";
 import EventCard from "../components/EventCard";
 import eventsService from "../services/eventsService";
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import {useFocusEffect} from '@react-navigation/native'
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useFocusEffect } from '@react-navigation/native'
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import EventCardHorizon from "../components/EventCardHorizon";
-import {Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons, Entypo} from "@expo/vector-icons";
-
+import { Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { platforms } from "react-native/react-native.config";
+import { useDispatch, useSelector } from "react-redux";
 
 const FeedScreen = ({route, navigation}) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -31,6 +33,11 @@ const FeedScreen = ({route, navigation}) => {
   const [feedbackTitle, setFeedbackTitle] = useState("ราชสีมาวิทยาลัย")
   const [selectedTag, setSelectedTag] = useState(["บันเทิง", "การศึกษา", "อาหาร", "กีฬา", "ท่องเที่ยว"])
   const [hasFeedBack, setHasFeedBack] = useState(false)
+  const [stepReward, setStepReward] = useState(0);
+  const { user } = useSelector(state => state.user)
+  const [userData, setUserData] = useState(JSON.parse(user))
+  const dispatch = useDispatch();
+
   // useFocusEffect(
   //   useCallback(() => {
   //     setIsVisible(true)
@@ -48,6 +55,7 @@ const FeedScreen = ({route, navigation}) => {
   }, [])
 
 
+
   // get Event
   const getEvent = async () => {
     const timeout = setTimeout(() => {
@@ -59,21 +67,19 @@ const FeedScreen = ({route, navigation}) => {
         await clearTimeout(timeout);
         await setAllEvent(res.data.content)
         await getEventByTag()
-      } else {
-        console.log(res.status)
       }
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
-      // alert('ผิดพลาดดด \n' + error.message)
     })
+    await setIsLoading(false)
   }
 
   const getEventByTag = async () => {
-    eventsService.getEventByTag(selectedTag).then(async (res) => {
-      if (res.status === 200) {
+    eventsService.getEventByTag(selectedTag).then( async (res) => {
+      if(res.status === 200){
         await setEventByTag(res.data.content)
         await getEventByAttention()
-      } else {
+      }else{
         console.log("TagsError")
       }
     }).catch(error => {
@@ -83,7 +89,7 @@ const FeedScreen = ({route, navigation}) => {
 
   const getEventByAttention = async () => {
     eventsService.getEventByAttention().then(async res => {
-      if (res.status === 200) {
+      if(res.status === 200){
         await setEventByAttention(res.data.content)
         await getRegisterEvent()
       }
@@ -96,7 +102,7 @@ const FeedScreen = ({route, navigation}) => {
 
   const getRegisterEvent = async () => {
     eventsService.getAllRegisteredEvent().then(async res => {
-      if (res.status === 200) {
+      if(res.status === 200){
         await setEventByRegistered(res.data.content)
         await setIsLoading(false)
       }
@@ -206,6 +212,8 @@ const FeedScreen = ({route, navigation}) => {
                 <Ionicons color={"black"} name={"ios-layers"} size={30}/>
               </View><Text>ทั้งหมด</Text>
             </TouchableOpacity>
+
+
           </View>
         </View>
       </View>
@@ -277,8 +285,6 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         </View>
         <FlatList
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
           data={allEvents}
           renderItem={({item}) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
@@ -286,6 +292,7 @@ const FeedScreen = ({route, navigation}) => {
           })}/>)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
+          showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
       </View>
@@ -313,14 +320,14 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         </View>
         <FlatList
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
           data={eventByTag}
           renderItem={({item}) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })}/>)}
           keyExtractor={(item) => item.id}
+          extraData={eventId}
+          showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
       </View>
@@ -348,8 +355,6 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         </View>
         <FlatList
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
           data={eventByAttention}
           renderItem={({item}) => (<EventCardHorizon item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
@@ -357,6 +362,7 @@ const FeedScreen = ({route, navigation}) => {
           })}/>)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
+          showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
       </View>
@@ -391,7 +397,6 @@ const FeedScreen = ({route, navigation}) => {
           })}/>)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
-          showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
@@ -402,30 +407,59 @@ const FeedScreen = ({route, navigation}) => {
 
   return (isLoading ?
       <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size={'large'} color={Colors.primary}/>
+        <ActivityIndicator size={'large'} color={Colors.primary} />
       </SafeAreaView> :
-      <View style={{flex: 1}}>
-        <View style={{flex: 1, backgroundColor: Colors.white}}>
-          <View style={styles.header}>
-            {/*something*/}
-          </View>
-          {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
-          <ScrollView showsVerticalScrollIndicator={false}
-                      showsHorizontalScrollIndicator={false}
-                      style={{paddingTop: 100}}>
-            <View style={{paddingBottom: 200}}>
-              {renderEventByAttentionSection()}
-              {renderEventShortcutSection()}
-              {renderAllEventSection()}
-              {renderEventByTagSection()}
-              {renderRegisteredEventSection()}
-              <View style={{display: hasFeedBack ? "flex" : "none"}}>
-                {renderRemindFeedback()}
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: Colors.white }}>
+        {Platform.OS === 'android' ?
+          (
+            <View style={[styles.iphoneHeaderBar, { paddingTop: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
+              <View style={{ flexDirection: "row", marginLeft: 16 }}>
+                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: Colors.gray, borderRadius: 30, borderWidth: 1, borderColor: Colors.white }} />
+                <View style={{ backgroundColor: Colors.white, alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
+                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData?.username ? userData?.username : "คุณยังไม่ได้เข้าสู้ระบบ"}</Text>
+                </View>
               </View>
+              {/*<View style={{ backgroundColor: Colors.white, borderRadius: 30, padding: 6, margin: 6, marginTop: 12, marginRight: 16, alignItems: "center", justifyContent: "center" }}>*/}
+              {/*  <Feather name={"bell"} size={24} color="black" />*/}
+              {/*</View>*/}
             </View>
-          </ScrollView>
-        </View>
+          )
+          :
+          (
+            <View style={[styles.iphoneHeaderBar, { paddingTop: 30, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
+              <View style={{ flexDirection: "row", marginLeft: 16 }}>
+                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: Colors.gray, borderRadius: 30, borderWidth: 1, borderColor: Colors.white }} />
+                <View style={{ backgroundColor: Colors.white, alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
+                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData?.username ? userData?.username : "คุณยังไม่ได้เข้าสู้ระบบ"}</Text>
+                </View>
+                {/* <TouchableOpacity style={{ display: userData ? "flex" : "none", backgroundColor: "white", alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
+                  <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}> "Login" </Text>
+                </TouchableOpacity> */}
+              </View>
+              {/*<View style={{ backgroundColor: Colors.white, borderRadius: 30, padding: 6, margin: 6, marginTop: 12, marginRight: 16, alignItems: "center", justifyContent: "center" }}>*/}
+              {/*  <Feather name={"bell"} size={24} color="black" />*/}
+              {/*</View>*/}
+            </View>
+          )
+        }
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          style={{ paddingTop: 110 }} >
+          <View style={{ paddingBottom: 110 }}>
+            {renderEventByAttentionSection()}
+            {renderEventShortcutSection()}
+            {renderAllEventSection()}
+            {renderEventByTagSection()}
+             {renderRegisteredEventSection()}
+            <View style={{ display: hasFeedBack ? "flex" : "none" }}>
+              {renderRemindFeedback()}
+            </View>
+          </View>
+        </ScrollView>
       </View>
+    </View >
   )
 }
 const styles = StyleSheet.create({
@@ -446,16 +480,26 @@ const styles = StyleSheet.create({
     color: Colors.black,
     marginRight: 3,
   },
-  header: {
+  iphoneHeaderBar: {
+    position: 'absolute',
+    display: 'flex',
+    width: "100%",
+    height: (Platform.OS === "ios" ? 110 : 80),
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    backgroundColor: Colors.primary,
+    zIndex: 10,
+  },
+  androidHeaderBar: {
     position: 'absolute',
     display: 'flex',
     width: "100%",
     height: 100,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
     backgroundColor: Colors.primary,
     zIndex: 10,
-    overflow: "hidden"
+
   },
   shadowsCard: {
     shadowColor: "#000",

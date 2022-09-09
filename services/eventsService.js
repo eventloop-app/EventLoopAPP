@@ -1,6 +1,5 @@
 import api from "./api"
-import config from "../getEnv";
-import axios from "react-native-axios";
+
 class eventsService {
 
   async hasUsername(username) {
@@ -14,7 +13,6 @@ class eventsService {
     try {
       return api.get('events?pageSize=10')
     } catch (e) {
-      console.log("catch")
       return new Promise(reject => reject(e))
     }
   }
@@ -36,6 +34,7 @@ class eventsService {
     }
   }
 
+
   async getAllRegisteredEvent() {
     try {
       return api.get('members/82c85d89-570d-4630-a463-7d1e3247dfc6/registerEvent?pageSize=1&pageNo=0')
@@ -45,12 +44,6 @@ class eventsService {
   }
 
   async transferMemberData(data) {
-    // axios({
-    //   method: "post",
-    //   url: "myurl",
-    //   data: bodyFormData,
-    //   headers: { "Content-Type": "multipart/form-data" },
-    // })
     try {
       return axios({
         method: "post",
@@ -151,6 +144,13 @@ class eventsService {
   async getMemberRegistedEvent(id, eveId){
     const data = {eventId: eveId, memberId : id  }
     return api.post(`/events/getRegisterMember`, data)
+  }
+  async getEventBySearch(keyword, pageNo = 0) {
+    try {
+      return api.get(`events/getEventByKeyword?keyword=${keyword}&pageNo=${pageNo}&pageSize=10&sortBy=createAt&orderBy=desc`)
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
   }
 }
 
