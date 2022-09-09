@@ -914,7 +914,6 @@ const CreateEventScreen = (props) => {
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
                   if (event.type !== "dismissed") {
-                    console.log(date)
                     changeDateTime(event, date)
                     setIsAnEditTime(!isAnEditTime)
                   }
@@ -938,11 +937,9 @@ const CreateEventScreen = (props) => {
                 mode="time"
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
-                  if (event.type === "set") {
-                    setEventDetail({...eventDetail, startDate: date})
-                    setTimeout(() => {
-                      setIsAnEndTime(!isAnEndTime)
-                    }, 500)
+                  if (event.type !== "dismissed") {
+                    setEventDetail({...eventDetail, startDate: date,  endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))})
+                    setIsAnEndTime(!isAnEndTime)
                   }
                 }}
               />
@@ -960,7 +957,7 @@ const CreateEventScreen = (props) => {
                 mode="time"
                 value={eventDetail.endDate}
                 onChange={(event, date) => {
-                  if (event.type === "set" && event.nativeEvent.timestamp !== null) {
+                  if (event.type !== "dismissed" && event.nativeEvent.timestamp !== null) {
                     setEventDetail({...eventDetail, endDate: date})
                     setIsAnEditTime(false)
                     setIsAnEditDate(false)
