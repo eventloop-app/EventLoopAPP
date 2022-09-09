@@ -415,7 +415,7 @@ const FeedScreen = ({route, navigation}) => {
           (
             <View style={[styles.iphoneHeaderBar, { paddingTop: 10, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
               <View style={{ flexDirection: "row", marginLeft: 16 }}>
-                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: "red", borderRadius: 30, borderWidth: 1, borderColor: Colors.white }} />
+                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: Colors.gray, borderRadius: 30, borderWidth: 1, borderColor: Colors.white }} />
                 <View style={{ backgroundColor: Colors.white, alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
                   <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData?.username ? userData?.username : "คุณยังไม่ได้เข้าสู้ระบบ"}</Text>
                 </View>
@@ -429,7 +429,7 @@ const FeedScreen = ({route, navigation}) => {
           (
             <View style={[styles.iphoneHeaderBar, { paddingTop: 30, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }]}>
               <View style={{ flexDirection: "row", marginLeft: 16 }}>
-                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: "red", borderRadius: 30, borderWidth: 1, borderColor: Colors.white }} />
+                <Image source={userData?.profileUrl ? { uri: userData?.profileUrl } : require('../assets/images/profileImage.jpg')} style={{ height: 50, width: 50, backgroundColor: Colors.gray, borderRadius: 30, borderWidth: 1, borderColor: Colors.white }} />
                 <View style={{ backgroundColor: Colors.white, alignSelf: 'flex-start', borderRadius: 30, paddingHorizontal: 8, marginTop: 12, marginLeft: 4 }}>
                   <Text numberOfLines={1} style={{ fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.black, }}>{userData?.username ? userData?.username : "คุณยังไม่ได้เข้าสู้ระบบ"}</Text>
                 </View>
