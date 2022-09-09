@@ -485,11 +485,7 @@ const ProfileDetailScreen = ({props, navigation}) => {
       <View>
         <View style={{width: '100%', height: 220, justifyContent: 'center', alignItems: 'center'}}>
           <Image
-            source={
-              userData?.profileUrl
-                ? {uri: userData?.profileUrl}
-                : profileImageMock
-            }
+            source={ userData?.profileUrl   ? {uri: userData?.profileUrl} : profileImageMock}
             style={{width: 200, height: 200, borderRadius: 200/2, borderWidth: 4, borderColor: Colors.primary}}
           />
         </View>
