@@ -7,7 +7,7 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Button
+  Button, ActivityIndicator, Platform
 } from "react-native";
 import React, { useCallback, useEffect, useState, } from "react";
 import EventCard from "../components/EventCard";
@@ -33,6 +33,7 @@ const FeedScreen = ({ route, navigation }) => {
   const [feedbackImageCover, setFeedbackImageCover] = useState("https://cdn.zipeventapp.com/blog/2020/09/2020-09-09_04-59-46_zip-onlineevent.png")
   const [feedbackTitle, setFeedbackTitle] = useState("ราชสีมาวิทยาลัย")
   const [selectedTag, setSelectedTag] = useState(["บันเทิง", "การศึกษา", "อาหาร", "กีฬา", "ท่องเที่ยว"])
+  const [feedBack, setFeedBack] = useState("")
   const [hasFeedBack, setHasFeedBack] = useState(false)
   const [stepReward, setStepReward] = useState(0);
   const [onLoadData, setLoadData] = useState(false)
@@ -118,7 +119,6 @@ const FeedScreen = ({ route, navigation }) => {
     await setIsLoading(false)
   }
 
-//-----------------------------------------------------------
   const getNewEvent = (keyword = "", newPage) => {
     setLoadData(true)
     eventsService.getEventBySearch(keyword, newPage).then(res => {
@@ -176,8 +176,6 @@ const FeedScreen = ({ route, navigation }) => {
       console.log(newPage)
     }
   }
-//-----------------------------------------------------------------
-
 
   const renderEventShortcutSection = () => {
     return (
@@ -288,7 +286,7 @@ const FeedScreen = ({ route, navigation }) => {
           <View style={{flex: 0.7, alignItems: 'flex-start', justifyContent: 'center'}}>
             <Text style={styles.textTitle}>กิจกรรม</Text>
           </View>
-          <View onTouchEnd={() => navigation.navigate('EventList', {name: 'รายการกิจกรรมที่ลงทะเบียน'})} style={{
+          <View onTouchEnd={() => navigation.navigate('ListSelectedEvent', { name: 'กิจกรรม', data: allEvents })} style={{
             flex: 0.3,
             flexDirection: 'row',
             justifyContent: 'flex-end',
@@ -323,7 +321,7 @@ const FeedScreen = ({ route, navigation }) => {
           <View style={{flex: 0.7, alignItems: 'flex-start', justifyContent: 'center'}}>
             <Text style={styles.textTitle}>กิจกรรมที่เหมาะกับคุณ</Text>
           </View>
-          <View onTouchEnd={() => navigation.navigate('EventList', {name: 'รายการกิจกรรมที่ลงทะเบียน'})} style={{
+          <View onTouchEnd={() => navigation.navigate('ListSelectedEvent', { name: 'กิจกรรมที่เหมาะกับคุณ', data: eventByTag })} style={{
             flex: 0.3,
             flexDirection: 'row',
             justifyContent: 'flex-end',
@@ -338,7 +336,7 @@ const FeedScreen = ({ route, navigation }) => {
         </View>
         <FlatList
           data={eventByTag}
-          renderItem={({item}) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
+          renderItem={({ item }) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })}/>)}
@@ -358,7 +356,7 @@ const FeedScreen = ({ route, navigation }) => {
           <View style={{flex: 0.7, alignItems: 'flex-start', justifyContent: 'center'}}>
             <Text style={styles.textTitle}>กำลังมาแรง</Text>
           </View>
-          <View onTouchEnd={() => navigation.navigate('EventList', {name: 'รายการกิจกรรมที่ลงทะเบียน'})} style={{
+          <View onTouchEnd={() => navigation.navigate('ListSelectedEvent', { name: 'กำลังมาแรง', data: eventByAttention })} style={{
             flex: 0.3,
             flexDirection: 'row',
             justifyContent: 'flex-end',
@@ -381,8 +379,6 @@ const FeedScreen = ({ route, navigation }) => {
           extraData={eventId}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
-
-
         />
       </View>
     )
@@ -395,7 +391,7 @@ const FeedScreen = ({ route, navigation }) => {
           <View style={{flex: 0.7, alignItems: 'flex-start', justifyContent: 'center'}}>
             <Text style={styles.textTitle}>กิจกรรมที่คุณได้ลงทะเบียน</Text>
           </View>
-          <View onTouchEnd={() => navigation.navigate('EventList', {name: 'รายการกิจกรรมที่ลงทะเบียน'})} style={{
+          <View onTouchEnd={() => navigation.navigate('ListSelectedEvent', { name: 'รายการกิจกรรมที่ลงทะเบียน', data: eventByRegistered })} style={{
             flex: 0.3,
             flexDirection: 'row',
             justifyContent: 'flex-end',

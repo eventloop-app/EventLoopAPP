@@ -171,19 +171,34 @@ const Routing = () => {
           )
         })}/>
 
-        <Stack.Screen name={'CreatedEventList'} component={CreatedEventListScreen} options={({route}) => ({
-          headerShown: true,
-          headerTransparent: false,
-          tabBarShowLabel: false,
-          headerTitleAlign: 'center',
-          headerTitleStyle: {
-            fontFamily: Fonts.bold,
-            fontSize: fontSize.primary,
-            color: Colors.black,
-          },
-          headerBackTitle: '',
-          title: 'รายการกิจกรรมที่สร้าง'
-        })}/>
+                <Stack.Screen name={'CreatedEventList'} component={CreatedEventListScreen} options={({ route }) => ({
+                    headerShown: true,
+                    headerTransparent: false,
+                    tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    headerTitleStyle: {
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.black,
+                    },
+                    headerBackTitle: '',
+                    title: 'รายการกิจกรรมที่สร้าง',
+                })} />
+
+
+                <Stack.Screen name={'ListSelectedEvent'} component={ListEventScreen} options={({ route }) => ({
+                    headerShown: true,
+                    headerTransparent: false,
+                    tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    headerTitleStyle: {
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.black,
+                    },
+                    headerBackTitle: '',
+                    title: route.params.name
+                })} />
 
         <Stack.Screen name={'Scanner'} component={ScannerScreen} options={{headerShown: false}}/>
 
