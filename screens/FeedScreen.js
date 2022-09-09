@@ -69,11 +69,11 @@ const FeedScreen = ({route, navigation}) => {
   }
 
   const getEventByTag = async () => {
-    eventsService.getEventByTag(selectedTag).then( async (res) => {
-      if(res.status === 200){
+    eventsService.getEventByTag(selectedTag).then(async (res) => {
+      if (res.status === 200) {
         await setEventByTag(res.data.content)
         await getEventByAttention()
-      }else{
+      } else {
         console.log("TagsError")
       }
     }).catch(error => {
@@ -83,7 +83,7 @@ const FeedScreen = ({route, navigation}) => {
 
   const getEventByAttention = async () => {
     eventsService.getEventByAttention().then(async res => {
-      if(res.status === 200){
+      if (res.status === 200) {
         await setEventByAttention(res.data.content)
         await getRegisterEvent()
       }
@@ -96,7 +96,7 @@ const FeedScreen = ({route, navigation}) => {
 
   const getRegisterEvent = async () => {
     eventsService.getAllRegisteredEvent().then(async res => {
-      if(res.status === 200){
+      if (res.status === 200) {
         await setEventByRegistered(res.data.content)
         await setIsLoading(false)
       }
@@ -277,6 +277,8 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         </View>
         <FlatList
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           data={allEvents}
           renderItem={({item}) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
@@ -284,7 +286,6 @@ const FeedScreen = ({route, navigation}) => {
           })}/>)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
-          showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
       </View>
@@ -312,13 +313,14 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         </View>
         <FlatList
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           data={eventByTag}
-          renderItem={({item}) => (<EventCard  item={item} onPress={() => navigation.navigate('EventDetail', {
+          renderItem={({item}) => (<EventCard item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })}/>)}
           keyExtractor={(item) => item.id}
-          showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
       </View>
@@ -346,6 +348,8 @@ const FeedScreen = ({route, navigation}) => {
           </View>
         </View>
         <FlatList
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
           data={eventByAttention}
           renderItem={({item}) => (<EventCardHorizon item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
@@ -353,7 +357,6 @@ const FeedScreen = ({route, navigation}) => {
           })}/>)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
-          showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
       </View>
@@ -388,6 +391,7 @@ const FeedScreen = ({route, navigation}) => {
           })}/>)}
           keyExtractor={(item) => item.id}
           extraData={eventId}
+          showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
         />
@@ -398,7 +402,7 @@ const FeedScreen = ({route, navigation}) => {
 
   return (isLoading ?
       <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size={'large'} color={Colors.primary} />
+        <ActivityIndicator size={'large'} color={Colors.primary}/>
       </SafeAreaView> :
       <View style={{flex: 1}}>
         <View style={{flex: 1, backgroundColor: Colors.white}}>
@@ -406,7 +410,9 @@ const FeedScreen = ({route, navigation}) => {
             {/*something*/}
           </View>
           {/* <Button title="Test" onPress={() => console.log(eventByTag)} /> */}
-          <ScrollView style={{paddingTop: 100}}>
+          <ScrollView showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
+                      style={{paddingTop: 100}}>
             <View style={{paddingBottom: 200}}>
               {renderEventByAttentionSection()}
               {renderEventShortcutSection()}
