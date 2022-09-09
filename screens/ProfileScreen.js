@@ -54,9 +54,9 @@ const ProfileScreen = (props, {navigation}) => {
     if (userData !== null && userData !== undefined) {
       console.log("Has user " + userData.id)
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       setIsLoad(false)
-    },1000)
+    }, 1000)
   }, [userData])
 
   useEffect(() => {
@@ -125,13 +125,9 @@ const ProfileScreen = (props, {navigation}) => {
     setIsLoad(true)
     await dispatch(SignOut())
     setTimeout(() => {
-      try {
-        setUserData(null)
-        setIsLoad(false)
-        navigation.navigate("Profile")
-      } catch (e) {
-        return;
-      }
+      setUserData(null)
+      setIsLoad(false)
+      props.navigation.navigate("Profile")
     }, 1000)
   }
 
@@ -216,7 +212,11 @@ const ProfileScreen = (props, {navigation}) => {
                   </View>
                 </View>
 
-                <View style={{justifyContent: 'center', alignItems: 'center', marginTop:(Platform.OS === "ios" ? 20: 100)}}>
+                <View style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: (Platform.OS === "ios" ? 20 : 100)
+                }}>
                   <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent()}>
                     <View style={{
                       width: 350,
