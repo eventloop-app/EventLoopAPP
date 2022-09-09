@@ -26,14 +26,17 @@ const ManageEventDetailScreen = (props) => {
   const [isLoad, setIsLoad] = useState(true)
   const [showQr, setShowQr] = useState(false)
   const [checkInData, setCheckInData] = useState({qr : null, code: null})
+  const [endDate, setEndDate] = useState(null)
 
   useEffect(() => {
     setEventId(props.route.params.id)
+    setEndDate(props.route.params.endDate)
   }, [])
 
   useEffect(() => {
     if (evntId !== null) {
       eventsService.getMemberRegistedEvent(userData.id, evntId).then(res => {
+        console.log(res.data)
         setUserJoin(res.data)
         setIsLoad(false)
       }).catch(e => console.log(e))
@@ -78,7 +81,7 @@ const ManageEventDetailScreen = (props) => {
         <ActivityIndicator size={'large'} color={Colors.primary}/>
       </SafeAreaView> :
       <SafeAreaView style={{flex: 1, marginTop: (Platform.OS === "ios" ? 0 : 50), backgroundColor: Colors.white}}>
-        <View style={{height: 350, margin: 10}}>
+        <View style={{height: 300, margin: 10}}>
           <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.primary}}>รายชื่อของผู้ร่วมกิจกรรม</Text>
           <FlatList
             contentContainerStyle={{ paddingBottom: 20}}
@@ -101,17 +104,17 @@ const ManageEventDetailScreen = (props) => {
         </TouchableOpacity>
         {
           (showQr &&
-            <View style={{position: "absolute", width: 300, height:300, borderRadius: 12, top: "30%", left: "10%", }}>
+            <View style={{position: "absolute", flex: 1, width: "100%", height:"120%", backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 50}}>
               <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                {
-                  console.log(`data:image/jpeg;base64,${checkInData.qr}`)
-                }
                 <Image source={{uri: `data:image/jpeg;base64,${checkInData.qr}`}}
-                       style={{width: 230, height: 230, borderRadius: 12}}/>
-
-                <Button onPress={()=> setShowQr(false)} title={'ปิด'}/>
+                       style={{width: 270, height: 270, borderRadius: 12}}/>
+                <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.medium, color: Colors.white}}>{`Code : ${checkInData.code}`}</Text>
+                <TouchableOpacity onPress={()=> setShowQr(!showQr)}>
+                  <View style={{marginTop: 20, backgroundColor: Colors.red, padding: 8, borderRadius: 20}}>
+                    <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.primary, color: Colors.white}}>ปิดหน้าต่าง</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
-
           </View>)
         }
       </SafeAreaView>

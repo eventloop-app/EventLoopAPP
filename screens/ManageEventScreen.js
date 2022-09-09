@@ -68,7 +68,7 @@ const ManageEventScreen = (props) => {
         <Ionicons name={'ios-create-outline'} size={36} color={Colors.white} />
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={()=> props.navigation.push('ManageEventDetail',{name: event?.eventName, id: event?.id})}
+        onPress={()=> props.navigation.push('ManageEventDetail',{name: event?.eventName, id: event?.id, endDate: event?.endDate})}
         style={{flex: 0.2, borderBottomRightRadius: 10, borderTopRightRadius: 10, backgroundColor: Colors.primary, justifyContent: "center", alignItems: "center"}}>
         <Ionicons name={'ios-reorder-three-outline'} size={36} color={Colors.white} />
       </TouchableOpacity>

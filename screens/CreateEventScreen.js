@@ -675,7 +675,6 @@ const CreateEventScreen = (props) => {
                                      setEventDetail({
                                        ...eventDetail, location: e.nativeEvent.text
                                      })
-                                     console.log(eventDetail.location)
                                      if (e.nativeEvent.text === "" && Platform.OS === "ios") {
                                        setError({
                                          ...error,
