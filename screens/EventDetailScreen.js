@@ -212,9 +212,9 @@ const EventDetailScreen = (props) => {
 
   return (
       <View style={styles.container}>
-        {(isLoading && <SafeAreaView style={{position: 'absolute', flex: 1, width: '100%', height: "100%", zIndex: 50}}>
+        {(isLoading && <View style={{position: 'absolute', flex: 1, width: '100%', height: "100%", zIndex: 50}}>
           <View style={{flex: 1, backgroundColor: Colors.white, justifyContent: 'center', zIndex: 50}}>
-            <ActivityIndicator size={'large'} color={Colors.primary}/>
+            <ActivityIndicator size={"large"} color={Colors.primary}/>
             <Text style={{
               textAlign: 'center',
               fontFamily: Fonts.primary,
@@ -223,7 +223,7 @@ const EventDetailScreen = (props) => {
               marginTop: 20
             }}>กำลังโหลดข้อมูลกิจกรรม</Text>
           </View>
-        </SafeAreaView>)}
+        </View>)}
         <View style={styles.imageCover}>
           <Image style={styles.image}
                  source={{
@@ -304,7 +304,7 @@ const EventDetailScreen = (props) => {
                           fontSize: FontSize.small,
                           color: Colors.white
                         }}>
-                          {event?.type}
+                          {(event?.type === "ONLINE" ? "ออนไลน์" : "ออนไซต์")}
                         </Text>
                       </View>
                     }

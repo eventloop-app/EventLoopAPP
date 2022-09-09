@@ -765,8 +765,7 @@ const CreateEventScreen = (props) => {
                   }}>{error.description}</Text>
                 </View>)}
 
-              <View style={{position: 'absolute', bottom: 100, display: 'flex', flexDirection: 'column', zIndex: 55}}>
-                {/*<Button  title={'สร้างกิจกรมม'}/>*/}
+              <View style={{flex: 1, width: "100%", justifyContent: 'center', alignItems: 'center', marginTop : 50 }}>
                 <TouchableOpacity activeOpacity={0.8}
                                   disabled={error.all}
                                   onPress={() => onSubmit()}>
