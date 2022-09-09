@@ -19,6 +19,7 @@ import Fonts from "../constants/Fonts";
 import FontSize from "../constants/FontSize";
 import EventCardHorizon from "../components/EventCardHorizon";
 import { Ionicons, Feather, AntDesign, MaterialIcons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native-paper";
 
 
 const FeedScreen = ({ route, navigation }) => {
@@ -56,10 +57,14 @@ const FeedScreen = ({ route, navigation }) => {
   useEffect(() => {
     getAllEvent()
     getEventByTag()
-    getEventByAttention()
+    // getEventByAttention()
     getRegisterEvent()
   }, [])
 
+  useEffect(() => {
+    setLoadData(true)
+    getEventByAttention()
+  }, [page])
 
   // get Event
   const getAllEvent = async () => {
@@ -92,9 +97,15 @@ const FeedScreen = ({ route, navigation }) => {
   }
 
   const getEventByAttention = async () => {
-    eventsService.getEventByAttention().then(res => {
-      setEventByAttention(res.data.content)
-    }).catch(error => {
+    eventsService.getEventByAttention(page).then(res => {
+      let newEvent = res.data.content
+      let currentData = eventByAttention.concat(newEvent)
+ 
+
+      setEventByAttention(currentData)
+      setTotalPage(res.data.totalPages)
+      setLoadData(false)
+    }).catch(error => { 
       console.log('get_all_event: ' + error.message)
       alert('ผิดพลาดดด \n' + error.message)
     })
@@ -111,14 +122,14 @@ const FeedScreen = ({ route, navigation }) => {
     await setIsLoading(false)
   }
 
-//-----------------------------------------------------------
+  //-----------------------------------------------------------
   const getNewEvent = (keyword = "", newPage) => {
     setLoadData(true)
     eventsService.getEventBySearch(keyword, newPage).then(res => {
       if (res.status === 200) {
         setLoadData(false)
         let newEvent = res.data.content
-        let currentData = event.concat(newEvent) 
+        let currentData = event.concat(newEvent)
 
         currentData.map((item, index) => {
           if (typeof (item.location?.name) === "string") {
@@ -152,24 +163,28 @@ const FeedScreen = ({ route, navigation }) => {
   }
 
   const renderFooter = () => {
-    if (!onLoadData) return null;
+    // if (!onLoadData) return null;
     return (
-      <ActivityIndicator
-        style={{ color: '#000' }}
-      />
+      onLoadData ?
+        <ActivityIndicator
+          style={{ color: '#000' }}
+        /> : null
     );
   }
-
+  // setPage(page + 1)
+  // setIsLoading(true)
   const handleLoadMore = () => {
-    if (!onLoadData) {
-
-      let newPage = page + 1; // increase page by 1
-      getNewEvent(searchText, newPage); // method for API call 
+    let newPage = page;
+    if (!onLoadData && newPage <= totalPage) {
+      newPage = page + 1
+      getEventByAttention(newPage);
       setPage(newPage)
-      console.log(newPage)
+
+
     }
+    setIsLoading(true)
   }
-//-----------------------------------------------------------------
+  //-----------------------------------------------------------------
 
 
   const renderEventShortcutSection = () => {
@@ -365,18 +380,20 @@ const FeedScreen = ({ route, navigation }) => {
           </View>
         </View>
         <FlatList
-        
+
           data={eventByAttention}
           renderItem={({ item }) => (<EventCardHorizon item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
             name: item.eventName
           })} />)}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id}
           extraData={eventId}
           showsHorizontalScrollIndicator={false}
           horizontal={true}
 
-  
+          ListFooterComponent={renderFooter}
+          onEndReachedThreshold={0.2}
+          onEndReached={handleLoadMore}
         />
       </View>
     )
