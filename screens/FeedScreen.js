@@ -40,6 +40,7 @@ const FeedScreen = ({ route, navigation }) => {
   const [onLoadData, setLoadData] = useState(false)
   const [page, setPage] = useState(0)
   const [totalPage, setTotalPage] = useState(0)
+  
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -84,7 +85,12 @@ const FeedScreen = ({ route, navigation }) => {
 
   const getEventByTag = async () => {
     eventsService.getEventByTag(selectedTag).then((res) => {
-      setEventByTag(res.data.content)
+      if (res.status === 200) {
+        setEventByTag(res.data.content)
+      } else {
+        console.log(res.status)
+      }
+
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
     })
@@ -93,7 +99,14 @@ const FeedScreen = ({ route, navigation }) => {
 
   const getEventByAttention = async () => {
     eventsService.getEventByAttention().then(res => {
-      setEventByAttention(res.data.content)
+      if (res.status === 200) {
+        setEventByAttention(res.data.content)
+      }
+      else {
+        console.log(res.status)
+      }
+
+
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
       alert('ผิดพลาดดด \n' + error.message)
@@ -103,7 +116,12 @@ const FeedScreen = ({ route, navigation }) => {
 
   const getRegisterEvent = async () => {
     eventsService.getAllRegisteredEvent().then(res => {
-      setEventByRegistered(res.data.content)
+      if (res.status === 200) {
+        setEventByRegistered(res.data.content)
+      } else {
+        console.log(res.status)
+      }
+
     }).catch(error => {
       console.log('get_all_event: ' + error.message)
       alert('ผิดพลาดดด \n' + error.message)
@@ -111,14 +129,14 @@ const FeedScreen = ({ route, navigation }) => {
     await setIsLoading(false)
   }
 
-//-----------------------------------------------------------
+  //-----------------------------------------------------------
   const getNewEvent = (keyword = "", newPage) => {
     setLoadData(true)
     eventsService.getEventBySearch(keyword, newPage).then(res => {
       if (res.status === 200) {
         setLoadData(false)
         let newEvent = res.data.content
-        let currentData = event.concat(newEvent) 
+        let currentData = event.concat(newEvent)
 
         currentData.map((item, index) => {
           if (typeof (item.location?.name) === "string") {
@@ -169,7 +187,7 @@ const FeedScreen = ({ route, navigation }) => {
       console.log(newPage)
     }
   }
-//-----------------------------------------------------------------
+  //-----------------------------------------------------------------
 
 
   const renderEventShortcutSection = () => {
@@ -365,7 +383,7 @@ const FeedScreen = ({ route, navigation }) => {
           </View>
         </View>
         <FlatList
-        
+
           data={eventByAttention}
           renderItem={({ item }) => (<EventCardHorizon item={item} onPress={() => navigation.navigate('EventDetail', {
             item: item,
@@ -376,7 +394,7 @@ const FeedScreen = ({ route, navigation }) => {
           showsHorizontalScrollIndicator={false}
           horizontal={true}
 
-  
+
         />
       </View>
     )

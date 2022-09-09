@@ -12,7 +12,7 @@ class eventsService {
 
   async getAllEvent() {
     try {
-      return api.get('events?pageSize=10')
+      return api.get('events?pageSize=100')
     } catch (e) {
       console.log("catch")
       return new Promise(reject => reject(e))
@@ -22,7 +22,7 @@ class eventsService {
   async getEventByTag(selectTag = []) {
     const tags = selectTag.map((item) => `&tags=${item}`).join('')
     try {
-      return api.get(`events/getEventByTag?tags=INT210${tags}&pageSize=20&pageNo=0&sortBy=startDate&orderBy=desc`)
+      return api.get(`events/getEventByTag?tags=INT210${tags}&pageSize=100&pageNo=0&sortBy=startDate&orderBy=desc`)
     } catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -39,7 +39,7 @@ class eventsService {
 
   async getAllRegisteredEvent() {
     try {
-      return api.get('members/82c85d89-570d-4630-a463-7d1e3247dfc6/registerEvent?pageSize=1&pageNo=0')
+      return api.get('members/82c85d89-570d-4630-a463-7d1e3247dfc6/registerEvent?pageSize=100&pageNo=0')
     } catch (e) {
       return new Promise(reject => reject(e))
     }
