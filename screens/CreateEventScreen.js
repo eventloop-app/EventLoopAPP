@@ -192,11 +192,26 @@ const CreateEventScreen = (props) => {
             }
             break
           case "location":
-            if (value === '' || value === undefined || value === null) {
+
+            if (value !== '' && value !== undefined && value !== null && eventDetail.type === "ONLINE") {
+              const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+              console.log(http.test(value))
+              if (!http.test(value)) {
+                count += 1
+                setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
+              } else {
+                count -= 1
+                if (count === 0) {
+                  setError({...error, all: false, location: null})
+                } else {
+                  setError({...error, all: true, location: null})
+                }
+              }
+            } else if (value === '' || value === undefined || value === null) {
               count += 1
               setError({
                 ...error,
-                location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมไม่ถูกต้อง"),
+                location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่ว่าง"),
                 all: true
               })
             } else {
@@ -675,15 +690,40 @@ const CreateEventScreen = (props) => {
                                      setEventDetail({
                                        ...eventDetail, location: e.nativeEvent.text
                                      })
+
+                                     // if (value !== '' && value !== undefined && value !== null && eventDetail.type === "ONLINE") {
+                                     //   const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+                                     //   console.log(http.test(value))
+                                     //   if(!http.test(value)){
+                                     //     count += 1
+                                     //     setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
+                                     //   }else{
+                                     //     count -= 1
+                                     //     if (count === 0) {
+                                     //       setError({...error, all: false, location: null})
+                                     //     } else {
+                                     //       setError({...error, all: true, location: null})
+                                     //     }
+                                     //   }
+                                     // }
                                      if (e.nativeEvent.text === "" && Platform.OS === "ios") {
                                        setError({
                                          ...error,
                                          location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง")
                                        })
-                                     } else if (e.nativeEvent.text !== "" || eventDetail.location !== null || eventDetail.location !== "") {
+                                     } else if (e.nativeEvent.text !== '' && e.nativeEvent.text !== undefined && e.nativeEvent.text !== null && eventDetail.type === "ONLINE" && Platform.OS === "ios") {
+                                       const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+                                         if(!http.test(e.nativeEvent.text)){
+                                           setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
+                                         }else {
+                                           setError({...error, location: null})
+                                         }
+                                     }else if (e.nativeEvent.text !== "" || eventDetail.location !== null || eventDetail.location !== "") {
                                        setError({...error, location: null})
                                      }
                                    }}
+
+
                                    style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
                         />
                       </View>
@@ -765,8 +805,7 @@ const CreateEventScreen = (props) => {
                   }}>{error.description}</Text>
                 </View>)}
 
-              <View style={{position: 'absolute', bottom: 100, display: 'flex', flexDirection: 'column', zIndex: 55}}>
-                {/*<Button  title={'สร้างกิจกรมม'}/>*/}
+              <View style={{flex: 1, width: "100%", justifyContent: 'center', alignItems: 'center', marginTop: 50}}>
                 <TouchableOpacity activeOpacity={0.8}
                                   disabled={error.all}
                                   onPress={() => onSubmit()}>
@@ -861,7 +900,10 @@ const CreateEventScreen = (props) => {
                                 onChange={(event, date) => {
                                   setEventDetail({...eventDetail, endDate: date})
                                   if (Platform.OS === "ios" && eventDetail.startDate.getDate() < new Date().getDate() + 3) {
-                                    setError({...error, startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"})
+                                    setError({
+                                      ...error,
+                                      startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"
+                                    })
                                   } else if (Platform.OS === "ios" && eventDetail.startDate.getHours() > date.getHours()) {
                                     setError({
                                       ...error,
@@ -937,7 +979,11 @@ const CreateEventScreen = (props) => {
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
                   if (event.type !== "dismissed") {
-                    setEventDetail({...eventDetail, startDate: date,  endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))})
+                    setEventDetail({
+                      ...eventDetail,
+                      startDate: date,
+                      endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))
+                    })
                     setIsAnEndTime(!isAnEndTime)
                   }
                 }}
