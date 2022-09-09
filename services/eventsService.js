@@ -1,5 +1,6 @@
 import api from "./api"
-
+import axios from "react-native-axios";
+import config from "../getEnv";
 class eventsService {
 
   async hasUsername(username) {
