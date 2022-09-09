@@ -126,6 +126,7 @@ const CreateEventScreen = (props) => {
           latitude: props.route.params.data.lat,
           longitude: props.route.params.data.lng
         })
+        setError({...error, location: null})
       }, 100)
     }
   }, [props])
@@ -140,9 +141,9 @@ const CreateEventScreen = (props) => {
               setError({...error, eventName: "ชื่อกิจกรรมต้องไม่เป็นช่องว่าง", all: true})
             } else {
               count -= 1
-              if(count === 0){
+              if (count === 0) {
                 setError({...error, all: false, eventName: null})
-              }else{
+              } else {
                 setError({...error, all: true, eventName: null})
               }
             }
@@ -157,10 +158,10 @@ const CreateEventScreen = (props) => {
               setError({...error, startDate: "เวลาสิ้นสุดกิจกรรมต้องมากกว่าเวลาเริ่มต้นกิจกรรม", all: true})
             } else {
               count -= 1
-              if(count === 0){
+              if (count === 0) {
                 setError({...error, all: false, startDate: null})
-              }else{
-                setError({...error, all: true , startDate: null})
+              } else {
+                setError({...error, all: true, startDate: null})
               }
             }
             break
@@ -170,9 +171,9 @@ const CreateEventScreen = (props) => {
               setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก", all: true})
             } else {
               count -= 1
-              if(count === 0){
+              if (count === 0) {
                 setError({...error, all: false, tags: null})
-              }else{
+              } else {
                 setError({...error, all: true, tags: null})
               }
             }
@@ -183,10 +184,10 @@ const CreateEventScreen = (props) => {
               setError({...error, numberOfPeople: "จำนวนผู้เข้าร่วมต้องมีอย่างน้อย 2 คน", all: true})
             } else {
               count -= 1
-              if(count === 0){
-                setError({...error, all: false,numberOfPeople: null})
-              }else{
-                setError({...error, all: true,numberOfPeople: null})
+              if (count === 0) {
+                setError({...error, all: false, numberOfPeople: null})
+              } else {
+                setError({...error, all: true, numberOfPeople: null})
               }
             }
             break
@@ -195,14 +196,14 @@ const CreateEventScreen = (props) => {
               count += 1
               setError({
                 ...error,
-                location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง"),
+                location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมไม่ถูกต้อง"),
                 all: true
               })
             } else {
               count -= 1
-              if(count === 0){
+              if (count === 0) {
                 setError({...error, all: false, location: null})
-              }else{
+              } else {
                 setError({...error, all: true, location: null})
               }
             }
@@ -213,18 +214,18 @@ const CreateEventScreen = (props) => {
               setError({...error, description: "รายละเอียดกิจกรรมต้องไม่เป็นช่องว่าง", all: true})
             } else {
               count -= 1
-              if(count === 0){
-                setError({...error, all: false,description: null})
-              }else{
-                setError({...error, all: true,description: null})
+              if (count === 0) {
+                setError({...error, all: false, description: null})
+              } else {
+                setError({...error, all: true, description: null})
               }
             }
             break
           default:
             count += 1
-            if(count === 0){
+            if (count === 0) {
               setError({...error, all: false})
-            }else{
+            } else {
               setError({...error, all: true})
             }
             setIsLoad(false)
@@ -271,7 +272,7 @@ const CreateEventScreen = (props) => {
 
     console.log(newEventDetail)
     setWaitSub(true)
-    eventsService.createEvent(data).then( async res => {
+    eventsService.createEvent(data).then(async res => {
       if (res.status === 200) {
         await setEventDetail({
           type: "ONSITE",
@@ -312,11 +313,11 @@ const CreateEventScreen = (props) => {
   const renderUI = () => (
     <View style={{flex: 1, backgroundColor: Colors.white}}>
       {
-        (waitSub && <SafeAreaView style={{
+        (waitSub && <View style={{
           position: "absolute",
           flex: 1,
           width: "100%",
-          height: (Platform.OS === 'ios' ? "120%" : '100%'),
+          height: (Platform.OS === 'ios' ? "100%" : '100%'),
           top: 0,
           left: 0,
           justifyContent: 'center',
@@ -325,7 +326,7 @@ const CreateEventScreen = (props) => {
           zIndex: 50
         }}>
           <ActivityIndicator size={75} color={Colors.primary}/>
-        </SafeAreaView>)
+        </View>)
       }
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {
@@ -369,7 +370,14 @@ const CreateEventScreen = (props) => {
               <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 30}}>
                 <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.lightgray}
                            style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
-                           onChange={(e) => setEventDetail({...eventDetail, eventName: e.nativeEvent.text})}/>
+                           onChange={(e) => {
+                             setEventDetail({...eventDetail, eventName: e.nativeEvent.text})
+                             if (e.nativeEvent.text === "" && Platform.OS === "ios") {
+                               setError({...error, eventName: "ชื่อกิจกรรมต้องไม่เป็นช่องว่าง"})
+                             } else {
+                               setError({...error, eventName: null})
+                             }
+                           }}/>
               </View>
               {(error.eventName &&
                 <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
@@ -413,9 +421,14 @@ const CreateEventScreen = (props) => {
                               return tag.name
                             }
                           }
-                        )
+                        ).filter(tag => tag !== undefined)
 
-                        setEventDetail({...eventDetail, tags: newTags.filter(tag => tag !== undefined)})
+                        if (newTags.length === 0 && Platform.OS === "ios") {
+                          setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก"})
+                        } else {
+                          setError({...error, tags: null})
+                        }
+                        setEventDetail({...eventDetail, tags: newTags})
                       }}>
                         <View style={{
                           justifyContent: 'center',
@@ -606,7 +619,14 @@ const CreateEventScreen = (props) => {
                              placeholder={"10"}
                              placeholderTextColor={Colors.lightgray}
                              ref={input_num}
-                             onChange={(e) => setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})}
+                             onChange={(e) => {
+                               setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})
+                               if (parseInt(e.nativeEvent.text) < 2 && Platform.OS === "ios") {
+                                 setError({...error, numberOfPeople: "จำนวนผู้เข้าร่วมต้องมีอย่างน้อย 2 คน"})
+                               } else {
+                                 setError({...error, numberOfPeople: null})
+                               }
+                             }}
                              style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
                     // value={eventDetail.numberOfPeople.toString()}
                   />
@@ -651,9 +671,19 @@ const CreateEventScreen = (props) => {
                                    value={eventDetail.location}
                                    placeholderTextColor={Colors.lightgray}
                                    ref={input_loc}
-                                   onChange={(e) => setEventDetail({
-                                     ...eventDetail, location: e.nativeEvent.text
-                                   })}
+                                   onChange={(e) => {
+                                     setEventDetail({
+                                       ...eventDetail, location: e.nativeEvent.text
+                                     })
+                                     if (e.nativeEvent.text === "" && Platform.OS === "ios") {
+                                       setError({
+                                         ...error,
+                                         location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง")
+                                       })
+                                     } else if (e.nativeEvent.text !== "" || eventDetail.location !== null || eventDetail.location !== "") {
+                                       setError({...error, location: null})
+                                     }
+                                   }}
                                    style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
                         />
                       </View>
@@ -716,7 +746,14 @@ const CreateEventScreen = (props) => {
                     // value={eventDetail.description}
                              placeholder={"ใส่รายละเอียดกิจกรรม"}
                              placeholderTextColor={Colors.lightgray}
-                             onChange={(e) => setEventDetail({...eventDetail, description: e.nativeEvent.text})}/>
+                             onChange={(e) => {
+                               setEventDetail({...eventDetail, description: e.nativeEvent.text})
+                               if (e.nativeEvent.text === "" && Platform.OS === "ios") {
+                                 setError({...error, description: "ต้องระบุรายละเอียดกิจกรรม"})
+                               } else {
+                                 setError({...error, description: null})
+                               }
+                             }}/>
                 </View>
               </View>
               {(error.description &&
@@ -821,7 +858,20 @@ const CreateEventScreen = (props) => {
                                 locale={'th'}
                                 mode="time"
                                 value={eventDetail.endDate}
-                                onChange={(event, date) => setEventDetail({...eventDetail, endDate: date})}/>
+                                onChange={(event, date) => {
+                                  setEventDetail({...eventDetail, endDate: date})
+                                  if (Platform.OS === "ios" && eventDetail.startDate.getDate() < new Date().getDate() + 3) {
+                                    setError({...error, startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"})
+                                  } else if (Platform.OS === "ios" && eventDetail.startDate.getHours() > date.getHours()) {
+                                    setError({
+                                      ...error,
+                                      startDate: "เวลาสิ้นสุดกิจกรรมต้องมากกว่าเวลาเริ่มต้นกิจกรรม"
+                                    })
+                                  } else {
+                                    setError({...error, startDate: null})
+                                  }
+                                }
+                                }/>
               <TouchableOpacity onPress={() => {
                 setIsEditTime(!isEditTime)
                 setIsEndTime(!isEndTime)
@@ -863,7 +913,6 @@ const CreateEventScreen = (props) => {
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
                   if (event.type !== "dismissed") {
-                    console.log(date)
                     changeDateTime(event, date)
                     setIsAnEditTime(!isAnEditTime)
                   }
@@ -887,11 +936,9 @@ const CreateEventScreen = (props) => {
                 mode="time"
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
-                  if (event.type === "set") {
-                    setEventDetail({...eventDetail, startDate: date})
-                    setTimeout(() => {
-                      setIsAnEndTime(!isAnEndTime)
-                    }, 500)
+                  if (event.type !== "dismissed") {
+                    setEventDetail({...eventDetail, startDate: date,  endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))})
+                    setIsAnEndTime(!isAnEndTime)
                   }
                 }}
               />
@@ -909,7 +956,7 @@ const CreateEventScreen = (props) => {
                 mode="time"
                 value={eventDetail.endDate}
                 onChange={(event, date) => {
-                  if (event.type === "set" && event.nativeEvent.timestamp !== null) {
+                  if (event.type !== "dismissed" && event.nativeEvent.timestamp !== null) {
                     setEventDetail({...eventDetail, endDate: date})
                     setIsAnEditTime(false)
                     setIsAnEditDate(false)
@@ -926,7 +973,7 @@ const CreateEventScreen = (props) => {
 
   return (isLoad ?
       <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size={'large'} color={Colors.primary} />
+        <ActivityIndicator size={'large'} color={Colors.primary}/>
       </SafeAreaView> : (user ? renderUI() : <SafeAreaView></SafeAreaView>)
   )
 };

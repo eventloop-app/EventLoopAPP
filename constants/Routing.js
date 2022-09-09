@@ -22,12 +22,13 @@ import ReviewEventScreen from "../screens/ReviewEventScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import MapScreen from "../screens/MapScreen";
 import ErrorScreen from "../screens/ErrorScreen";
+import ListEventScreen from '../screens/ListEventScreen';
 import ManageEventDetailScreen from "../screens/ManageEventDetailScreen";
 
 const Routing = () => {
 
-  const Stack = createNativeStackNavigator();
-  const Tab = createBottomTabNavigator();
+    const Stack = createNativeStackNavigator();
+    const Tab = createBottomTabNavigator();
 
   const HomeScreen = () => {
     return (
@@ -170,19 +171,34 @@ const Routing = () => {
           )
         })}/>
 
-        <Stack.Screen name={'CreatedEventList'} component={CreatedEventListScreen} options={({route}) => ({
-          headerShown: true,
-          headerTransparent: false,
-          tabBarShowLabel: false,
-          headerTitleAlign: 'center',
-          headerTitleStyle: {
-            fontFamily: Fonts.bold,
-            fontSize: fontSize.primary,
-            color: Colors.black,
-          },
-          headerBackTitle: '',
-          title: 'รายการกิจกรรมที่สร้าง'
-        })}/>
+                <Stack.Screen name={'CreatedEventList'} component={CreatedEventListScreen} options={({ route }) => ({
+                    headerShown: true,
+                    headerTransparent: false,
+                    tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    headerTitleStyle: {
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.black,
+                    },
+                    headerBackTitle: '',
+                    title: 'รายการกิจกรรมที่สร้าง',
+                })} />
+
+
+                <Stack.Screen name={'ListSelectedEvent'} component={ListEventScreen} options={({ route }) => ({
+                    headerShown: true,
+                    headerTransparent: false,
+                    tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    headerTitleStyle: {
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.black,
+                    },
+                    headerBackTitle: '',
+                    title: route.params.name
+                })} />
 
         <Stack.Screen name={'Scanner'} component={ScannerScreen} options={{headerShown: false}}/>
 
