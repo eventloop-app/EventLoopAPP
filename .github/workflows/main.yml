@@ -27,7 +27,7 @@ jobs:
         with:
           webhook: "https://discord.com/api/webhooks/1014651514054262897/aAlSH2xaOT_ekFd0A88wWc0q4JngR8G5BtJoN9YSVV02posQKM5-5WY8-FpoM0YFmREi"
           title: "Deploy Success"
-          image: "https://cdn.discordapp.com/attachments/1014617211308097668/1014743489860337744/unknown.png"
+          image: "https://cdn.discordapp.com/attachments/1014617211308097668/1017689769116958730/unknown.png"
           color: "0x77FF06"
           status: success
           
@@ -35,7 +35,7 @@ jobs:
         if: failure()
         with:
           webhook: "https://discord.com/api/webhooks/1014651514054262897/aAlSH2xaOT_ekFd0A88wWc0q4JngR8G5BtJoN9YSVV02posQKM5-5WY8-FpoM0YFmREi"
-          image: "https://cdn.discordapp.com/attachments/1014617211308097668/1014743489860337744/unknown.png"
+          image: "https://cdn.discordapp.com/attachments/1014617211308097668/1017689769116958730/unknown.png"
           title: Deploy Failure
           color: "0xFF0040"
           status: failure
