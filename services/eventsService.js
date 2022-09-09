@@ -27,9 +27,9 @@ class eventsService {
     }
   }
 
-  async getEventByAttention(pageNo = 0, pageSize = 20) {
+  async getEventByAttention(pageNo = 0) {
     try {
-      return api.get(`events/attention?pageNo=${pageNo}&pageSize=${pageSize}`)
+      return api.get(`events/attention?pageNo=${pageNo}&pageSize=10`)
     } catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -128,7 +128,7 @@ class eventsService {
     return api.post(`members/hasEmail`, data)
   }
 
-  async createEvent(data){
+  async createEvent(data) {
     return axios({
       method: "post",
       url: `${config.APP_API}events/createEvent`,
@@ -138,8 +138,8 @@ class eventsService {
     // return api.post(`events/createEvent`, data)
   }
 
-  async getEventById(id){
-    return api.get(`events/${id}` )
+  async getEventById(id) {
+    return api.get(`events/${id}`)
   }
 
   async getMemberRegistedEvent(id, eveId){

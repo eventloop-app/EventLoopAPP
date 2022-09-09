@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 4,
         flexDirection: "row",
-        alignItems: "center"
     },
     ImageCover: {
         position: "relative",

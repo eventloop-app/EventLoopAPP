@@ -22,12 +22,13 @@ import ReviewEventScreen from "../screens/ReviewEventScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import MapScreen from "../screens/MapScreen";
 import ErrorScreen from "../screens/ErrorScreen";
+import ListEventScreen from '../screens/ListEventScreen';
 import ManageEventDetailScreen from "../screens/ManageEventDetailScreen";
 
 const Routing = () => {
 
-  const Stack = createNativeStackNavigator();
-  const Tab = createBottomTabNavigator();
+    const Stack = createNativeStackNavigator();
+    const Tab = createBottomTabNavigator();
 
   const HomeScreen = () => {
     return (
