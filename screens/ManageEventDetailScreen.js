@@ -54,6 +54,9 @@ const ManageEventDetailScreen = (props) => {
         <Image source={user?.profileUrl ? {uri: user?.profileUrl} : profileImageMock}
                style={{width: 60, height: 60, borderRadius: 60 / 2}}/>
         <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.small, paddingLeft:8}}>{user?.username}</Text>
+        <View style={{flex: 1, width: "100%", alignItems: "flex-end"}}>
+          <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.small, paddingRight:8, color: (user.isCheckIn ? Colors.green : Colors.lightgray)}}>{(user.isCheckIn ? "เช็คอินเรียบร้อย" : "ยังไม่ได้เช็คอิน")}</Text>
+        </View>
       </View>
     </View>
   )

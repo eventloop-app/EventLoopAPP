@@ -78,7 +78,7 @@ const MapScreen = (props) => {
             setMapData({
               lat: a.nativeEvent.coordinate.latitude,
               lng: a.nativeEvent.coordinate.longitude,
-              name: a.nativeEvent.name
+              name: a.nativeEvent.name.replace(/\n/g,' ')
             })
           }}>
           <Marker image={'https://cdn.discordapp.com/emojis/855437648718069771.webp?size=96&quality=lossless'}
@@ -103,6 +103,7 @@ const MapScreen = (props) => {
             autoFocus={true}
             fetchDetails={true}
             onPress={(data, details = null) => {
+              console.log(data.description)
               setMarker({
                 ...marker,
                 lat: details.geometry.location.lat,
@@ -112,7 +113,7 @@ const MapScreen = (props) => {
                 ...mapData,
                 lat: details.geometry.location.lat,
                 lng: details.geometry.location.lng,
-                name: data.description
+                name: data.description.replace(/\n/g,' ')
               })
             }}
             nearbyPlacesAPI='GooglePlacesSearch'
