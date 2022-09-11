@@ -20,7 +20,7 @@ import fontSize from "../constants/FontSize";
 import eventsService from "../services/eventsService";
 import AwesomeAlert from "react-native-awesome-alerts";
 import MapView, {Marker} from "react-native-maps";
-
+import Mappin from  '../assets/images/pin.png'
 const EventDetailScreen = (props) => {
   const [isLoading, setIsLoading] = useState(true)
   const [event, setEvent] = useState(null)
@@ -472,7 +472,7 @@ const EventDetailScreen = (props) => {
                       height: Dimensions.get("window").height / 5
                     }}>
                     <Marker
-                      image={'https://cdn.discordapp.com/emojis/855437648718069771.webp?size=96&quality=lossless'}
+                      image={Mappin}
                       coordinate={{
                         latitude: parseFloat(event?.location?.latitude),
                         longitude: parseFloat(event?.location?.longitude)
