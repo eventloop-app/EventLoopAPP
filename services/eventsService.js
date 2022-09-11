@@ -154,14 +154,15 @@ class eventsService {
     }
   }
 
-  async feedbackEvent(feed) {
-    const data = {
-      eventId: feed,
-      memberId: feed,
-      score: feed,
-      feedback: feed
-    }
+  async feedbackEvent(memId, eveId, scr, fb) {
     try {
+      const data = {
+        eventId: eveId,
+        memberId: memId,
+        score: parseInt(scr),
+        feedback: fb
+      }
+      console.log(data)
       return api.post(`/events/submitFeedback`,data)
     } catch (e) {
       return new Promise(reject => reject(e))

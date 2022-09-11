@@ -67,7 +67,6 @@ const ScannerScreen = (props) => {
                     onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
                     style={{flex: 1, width: '100%'}}
                 />
-
                 {scanned && test()}
             </View>
         </View>
