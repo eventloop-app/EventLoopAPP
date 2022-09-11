@@ -5,7 +5,7 @@ import {
   Image, Platform,
   SafeAreaView, ScrollView,
   StyleSheet,
-  Text,
+  Text, TextInput,
   TouchableOpacity,
   View
 } from "react-native";
@@ -21,6 +21,21 @@ import profileImageMock from "../assets/images/profileImage.jpg";
 import Fonts from "../constants/Fonts";
 import Color from "../constants/Colors";
 import FontSize from "../constants/FontSize";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
+import FormData from "form-data";
+
+const tagss = [
+  {name: "ดนตรี", icon: "music", source: "Feather", isSelect: false},
+  {name: "กีฬา", icon: "football", source: "Ionicons", isSelect: false},
+  {name: "บันเทิง", icon: "movie", source: "MaterialIcons", isSelect: false},
+  {name: "ศิลปะ", icon: "draw", source: "MaterialCommunityIcons", isSelect: false},
+  {name: "เกม", icon: "gamepad-variant-outline", source: "MaterialCommunityIcons", isSelect: false},
+  {name: "ท่องเที่ยว", icon: "briefcase", source: "Feather", isSelect: false},
+  {name: "การศึกษา", icon: "book-outline", source: "Ionicons", isSelect: false},
+  {name: "สุขภาพ", icon: "md-heart", source: "Ionicons", isSelect: false},
+  {name: "อาหาร", icon: "fast-food-outline", source: "Ionicons", isSelect: false},
+]
 
 const ProfileScreen = (props, {navigation}) => {
   const [isLoad, setIsLoad] = useState(true)
@@ -31,6 +46,8 @@ const ProfileScreen = (props, {navigation}) => {
   const {authData, authDataError} = useSelector(state => state.auth)
   const {user} = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
+  const [isEdit, setIsEdit] = useState(false)
+  const [tags, setTags] = useState(null)
 
   useEffect(() => {
     if (props.route.params !== undefined) {
@@ -40,19 +57,15 @@ const ProfileScreen = (props, {navigation}) => {
   }, [props])
 
   useEffect(() => {
-    if (user !== null || user !== undefined) {
+    if ((user !== null || user !== undefined) && isEdit !== true) {
       setUserData(JSON.parse(user))
     }
   }, [])
 
   useEffect(() => {
-    setIsLoad(true)
-    if (userData !== null && userData !== undefined) {
-      console.log("Has user " + userData.id)
+    if (userData !== null && userData !== undefined && isEdit !== true) {
+      setUpTag()
     }
-    setTimeout(() => {
-      setIsLoad(false)
-    }, 1000)
   }, [userData])
 
   useEffect(() => {
@@ -71,6 +84,30 @@ const ProfileScreen = (props, {navigation}) => {
       setIsLoad(false)
     }
   }, [authData])
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setUserData({...userData, profileUrl:result.uri})
+    }
+  };
+
+  const setUpTag = () =>{
+    let newTagee = []
+    tagss.map( obj => {
+      if(userData.tags.find( tag => tag === obj.name)){
+        newTagee = [...newTagee, {...obj, isSelect: true}]
+      }else {
+        newTagee = [...newTagee, {...obj, isSelect: false}]
+      }
+    })
+    setTags(newTagee)
+  }
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -100,6 +137,40 @@ const ProfileScreen = (props, {navigation}) => {
       }
     }
   }, [response]);
+
+  useEffect(()=>{
+
+  }, [isEdit])
+
+  const onSubmit = (status) => {
+    console.log(status)
+    if(status === 'แก้ไขโปรไฟล์'){
+      setIsEdit(!isEdit)
+    }else if(status === 'อัปเดทโปรไฟล์'){
+      let newUserData = {
+        memberId: userData.id,
+        username: userData.username,
+        tags: userData.tags,
+        description: userData.description
+      }
+      const filename = userData.profileUrl.split('/').pop()
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+      const data = new FormData();
+      data.append('profileImage', {uri: userData.profileUrl, name: filename, type: type});
+      data.append('memberInfo', JSON.stringify(newUserData));
+
+      console.log(data)
+      eventsService.upDateProfile(data).then(res => {
+        if(res.status === 200){
+          console.log(res)
+          setIsEdit(!isEdit)
+        }
+      }).catch(e => {
+        console.log(e)
+      })
+    }
+  }
 
   const renderProfile = () => (
     <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -136,7 +207,14 @@ const ProfileScreen = (props, {navigation}) => {
                 <ActivityIndicator size={'large'} color={Colors.primary}/>
               </View> :
               <ScrollView contentContainerStyle={{paddingBottom: 100}} showsVerticalScrollIndicator={false}>
-                <View style={{width: '100%', height: 220, justifyContent: 'center', alignItems: 'center', marginTop: Platform.OS === 'ios' ? 50:10}}>
+                <View style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: 220,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: Platform.OS === 'ios' ? 50 : 10
+                }}>
                   <Image
                     source={userData?.profileUrl ? {uri: userData?.profileUrl} : profileImageMock}
                     style={{
@@ -147,6 +225,22 @@ const ProfileScreen = (props, {navigation}) => {
                       borderColor: Colors.primary
                     }}
                   />
+
+                  {(isEdit && <View style={{
+                    position: 'absolute',
+                    width: 200,
+                    height: 200,
+                    borderRadius: 100,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    zIndex: 50,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <TouchableOpacity onPress={() => pickImage()}>
+                      <Ionicons color={Colors.white} name={'image-outline'} size={40}/>
+                    </TouchableOpacity>
+                  </View>)}
+
                 </View>
                 <View style={{alignItems: "center"}}>
                   <View style={{flexDirection: "row"}}>
@@ -169,12 +263,18 @@ const ProfileScreen = (props, {navigation}) => {
                     fontFamily: Fonts.bold,
                     fontSize: FontSize.medium,
                   }}>เกี่ยวกับฉัน</Text>
-                  <Text style={{
+                  {( !isEdit && <Text style={{
                     display: "flex",
                     color: userData?.description ? Color.black : "gray",
                     fontFamily: Fonts.primary,
                     fontSize: FontSize.small,
-                  }}>{userData?.description ? userData?.description.trim() : "คุณยังไม่ได้เพิ่มคำอธิบาย"}</Text>
+                  }}>
+                    {userData?.description ? userData?.description.trim() : "คุณยังไม่ได้เพิ่มคำอธิบาย"}
+                  </Text>)}
+                  {
+                    ( isEdit && <TextInput onChange={(e)=> setUserData({...userData, description: e.nativeEvent.text})} style={{fontFamily: Fonts.primary, fontSize: FontSize.small, paddingLeft: 1}} value={userData.description} placeholder={'คุณยังไม่ได้เพิ่มคำอธิบาย'} />)
+                  }
+
                 </View>
 
                 <View style={{padding: 20}}>
@@ -185,7 +285,7 @@ const ProfileScreen = (props, {navigation}) => {
                     กิจกรรมที่ฉันสนใจ
                   </Text>
                   <View style={{width: "100%", flexDirection: "row", flexWrap: "wrap",}}>
-                    {userData?.tags.map((item, index) => {
+                    {(!isEdit && userData?.tags.map((item, index) => {
                       return (
                         <View key={index} View style={{
                           flexDirection: "row",
@@ -194,6 +294,7 @@ const ProfileScreen = (props, {navigation}) => {
                           padding: 4,
                           paddingHorizontal: 8,
                           marginHorizontal: 2,
+                          margin: 5
                         }}>
                           <Text style={{
                             fontFamily: Fonts.primary,
@@ -203,8 +304,46 @@ const ProfileScreen = (props, {navigation}) => {
                           </Text>
                         </View>
                       )
+                    }))}
+                    {(isEdit && tags?.map((item, index) => {
+                      return (
+                        <TouchableOpacity onPress={async () => {
+                          await setTags([...tags.slice(0, index), {
+                            ...item,
+                            isSelect: !item.isSelect
+                          }, ...tags.slice(index + 1)])
 
-                    })}
+                          let newTags = [...tags.slice(0, index), {
+                            ...item,
+                            isSelect: !item.isSelect
+                          }, ...tags.slice(index + 1)]
+
+                          newTags = newTags.map(tag => {
+                              if (tag.isSelect) {
+                                return tag.name
+                              }
+                            }
+                          ).filter(tag => tag !== undefined)
+
+                          setUserData({...userData, tags:newTags})
+                        }} key={index} View style={{
+                          flexDirection: "row",
+                          backgroundColor:  item.isSelect ? Colors.primary : Colors.gray,
+                          borderRadius: 8,
+                          padding: 4,
+                          paddingHorizontal: 8,
+                          marginHorizontal: 2,
+                          margin: 5
+                        }}>
+                          <Text style={{
+                            fontFamily: Fonts.primary,
+                            fontSize: FontSize.small,
+                            color: Color.white
+                          }}>{item.name}
+                          </Text>
+                        </TouchableOpacity>
+                      )
+                    }))}
                   </View>
                 </View>
 
@@ -213,7 +352,7 @@ const ProfileScreen = (props, {navigation}) => {
                   alignItems: 'center',
 
                 }}>
-                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('myEvent')}>
+                  {(!isEdit && <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('myEvent')}>
                     <View style={{
                       width: Platform.OS === "ios" ? 340 : 350,
                       height: 45,
@@ -229,8 +368,8 @@ const ProfileScreen = (props, {navigation}) => {
                         color: Colors.white
                       }}>กิจกรรมที่เข้าร่วม</Text>
                     </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('manageEvent')}>
+                  </TouchableOpacity>)}
+                  {(!isEdit && <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('manageEvent')}>
                     <View style={{
                       width: Platform.OS === "ios" ? 340 : 350,
                       height: 45,
@@ -246,8 +385,10 @@ const ProfileScreen = (props, {navigation}) => {
                         color: Colors.white
                       }}>จัดการกิจกรรมที่สร้าง</Text>
                     </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('manageEvent')}>
+                  </TouchableOpacity>)}
+                  <TouchableOpacity activeOpacity={0.8} onPress={() => {
+                    onSubmit((isEdit ? 'อัปเดทโปรไฟล์': 'แก้ไขโปรไฟล์'))
+                  }}>
                     <View style={{
                       width: Platform.OS === "ios" ? 340 : 350,
                       height: 45,
@@ -261,11 +402,11 @@ const ProfileScreen = (props, {navigation}) => {
                         fontFamily: Fonts.bold,
                         fontSize: fontSize.primary,
                         color: Colors.white
-                      }}>แก้ไขโปรไฟล์</Text>
+                      }}>{isEdit ? 'อัปเดทโปรไฟล์': 'แก้ไขโปรไฟล์'}</Text>
                     </View>
                   </TouchableOpacity>
 
-                  <TouchableOpacity activeOpacity={0.8} onPress={() => signOut()}>
+                  {(!isEdit &&<TouchableOpacity activeOpacity={0.8} onPress={() => signOut()}>
                     <View style={{
                       // backgroundColor: Colors.red,
                       borderRadius: 12,
@@ -278,10 +419,8 @@ const ProfileScreen = (props, {navigation}) => {
                         color: Colors.red
                       }}>ออกจากระบบ</Text>
                     </View>
-                  </TouchableOpacity>
-
+                  </TouchableOpacity>)}
                 </View>
-
               </ScrollView>
           )}
       </View>

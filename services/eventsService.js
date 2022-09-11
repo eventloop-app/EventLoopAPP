@@ -208,6 +208,15 @@ class eventsService {
       return new Promise(reject => reject(e))
     }
   }
+
+  async upDateProfile(data) {
+    return axios({
+      method: "put",
+      url: `${config.APP_API}members/updateProfile`,
+      data: data,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+  }
 }
 
 export default new eventsService();
