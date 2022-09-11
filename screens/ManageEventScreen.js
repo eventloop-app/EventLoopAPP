@@ -88,7 +88,9 @@ const ManageEventScreen = (props) => {
           }}>{moment(event?.startDate).format("HH:mm") + " - " + moment(event?.endDate).format("HH:mm") + " น."}</Text>
         </View>
       </View>
-      <TouchableOpacity style={{flex: 0.2, backgroundColor: Colors.yellow, justifyContent: "center", alignItems: "center"}}>
+      <TouchableOpacity
+        onPress={()=> props.navigation.push('EditEvent',{eventId: event?.id})}
+        style={{flex: 0.2, backgroundColor: Colors.yellow, justifyContent: "center", alignItems: "center"}}>
         <Ionicons name={'ios-create-outline'} size={36} color={Colors.white} />
       </TouchableOpacity>
       <TouchableOpacity

@@ -24,6 +24,7 @@ import MapScreen from "../screens/MapScreen";
 import ErrorScreen from "../screens/ErrorScreen";
 import ListEventScreen from '../screens/ListEventScreen';
 import ManageEventDetailScreen from "../screens/ManageEventDetailScreen";
+import EditEventScreen from "../screens/EditEventScreen";
 
 const Routing = () => {
 
@@ -111,6 +112,8 @@ const Routing = () => {
             </TouchableOpacity>
           )
         })}/>
+
+
 
         <Stack.Screen name={'EventList'} component={RegisterEventListScreen} options={({route}) => ({
           headerShown: true,
@@ -249,7 +252,35 @@ const Routing = () => {
 
         <Stack.Group screenOptions={{presentation: 'fullScreenModal'}}>
 
-
+          <Stack.Screen name={'EditEvent'} component={EditEventScreen} options={({route, navigation}) => ({
+            headerShown: true,
+            headerTransparent: true,
+            tabBarShowLabel: false,
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              fontFamily: Fonts.bold,
+              fontSize: fontSize.primary,
+              color: Colors.black,
+            },
+            title: "",
+            headerTintColor: Colors.white,
+            headerBackTitle: '',
+            headerLeft: () => (
+              <TouchableOpacity
+                style={{
+                  borderRadius: 100,
+                  backgroundColor: 'rgba(255,255,255,0.8)',
+                  width: 30,
+                  height: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+                onPress={() => navigation.goBack()}
+              >
+                <Ionicons name="arrow-back-outline" size={25} color={Colors.black}/>
+              </TouchableOpacity>
+            )
+          })}/>
 
           <Stack.Screen name={'ReviewEvent'} component={ReviewEventScreen} options={({route, navigation}) => ({
             headerShown: true,
