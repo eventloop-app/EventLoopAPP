@@ -6,18 +6,16 @@ import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
-import { LinearGradient } from 'expo-linear-gradient';
+
 const EventCardType4 = ({ item, onPress }) => {
     const eventName = item.eventName
-    const [isLoading, setIsLoading] = useState(false)
     const eventDate = toBuddhistYear(moment(item.startDate), "DD/MM/YYYY")
-    const eventTime = moment(item.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
+    const eventTime = moment(item.startDate).format("HH:mm") + "-" + moment(item.endDate).format("HH:mm") + " น."
     const eventLocation = item.location?.name
     const ImageCover = item?.coverImageUrl
 
     return (
         <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={[styles.shadowsButton]} >
-
             <View style={[styles.Container,]}>
                 <View style={styles.ImageCover}>
                     <Image
@@ -101,7 +99,7 @@ const styles = StyleSheet.create({
 
     },
     Date: {
-        marginRight: 10,
+        marginRight: 5,
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",

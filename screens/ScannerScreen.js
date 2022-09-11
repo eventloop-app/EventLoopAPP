@@ -1,11 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {BarCodeScanner} from "expo-barcode-scanner";
 import {Button, Text, View, StyleSheet} from "react-native";
+import Fonts from "../constants/Fonts";
+import FontSize from "../constants/FontSize";
+import Colors from "../constants/Colors";
 
 const ScannerScreen = (props) => {
 
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
+    const [confirm, setConfirm] = useState(null)
 
     // useEffect(()=> {
     //     console.log(props)
@@ -46,6 +50,11 @@ const ScannerScreen = (props) => {
 
     return (
         <View style={styles.container}>
+            {/*<View style={{position: 'absolute', width: '100%', height:'100%', backgroundColor: 'rgba(0,0,0,0.5)', zIndex:50, justifyContent: 'center', alignItems: 'center'}}>*/}
+            {/*    <View style={{width: 300, height: 300, borderRadius: 10, backgroundColor: Colors.white,justifyContent: 'center', alignItems: 'center'}}>*/}
+            {/*    </View>*/}
+            {/*</View>*/}
+            <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.primary, paddingBottom: 10}}>แสกนคิวอาร์โค้ดเพื่อเช็คอินกิจกรรม</Text>
             <View style={{
                 height: 300,
                 width: '90%',
