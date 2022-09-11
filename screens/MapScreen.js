@@ -7,6 +7,7 @@ import {createRef, useEffect, useState} from "react";
 import fonts from "../constants/Fonts";
 import fontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
+import Mapin from  "../assets/images/pin.png"
 
 const MapScreen = (props) => {
 
@@ -81,7 +82,7 @@ const MapScreen = (props) => {
               name: a.nativeEvent.name.replace(/\n/g,' ')
             })
           }}>
-          <Marker image={'https://cdn.discordapp.com/emojis/855437648718069771.webp?size=96&quality=lossless'}
+          <Marker image={Mapin}
                   description={mapData?.name} coordinate={{latitude: marker.lat, longitude: marker.lng}}/>
         </MapView>
         <View style={{

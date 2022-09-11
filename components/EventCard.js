@@ -8,12 +8,12 @@ import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
 
 const EventCard = ({ item, onPress }) => {
-
-  const eventName = item?.eventName
+  console.log(item?.location?.name)
+  const eventName = item?.eventName ?? 'ไม่มีข้อมูล'
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item?.startDate), "DD/MM/YYYY")
   const eventTime = moment(item?.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item?.location?.name
+  const eventLocation = item?.location?.name ?? 'ไม่มีข้อมูล'
   const ImageCover = item?.coverImageUrl
 
   return (
