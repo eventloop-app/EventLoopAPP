@@ -25,6 +25,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
 import FormData from "form-data";
 
+
 const tagss = [
   {name: "ดนตรี", icon: "music", source: "Feather", isSelect: false},
   {name: "กีฬา", icon: "football", source: "Ionicons", isSelect: false},
@@ -164,6 +165,7 @@ const ProfileScreen = (props, {navigation}) => {
       eventsService.upDateProfile(data).then(res => {
         if(res.status === 200){
           console.log(res)
+          dispatch(saveUser(JSON.stringify(res.data)))
           setIsEdit(!isEdit)
         }
       }).catch(e => {
