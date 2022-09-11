@@ -70,6 +70,7 @@ const FeedScreen = ({route, navigation}) => {
     eventsService.getAllEvent().then(async res => {
       if (res.status === 200) {
         await clearTimeout(timeout);
+        console.log(res.data.content)
         await setAllEvent(res.data.content)
         if(user){
           await getEventByTag()

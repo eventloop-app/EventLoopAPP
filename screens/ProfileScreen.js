@@ -3,10 +3,9 @@ import {
   ActivityIndicator,
   Button,
   Image, Platform,
-  SafeAreaView,
+  SafeAreaView, ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
@@ -17,14 +16,11 @@ import {saveUser} from "../actions/user";
 import fonts from "../constants/Fonts";
 import fontSize from "../constants/FontSize";
 import eventsService from "../services/eventsService";
-import ProfileDetailScreen from "./ProfileDetailScreen";
 import Colors from "../constants/Colors";
 import profileImageMock from "../assets/images/profileImage.jpg";
-import {AntDesign} from "@expo/vector-icons";
 import Fonts from "../constants/Fonts";
 import Color from "../constants/Colors";
 import FontSize from "../constants/FontSize";
-import {useIsFocused} from "@react-navigation/native";
 
 const ProfileScreen = (props, {navigation}) => {
   const [isLoad, setIsLoad] = useState(true)
@@ -117,8 +113,8 @@ const ProfileScreen = (props, {navigation}) => {
     </SafeAreaView>
   )
 
-  const manageEvent = async () => {
-    props.navigation.navigate("ManageEvent")
+  const manageEvent = async (name) => {
+    props.navigation.navigate("ManageEvent", {page: name})
   }
 
   const signOut = async () => {
@@ -133,14 +129,14 @@ const ProfileScreen = (props, {navigation}) => {
 
   return (
     userData ?
-      <SafeAreaView style={{flex: 1, width: "100%", height: "100%", backgroundColor: Colors.white}}>
+      <View style={{flex: 1, width: "100%", height: "100%", backgroundColor: Colors.white}}>
         {
           (isLoad ?
               <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                 <ActivityIndicator size={'large'} color={Colors.primary}/>
               </View> :
-              <View>
-                <View style={{width: '100%', height: 220, justifyContent: 'center', alignItems: 'center'}}>
+              <ScrollView contentContainerStyle={{paddingBottom: 100}} showsVerticalScrollIndicator={false}>
+                <View style={{width: '100%', height: 220, justifyContent: 'center', alignItems: 'center', marginTop: Platform.OS === 'ios' ? 50:10}}>
                   <Image
                     source={userData?.profileUrl ? {uri: userData?.profileUrl} : profileImageMock}
                     style={{
@@ -215,11 +211,11 @@ const ProfileScreen = (props, {navigation}) => {
                 <View style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  marginTop: (Platform.OS === "ios" ? 20 : 100)
+
                 }}>
-                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent()}>
+                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('myEvent')}>
                     <View style={{
-                      width: 350,
+                      width: Platform.OS === "ios" ? 340 : 350,
                       height: 45,
                       backgroundColor: Colors.primary,
                       borderRadius: 12,
@@ -231,7 +227,24 @@ const ProfileScreen = (props, {navigation}) => {
                         fontFamily: Fonts.bold,
                         fontSize: fontSize.primary,
                         color: Colors.white
-                      }}>จัดการกิจกรรม</Text>
+                      }}>กิจกรรมที่เข้าร่วม</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('manageEvent')}>
+                    <View style={{
+                      width: Platform.OS === "ios" ? 340 : 350,
+                      height: 45,
+                      backgroundColor: Colors.primary,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 20
+                    }}>
+                      <Text style={{
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.white
+                      }}>จัดการกิจกรรมที่สร้าง</Text>
                     </View>
                   </TouchableOpacity>
 
@@ -251,9 +264,9 @@ const ProfileScreen = (props, {navigation}) => {
                   </TouchableOpacity>
                 </View>
 
-              </View>
+              </ScrollView>
           )}
-      </SafeAreaView>
+      </View>
       :
       renderProfile()
     // <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

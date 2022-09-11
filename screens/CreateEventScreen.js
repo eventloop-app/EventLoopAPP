@@ -636,7 +636,7 @@ const CreateEventScreen = (props) => {
                              ref={input_num}
                              onChange={(e) => {
                                setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})
-                               if (parseInt(e.nativeEvent.text) < 2 && Platform.OS === "ios") {
+                               if ((parseInt(e.nativeEvent.text) < 2 || e.nativeEvent.text === '')&& Platform.OS === "ios") {
                                  setError({...error, numberOfPeople: "จำนวนผู้เข้าร่วมต้องมีอย่างน้อย 2 คน"})
                                } else {
                                  setError({...error, numberOfPeople: null})
@@ -856,7 +856,17 @@ const CreateEventScreen = (props) => {
                 display="spinner" locale={'th'}
                 mode="datetime"
                 value={eventDetail.startDate}
-                onChange={(event, date) => changeDateTime(event, date)}/>
+                onChange={(event, date) => {
+                  changeDateTime(event, date)
+                  if (Platform.OS === "ios" && new Date(date).getDate() <= new Date().getDate() + 3) {
+                    setError({
+                      ...error,
+                      startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"
+                    })
+                  } else {
+                    setError({...error, startDate: null})
+                  }
+                }}/>
 
               <TouchableOpacity onPress={() => setIsEndTime(!isEndTime)} style={{marginTop: 5}}>
                 <Text style={{
@@ -899,6 +909,7 @@ const CreateEventScreen = (props) => {
                                 value={eventDetail.endDate}
                                 onChange={(event, date) => {
                                   setEventDetail({...eventDetail, endDate: date})
+
                                   if (Platform.OS === "ios" && eventDetail.startDate.getDate() < new Date().getDate() + 3) {
                                     setError({
                                       ...error,

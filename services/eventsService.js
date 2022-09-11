@@ -36,9 +36,9 @@ class eventsService {
   }
 
 
-  async getAllRegisteredEvent() {
+  async getAllRegisteredEvent(memId) {
     try {
-      return api.get('members/82c85d89-570d-4630-a463-7d1e3247dfc6/registerEvent?pageSize=1&pageNo=0')
+      return api.get(`members/${memId}/registerEvent`)
     } catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -153,6 +153,21 @@ class eventsService {
       return new Promise(reject => reject(e))
     }
   }
+
+  async feedbackEvent(feed) {
+    const data = {
+      eventId: feed,
+      memberId: feed,
+      score: feed,
+      feedback: feed
+    }
+    try {
+      return api.post(`/events/submitFeedback`,data)
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
+  }
+
 }
 
 export default new eventsService();

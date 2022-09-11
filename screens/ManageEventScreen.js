@@ -1,15 +1,13 @@
 import {
   ActivityIndicator,
-  Button,
   FlatList,
-  Image, Platform,
-  SafeAreaView,
-  StyleSheet,
+  Platform,
+  SafeAreaView, ScrollView,
   Text,
   TouchableOpacity,
   View
 } from "react-native";
-import React, {useEffect, useMemo, useRef, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import eventsService from "../services/eventsService";
 import {useSelector} from "react-redux";
 import Colors from "../constants/Colors";
@@ -18,16 +16,42 @@ import FontSize from "../constants/FontSize";
 import moment from "moment/moment";
 import {toBuddhistYear} from "../constants/Buddhist-year";
 import {Ionicons} from "@expo/vector-icons";
-import EventCard from "../components/EventCard";
+import EventCardList from "../components/EventCardList";
+import EventCardType4 from "../components/EventCardType4";
 
 
 const ManageEventScreen = (props) => {
   const {user} = useSelector(state => state.user)
-  const [userData, SetUserData] = useState(JSON.parse(user))
+  const [userData] = useState(JSON.parse(user))
   const [event, setEvent] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
+  const [page, setPage] = useState(null)
 
   useEffect(() => {
+    if(props.route.params){
+      setPage(props.route.params.page)
+      if(props.route.params.page === "manageEvent"){
+        getEventByOrganizer()
+      }else {
+        getEventRegisted()
+      }
+    }
+  }, [])
+
+  const getEventRegisted = () =>{
+    if (user !== null) {
+      eventsService.getAllRegisteredEvent(userData.id).then(res => {
+
+        if (res.status === 200) {
+          console.log(res.data.content)
+          setEvent(res.data.content)
+          setIsLoad(false)
+        }
+      })
+    }
+  }
+
+  const getEventByOrganizer = () => {
     if (user !== null) {
       eventsService.getEventByOrganizerId(userData.id).then(res => {
         if (res.status === 200) {
@@ -36,7 +60,7 @@ const ManageEventScreen = (props) => {
         }
       })
     }
-  }, [])
+  }
 
   const renderCard = (event) => (
     <View style={{
@@ -75,13 +99,7 @@ const ManageEventScreen = (props) => {
     </View>
   )
 
-
-
-  return ( isLoad ?
-      <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size={'large'} color={Colors.primary} />
-      </SafeAreaView>
-      :
+  const renderManageEventByOrganizer = () => (
     <SafeAreaView style={{flex: 1, backgroundColor: Colors.white, }}>
       <View style={{flex: 1, margin: 20, marginTop: (Platform.OS === 'ios' ? 0 : 50)}}>
         <FlatList
@@ -95,6 +113,29 @@ const ManageEventScreen = (props) => {
         />
       </View>
     </SafeAreaView>
+  )
+
+  const renderMyEventList = () =>(
+    <SafeAreaView style={{flex: 1, backgroundColor: Colors.white}}>
+      <ScrollView style={{flex: 1, margin: 1, marginTop: (Platform.OS === 'ios' ? 0 : 50)}}>
+        {
+          event.map( (item) => (
+            <EventCardType4 key={item.id} item={item} onPress={() => props.navigation.navigate('EventDetail', {
+              item: item,
+              name: item.eventName
+            })}/>
+          ))
+        }
+      </ScrollView>
+    </SafeAreaView>
+  )
+
+  return ( isLoad ?
+      <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size={'large'} color={Colors.primary} />
+      </SafeAreaView>
+      :
+      (page === "manageEvent" ? renderManageEventByOrganizer() : renderMyEventList())
   )
 }
 
