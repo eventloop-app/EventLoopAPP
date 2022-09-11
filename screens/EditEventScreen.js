@@ -25,7 +25,7 @@ import FormData from "form-data";
 import eventsService from "../services/eventsService";
 import {useIsFocused} from "@react-navigation/native";
 import fontSize from "../constants/FontSize";
-
+import Mappin from '../assets/images/pin.png'
 
 const weekdays = 'อาทิตย์_จันทร์_อังคาร_พุธ_พฤหัสบดี_ศุกร์_เสาร์'.split('_')
 
@@ -804,7 +804,7 @@ const EditEventScreen = (props) => {
                         height: Dimensions.get("window").height / 5
                       }}>
                       <Marker
-                        image={'https://cdn.discordapp.com/emojis/855437648718069771.webp?size=96&quality=lossless'}
+                        image={Mappin}
                         coordinate={{latitude: eventDetail.latitude, longitude: eventDetail.longitude}}/>
                     </MapView>
                   </View>)
