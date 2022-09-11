@@ -8,7 +8,7 @@ import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
 
 const EventCard = ({ item, onPress }) => {
-  console.log(item?.location?.name)
+  // console.log(item?.location?.name)
   const eventName = item?.eventName ?? 'ไม่มีข้อมูล'
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item?.startDate), "DD/MM/YYYY")

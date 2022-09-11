@@ -54,6 +54,10 @@ const ProfileScreen = (props, {navigation}) => {
     if (props.route.params !== undefined) {
       setIsLoad(true)
       setUserData(props.route.params.user)
+      console.log(props.route.params.user)
+      setTimeout(()=>{
+        setIsLoad(false)
+      }, 100)
     }
   }, [props])
 
