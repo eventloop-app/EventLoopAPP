@@ -247,6 +247,23 @@ const ProfileScreen = (props, {navigation}) => {
                       }}>จัดการกิจกรรมที่สร้าง</Text>
                     </View>
                   </TouchableOpacity>
+                  <TouchableOpacity activeOpacity={0.8} onPress={() => manageEvent('manageEvent')}>
+                    <View style={{
+                      width: Platform.OS === "ios" ? 340 : 350,
+                      height: 45,
+                      backgroundColor: Colors.primary,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 20
+                    }}>
+                      <Text style={{
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.white
+                      }}>แก้ไขโปรไฟล์</Text>
+                    </View>
+                  </TouchableOpacity>
 
                   <TouchableOpacity activeOpacity={0.8} onPress={() => signOut()}>
                     <View style={{
@@ -262,6 +279,7 @@ const ProfileScreen = (props, {navigation}) => {
                       }}>ออกจากระบบ</Text>
                     </View>
                   </TouchableOpacity>
+
                 </View>
 
               </ScrollView>

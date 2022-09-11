@@ -29,6 +29,7 @@ const EventDetailScreen = (props) => {
   const [showConfirmCancelEvent, setShowConfirmCancelEvent] = useState(false)
   const [showRegisterEvent, setShowRegisterEvent] = useState(false)
   const [isRegister, setIsRegister] = useState(null)
+  const [isReview, setIsReview] = useState(false)
   const {user} = useSelector(state => state.user)
   const [isCheckIn, setIsCheckIn] = useState(false)
   const [CheckInCode, setCheckInCode] = useState(null)
@@ -47,7 +48,7 @@ const EventDetailScreen = (props) => {
     }
 
     if (props.route.params.Review) {
-      console.log(props.route.params.Review)
+      onReview(props.route.params.Review.review,props.route.params.Review.score)
     }
   }, [props])
 
@@ -84,6 +85,15 @@ const EventDetailScreen = (props) => {
       setIsLogin(true)
     }
   }, [user])
+
+  const onReview = (r, s) => {
+    eventsService.feedbackEvent(userData.id, event.id, s, r).then( res => {
+      if(res.status === 200){
+        setIsReview(true)
+        console.log("Review")
+      }
+    })
+  }
 
   const CheckUserCheckIn = () => {
     eventsService.isCheckIn(userData.id, event.id).then(async res => {
@@ -197,7 +207,7 @@ const EventDetailScreen = (props) => {
           </View>
         </TouchableOpacity>
       )
-    } else if (isRegister && isLogin && isCheckIn) {
+    } else if (isRegister && isLogin && isCheckIn && !isReview) {
       return (
         <TouchableOpacity activeOpacity={0.8} disabled={!isLogin}
                           onPress={() => props.navigation.navigate('ReviewEvent')}>
