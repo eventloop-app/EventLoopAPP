@@ -85,7 +85,7 @@ const EditEventScreen = (props) => {
     description: null,
     all: true
   })
-
+  const [isSuccessed, setIsSuccessed] = useState(false)
   useEffect(() => {
     setIsLoad(true)
     if (props.route.params) {
@@ -318,36 +318,39 @@ const EditEventScreen = (props) => {
     setWaitSub(true)
     eventsService.upDateEvent(data).then(async res => {
       if (res.status === 200) {
-        console.log('asdasd')
-        await setEventDetail({
-          type: "ONSITE",
-          tags: [],
-          eventName: 'ชื่อกิจกรรม',
-          startDate: new Date(),
-          endDate: new Date(),
-          location: null,
-          latitude: 0,
-          longitude: 0,
-          description: 'ใส่รายละเอียดกิจกรรม',
-          numberOfPeople: 0,
-          memberId: null
-        })
-        await setCoverImage(null)
-        await setKinds(kind)
-        await setTags(tagss)
-        await setWaitSub(false)
-        await setIsLoad(true)
-        await setError({
-          eventName: null,
-          startDate: null,
-          tags: null,
-          numberOfPeople: null,
-          location: null,
-          description: null,
-          all: true
-        })
-        await props.navigation.pop()
-
+        await setIsSuccessed(true)
+        setTimeout(async ()=>{
+          await setIsSuccessed(false)
+          await setEventDetail({
+            type: "ONSITE",
+            tags: [],
+            eventName: 'ชื่อกิจกรรม',
+            startDate: new Date(),
+            endDate: new Date(),
+            location: null,
+            latitude: 0,
+            longitude: 0,
+            description: 'ใส่รายละเอียดกิจกรรม',
+            numberOfPeople: 0,
+            memberId: null
+          })
+          await setCoverImage(null)
+          await setKinds(kind)
+          await setTags(tagss)
+          await setWaitSub(false)
+          await setIsLoad(true)
+          await setError({
+            eventName: null,
+            startDate: null,
+            tags: null,
+            numberOfPeople: null,
+            location: null,
+            description: null,
+            all: true
+          })
+          setIsLoad(false)
+          await props.navigation.pop()
+        }, 1500)
       }
     }).catch(error => {
       props.navigation.navigate('Error')
@@ -372,6 +375,26 @@ const EditEventScreen = (props) => {
         }}>
           <ActivityIndicator size={75} color={Colors.primary}/>
         </View>)
+      }
+      {
+        isSuccessed && <View style={{
+          position: "absolute",
+          flex: 1,
+          width: "100%",
+          height: (Platform.OS === 'ios' ? "100%" : '100%'),
+          top: 0,
+          left: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: "rgba(0,0,0,0.25)",
+          zIndex: 50
+        }}>
+          <View style={{width: 300, height: 250, backgroundColor: Colors.white, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+            <Ionicons name={'ios-checkmark-circle'}
+                      color={Colors.green} size={64}/>
+            <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}>อัปเดทกิจกรรมสำเร็จ</Text>
+          </View>
+        </View>
       }
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {

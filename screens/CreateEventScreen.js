@@ -86,6 +86,7 @@ const CreateEventScreen = (props) => {
     description: null,
     all: true
   })
+  const [isSuccessed, setIsSuccessed] = useState(false)
   // useEffect(() => {
   //   if (isFocused === false) {
   //     setEventDetail({
@@ -129,7 +130,7 @@ const CreateEventScreen = (props) => {
           longitude: props.route.params.data.lng
         })
         setError({...error, location: null})
-      }, 100)
+      }, 500)
     }
   }, [props])
 
@@ -277,8 +278,8 @@ const CreateEventScreen = (props) => {
   const onSubmit = async () => {
     let newEventDetail = {
       ...eventDetail,
-      startDate: moment(eventDetail.startDate).unix() * 1000,
-      endDate: moment(eventDetail.endDate).unix() * 1000
+      startDate: Platform.OS === 'ios' ? moment(eventDetail.startDate).unix() * 1000 : moment(eventDetail.startDate).add(7,"hours").unix() * 1000,
+      endDate: Platform.OS === 'ios' ? moment(eventDetail.endDate).unix() * 1000 : moment(eventDetail.endDate).add(7,"hours").unix() * 1000
     }
     const filename = coverImage?.uri.toString().split('/').pop()
     const match = /\.(\w+)$/.exec(filename);
@@ -287,42 +288,46 @@ const CreateEventScreen = (props) => {
     data.append('coverImage', coverImage ? {uri: coverImage.uri, name: filename, type: type} : null);
     data.append('eventInfo', JSON.stringify(newEventDetail));
 
-    console.log(newEventDetail)
+    console.log(new Date(newEventDetail.startDate), new Date(newEventDetail.endDate))
     setWaitSub(true)
     eventsService.createEvent(data).then(async res => {
       if (res.status === 200) {
-        await setEventDetail({
-          type: "ONSITE",
-          tags: [],
-          eventName: 'ชื่อกิจกรรม',
-          startDate: new Date(),
-          endDate: new Date(),
-          location: null,
-          latitude: 0,
-          longitude: 0,
-          description: 'ใส่รายละเอียดกิจกรรม',
-          numberOfPeople: 0,
-          memberId: null
-        })
-        await setCoverImage(null)
-        await setKinds(kind)
-        await setTags(tagss)
-        await setWaitSub(false)
-        await setIsLoad(true)
-        await setError({
-          eventName: null,
-          startDate: null,
-          tags: null,
-          numberOfPeople: null,
-          location: null,
-          description: null,
-          all: true
-        })
-
-        await props.navigation.navigate('Feed')
-
+        await setIsSuccessed(true)
+        setTimeout(async ()=>{
+          await setIsSuccessed(false)
+          await setEventDetail({
+            type: "ONSITE",
+            tags: [],
+            eventName: 'ชื่อกิจกรรม',
+            startDate: new Date(),
+            endDate: new Date(),
+            location: null,
+            latitude: 0,
+            longitude: 0,
+            description: 'ใส่รายละเอียดกิจกรรม',
+            numberOfPeople: 0,
+            memberId: null
+          })
+          await setCoverImage(null)
+          await setKinds(kind)
+          await setTags(tagss)
+          await setWaitSub(false)
+          await setIsLoad(true)
+          await setError({
+            eventName: null,
+            startDate: null,
+            tags: null,
+            numberOfPeople: null,
+            location: null,
+            description: null,
+            all: true
+          })
+          setIsLoad(false)
+           await props.navigation.navigate('Feed')
+        }, 1500)
       }
     }).catch(error => {
+      props.navigation.navigate('Error')
       console.log(error)
     })
   }
@@ -344,6 +349,26 @@ const CreateEventScreen = (props) => {
         }}>
           <ActivityIndicator size={75} color={Colors.primary}/>
         </View>)
+      }
+      {
+        isSuccessed && <View style={{
+          position: "absolute",
+          flex: 1,
+          width: "100%",
+          height: (Platform.OS === 'ios' ? "100%" : '100%'),
+          top: 0,
+          left: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: "rgba(0,0,0,0.25)",
+          zIndex: 50
+        }}>
+          <View style={{width: 300, height: 250, backgroundColor: Colors.white, borderRadius: 10, justifyContent: 'center', alignItems: 'center'}}>
+            <Ionicons name={'ios-checkmark-circle'}
+                      color={Colors.green} size={64}/>
+            <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}>สร้างกิจกรรมสำเร็จ</Text>
+          </View>
+        </View>
       }
       <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
         {
@@ -502,6 +527,7 @@ const CreateEventScreen = (props) => {
                             setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: false},
                               {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: true}])
                           }
+                          setError({...error, location: null})
                           setEventDetail({...eventDetail, type: item.en_name})
                         }} key={index}>
                           <View style={{
@@ -677,7 +703,7 @@ const CreateEventScreen = (props) => {
                   style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
 
                   {
-                    (eventDetail.type !== "ONSITE" ?
+                    ((eventDetail.type !== "ONSITE") ?
                       <View>
                         <Text style={{
                           fontFamily: Fonts.primary,
@@ -708,11 +734,10 @@ const CreateEventScreen = (props) => {
                                      //     }
                                      //   }
                                      // }
-                                     if (e.nativeEvent.text === "" && Platform.OS === "ios") {
-                                       setError({
-                                         ...error,
-                                         location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง")
-                                       })
+                                    if (e.nativeEvent.text === "" && Platform.OS === "ios" && eventDetail.type === 'ONSITE') {
+                                       setError({...error, location: "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง"})
+                                     }else if(e.nativeEvent.text === "" && Platform.OS === "ios" && eventDetail.type === 'ONLINE'){
+                                       setError({...error, location:  "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง"})
                                      } else if (e.nativeEvent.text !== '' && e.nativeEvent.text !== undefined && e.nativeEvent.text !== null && eventDetail.type === "ONLINE" && Platform.OS === "ios") {
                                        const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
                                          if(!http.test(e.nativeEvent.text)){
@@ -968,7 +993,7 @@ const CreateEventScreen = (props) => {
                 value={eventDetail.startDate}
                 onChange={(event, date) => {
                   if (event.type !== "dismissed") {
-                    changeDateTime(event, date)
+                    changeDateTime(event, new Date(moment(date).add(7,'hours')))
                     setIsAnEditTime(!isAnEditTime)
                   }
                 }

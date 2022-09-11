@@ -77,17 +77,20 @@ const ProfileScreen = (props, {navigation}) => {
     setIsLoad(true)
     if (authData !== null && authData !== undefined) {
       eventsService.checkEmail(authData.user.email).then(async res => {
+        console.log(authData.user.email, res.data)
         if (!res.data.hasEmail) {
           setIsLoad(false)
           props.navigation.navigate('EditProfile', {user: authData.user})
         } else {
           dispatch(saveUser(JSON.stringify(res.data.member)))
           setUserData(res.data.member)
+          setIsLoad(false)
         }
       })
     } else {
       setIsLoad(false)
     }
+
   }, [authData])
 
   const pickImage = async () => {
@@ -411,6 +414,23 @@ const ProfileScreen = (props, {navigation}) => {
                       }}>{isEdit ? 'อัปเดทโปรไฟล์': 'แก้ไขโปรไฟล์'}</Text>
                     </View>
                   </TouchableOpacity>
+                  {( isEdit && <TouchableOpacity activeOpacity={0.8} onPress={() => setIsEdit(false)}>
+                    <View style={{
+                      width: Platform.OS === "ios" ? 340 : 350,
+                      height: 45,
+                      backgroundColor: Colors.red,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginBottom: 20
+                    }}>
+                      <Text style={{
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.white
+                      }}>ยกเลิกแก้ไขโปรไฟล์</Text>
+                    </View>
+                  </TouchableOpacity>)}
 
                   {(!isEdit &&<TouchableOpacity activeOpacity={0.8} onPress={() => signOut()}>
                     <View style={{

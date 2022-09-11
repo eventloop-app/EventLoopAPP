@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator, Button,
   FlatList,
@@ -27,11 +27,22 @@ const ManageEventDetailScreen = (props) => {
   const [showQr, setShowQr] = useState(false)
   const [checkInData, setCheckInData] = useState({qr : null, code: null})
   const [endDate, setEndDate] = useState(null)
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     setEventId(props.route.params.id)
     setEndDate(props.route.params.endDate)
   }, [])
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    console.log(userData.id, evntId)
+    eventsService.getMemberRegistedEvent(userData.id, props.route.params.id).then(res => {
+      console.log(res.data)
+      setUserJoin(res.data)
+      setRefreshing(false)
+    }).catch(e => console.log(e))
+  }, []);
 
   useEffect(() => {
     if (evntId !== null) {
@@ -84,6 +95,8 @@ const ManageEventDetailScreen = (props) => {
         <View style={{height: 300, margin: 10}}>
           <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.primary}}>รายชื่อของผู้ร่วมกิจกรรม</Text>
           <FlatList
+            refreshing={refreshing}
+            onRefresh={onRefresh}
             contentContainerStyle={{ paddingBottom: 20}}
             data={userJoin}
             renderItem={({item}) => renderCard(item)}
