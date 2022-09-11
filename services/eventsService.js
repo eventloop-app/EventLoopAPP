@@ -12,7 +12,7 @@ class eventsService {
 
   async getAllEvent() {
     try {
-      return api.get('events?pageSize=10')
+      return api.get('events?pageSize=50')
     } catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -34,7 +34,6 @@ class eventsService {
       return new Promise(reject => reject(e))
     }
   }
-
 
   async getAllRegisteredEvent(memId) {
     try {
@@ -144,8 +143,9 @@ class eventsService {
 
   async getMemberRegistedEvent(id, eveId){
     const data = {eventId: eveId, memberId : id  }
-    return api.post(`/events/getRegisterMember`, data)
+    return api.post(`events/getRegisterMember`, data)
   }
+
   async getEventBySearch(keyword, pageNo = 0) {
     try {
       return api.get(`events/getEventByKeyword?keyword=${keyword}&pageNo=${pageNo}&pageSize=10&sortBy=createAt&orderBy=desc`)
@@ -162,13 +162,61 @@ class eventsService {
         score: parseInt(scr),
         feedback: fb
       }
-      console.log(data)
-      return api.post(`/events/submitFeedback`,data)
+      return api.post(`events/submitFeedback`,data)
     } catch (e) {
       return new Promise(reject => reject(e))
     }
   }
 
+  async isReviewEvent(memId, eveId) {
+    try {
+      const data = {
+        eventId: eveId,
+        memberId: memId,
+      }
+      return api.post(`events/isReview`,data)
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
+  }
+
+  async upDateEvent(data) {
+    return axios({
+      method: "put",
+      url: `${config.APP_API}events/editEvent`,
+      data: data,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+  }
+
+  async removeEvent(memId, eveId) {
+    try {
+      const data = {
+        eventId: eveId,
+        memberId: memId,
+      }
+      console.log(data)
+      return axios({
+        method: "delete",
+        url: `${config.APP_API}events/deleteEvent`,
+        data: data,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
+  }
+
+  async upDateProfile(data) {
+    return axios({
+      method: "put",
+      url: `${config.APP_API}members/updateProfile`,
+      data: data,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+  }
 }
 
 export default new eventsService();

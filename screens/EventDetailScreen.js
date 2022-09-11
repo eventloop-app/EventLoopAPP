@@ -38,7 +38,6 @@ const EventDetailScreen = (props) => {
   const [popCheckIn, setPopCheckIn] = useState(false)
   const [popCheckCode, setPopCheckCode] = useState(false)
 
-
   useEffect(() => {
     if (props.route.params.QRcode) {
       console.log('QRCODE')
@@ -76,6 +75,7 @@ const EventDetailScreen = (props) => {
         setIsOwner(true)
       }
       CheckUserCheckIn()
+      isReviewEvent()
     }
   }, [event])
 
@@ -86,11 +86,23 @@ const EventDetailScreen = (props) => {
     }
   }, [user])
 
+  const isReviewEvent = () => {
+
+    eventsService.isReviewEvent(userData.id, event.id).then(res => {
+      if(res.status === 200 && res.data.isReview === true){
+        console.log('Review!!!')
+        setIsReview(true)
+      }else {
+        console.log(res.data.isReview)
+        console.log('Not Review!!!')
+      }
+    })
+  }
+
   const onReview = (r, s) => {
     eventsService.feedbackEvent(userData.id, event.id, s, r).then( res => {
-      if(res.status === 200){
+      if(res.status === 200 ){
         setIsReview(true)
-        console.log("Review")
       }
     })
   }
@@ -229,11 +241,11 @@ const EventDetailScreen = (props) => {
       )
     } else {
       return (
-        <TouchableOpacity activeOpacity={0.8} disabled={!isLogin} onPress={() => setShowRegisterEvent(true)}>
+        <TouchableOpacity activeOpacity={0.8} disabled={(isLogin && isReview)} onPress={() => setShowRegisterEvent(true)}>
           <View style={{
             width: 340,
             height: 60,
-            backgroundColor: (isLogin ? Colors.primary : Colors.gray),
+            backgroundColor: (!(isLogin && isReview) ? Colors.primary : Colors.gray),
             borderRadius: 12,
             justifyContent: 'center',
             alignItems: 'center'
@@ -242,7 +254,7 @@ const EventDetailScreen = (props) => {
               fontFamily: Fonts.bold,
               fontSize: fontSize.primary,
               color: Colors.white
-            }}>เข้าร่วมกิจกรรม</Text>
+            }}>{(!(isLogin && isReview) ? 'เข้าร่วมกิจกรรม' : 'เข้าร่วมกิจกรรมเสร็จสมบูรณ์')}</Text>
           </View>
         </TouchableOpacity>
       )

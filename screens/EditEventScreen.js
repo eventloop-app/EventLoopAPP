@@ -46,7 +46,7 @@ const kind = [
   {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}
 ]
 
-const CreateEventScreen = (props) => {
+const EditEventScreen = (props) => {
   const [isLoad, setIsLoad] = useState(true)
   const [coverImage, setCoverImage] = useState(null)
   const [isEditTime, setIsEditTime] = useState(false)
@@ -85,50 +85,51 @@ const CreateEventScreen = (props) => {
     description: null,
     all: true
   })
-  // useEffect(() => {
-  //   if (isFocused === false) {
-  //     setEventDetail({
-  //       type: "ONSITE",
-  //       tags: [],
-  //       eventName: 'ชื่อกิจกรรม',
-  //       startDate: new Date(),
-  //       endDate: new Date(),
-  //       location: null,
-  //       latitude: 0,
-  //       longitude: 0,
-  //       description: 'ใส่รายละเอียดกิจกรรม',
-  //       numberOfPeople: 0,
-  //       memberId: null
-  //     })
-  //     setIsLoad(true)
-  //     setCoverImage(null)
-  //     setKinds(kind)
-  //     setTags(tagss)
-  //   }
-  // }, [isFocused])
 
   useEffect(() => {
-    if (userData !== undefined && userData !== null) {
-      console.log("setMemberId")
-      setEventDetail({...eventDetail, memberId: userData?.id})
-    }
-  }, [])
-
-  useEffect(() => {
+    setIsLoad(true)
     if (props.route.params) {
       setEventDetail({
         ...eventDetail,
         location: null,
       })
-      setTimeout(() => {
-        setEventDetail({
-          ...eventDetail,
-          location: props.route.params.data.name,
-          latitude: props.route.params.data.lat,
-          longitude: props.route.params.data.lng
+      if(props.route.params.data){
+        setTimeout(() => {
+          setEventDetail({
+            ...eventDetail,
+            location: props.route.params.data.name,
+            latitude: props.route.params.data.lat,
+            longitude: props.route.params.data.lng
+          })
+          setError({...error, location: null})
+        }, 100)
+      }
+      if(props.route.params.eventId){
+        eventsService.getEventById(props.route.params.eventId).then( async res =>{
+          if(res.status === 200){
+            console.log('=======================================================')
+            await setEventDetail({
+              type: res.data.type,
+              tags: res.data.tags,
+              eventName: res.data.eventName,
+              startDate: new Date(res.data.startDate),
+              endDate: new Date(res.data.endDate),
+              location: res.data.location.name,
+              latitude: parseFloat(res.data.location.latitude) ?? -1,
+              longitude: parseFloat(res.data.location.longitude)  ?? -1,
+              description: res.data.description,
+              numberOfPeople: res.data.numberOfPeople,
+              memberId: res.data.organizerId,
+              eventId: res.data.id
+            })
+            if(res.data.coverImageUrl){
+              setCoverImage({uri: res.data.coverImageUrl})
+            }
+            setUpTag(res.data.tags)
+            setUpType(res.data.type)
+          }
         })
-        setError({...error, location: null})
-      }, 100)
+      }
     }
   }, [props])
 
@@ -196,7 +197,6 @@ const CreateEventScreen = (props) => {
 
             if (value !== '' && value !== undefined && value !== null && eventDetail.type === "ONLINE") {
               const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-              console.log(http.test(value))
               if (!http.test(value)) {
                 count += 1
                 setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
@@ -238,20 +238,48 @@ const CreateEventScreen = (props) => {
             }
             break
           default:
-            count += 1
-            if (count === 0) {
-              setError({...error, all: false})
-            } else {
-              setError({...error, all: true})
+            let numError = 0
+            for (const [key, value] of Object.entries(error)) {
+              if(value !== null && key !== 'all'){
+                numError += 1
+                console.log(key)
+                setError({...error, all: true})
+              }else{
+                setError({...error, all: false})
+              }
             }
-            setIsLoad(false)
             break
         }
       }
+      setIsLoad(false)
     }
     ,
     [eventDetail]
   )
+
+  const setUpTag = (Oldtags) =>{
+    let newTagee = []
+    tags.map( obj => {
+      if(Oldtags.find( tag => tag === obj.name)){
+        newTagee = [...newTagee, {...obj, isSelect: true}]
+      }else {
+        newTagee = [...newTagee, {...obj, isSelect: false}]
+      }
+    })
+    setTags(newTagee)
+  }
+
+  const setUpType = (type) =>{
+    let newType = []
+    kinds.map( obj => {
+      if(type === obj.en_name){
+        newType = [...newType, {...obj, isSelect: true}]
+      }else {
+        newType = [...newType, {...obj, isSelect: false}]
+      }
+    })
+    setKinds(newType)
+  }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -277,7 +305,7 @@ const CreateEventScreen = (props) => {
     let newEventDetail = {
       ...eventDetail,
       startDate: moment(eventDetail.startDate).unix() * 1000,
-      endDate: moment(eventDetail.endDate).unix() * 1000
+      endDate: moment(eventDetail.endDate).unix() * 1000,
     }
     const filename = coverImage?.uri.toString().split('/').pop()
     const match = /\.(\w+)$/.exec(filename);
@@ -286,10 +314,11 @@ const CreateEventScreen = (props) => {
     data.append('coverImage', coverImage ? {uri: coverImage.uri, name: filename, type: type} : null);
     data.append('eventInfo', JSON.stringify(newEventDetail));
 
-    console.log(newEventDetail)
+    console.log(data)
     setWaitSub(true)
-    eventsService.createEvent(data).then(async res => {
+    eventsService.upDateEvent(data).then(async res => {
       if (res.status === 200) {
+        console.log('asdasd')
         await setEventDetail({
           type: "ONSITE",
           tags: [],
@@ -317,11 +346,11 @@ const CreateEventScreen = (props) => {
           description: null,
           all: true
         })
-
-        await props.navigation.navigate('Feed')
+        await props.navigation.pop()
 
       }
     }).catch(error => {
+      props.navigation.navigate('Error')
       console.log(error)
     })
   }
@@ -386,6 +415,7 @@ const CreateEventScreen = (props) => {
               <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 30}}>
                 <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.lightgray}
                            style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
+                           value={eventDetail?.eventName}
                            onChange={(e) => {
                              setEventDetail({...eventDetail, eventName: e.nativeEvent.text})
                              if (e.nativeEvent.text === "" && Platform.OS === "ios") {
@@ -493,7 +523,8 @@ const CreateEventScreen = (props) => {
                   <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
                     {
                       kinds.map((item, index) => (
-                        <TouchableOpacity onPress={() => {
+                        item.isSelect &&
+                        <TouchableOpacity disabled={true} onPress={() => {
                           if (index === 0) {
                             setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
                               {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}])
@@ -633,6 +664,7 @@ const CreateEventScreen = (props) => {
 
                   <TextInput id={'number_people'} keyboardType={"number-pad"} maxLength={2}
                              placeholder={"10"}
+                             value={eventDetail?.numberOfPeople.toString()}
                              placeholderTextColor={Colors.lightgray}
                              ref={input_num}
                              onChange={(e) => {
@@ -786,6 +818,7 @@ const CreateEventScreen = (props) => {
                   <TextInput style={{fontFamily: Fonts.primary, fontSize: fontSize.small}} multiline={true}
                     // value={eventDetail.description}
                              placeholder={"ใส่รายละเอียดกิจกรรม"}
+                             value={eventDetail?.description}
                              placeholderTextColor={Colors.lightgray}
                              onChange={(e) => {
                                setEventDetail({...eventDetail, description: e.nativeEvent.text})
@@ -822,7 +855,26 @@ const CreateEventScreen = (props) => {
                       fontFamily: Fonts.bold,
                       fontSize: fontSize.primary,
                       color: Colors.white
-                    }}>สร้างกิจกรรม</Text>
+                    }}>อัปเดตกิจกรรม</Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity activeOpacity={0.8}
+                                  onPress={() => eventsService.removeEvent(userData.id, eventDetail.eventId).then(res => console.log(res.status))}>
+                  <View style={{
+                    width: 340,
+                    height: 60,
+                    backgroundColor: Colors.red,
+                    borderRadius: 12,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: 20,
+                  }}>
+                    <Text style={{
+                      fontFamily: Fonts.bold,
+                      fontSize: fontSize.primary,
+                      color: Colors.white
+                    }}>ยกเลิกกิจกรรม</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -1036,4 +1088,4 @@ const CreateEventScreen = (props) => {
   )
 };
 
-export default CreateEventScreen;
+export default EditEventScreen;
