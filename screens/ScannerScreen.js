@@ -54,7 +54,7 @@ const ScannerScreen = (props) => {
             {/*    <View style={{width: 300, height: 300, borderRadius: 10, backgroundColor: Colors.white,justifyContent: 'center', alignItems: 'center'}}>*/}
             {/*    </View>*/}
             {/*</View>*/}
-            <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.primary, paddingBottom: 10}}>แสกนคิวอาร์โค้ดเพื่อเช็คอินกิจกรรม</Text>
+            <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.primary, paddingBottom: 10}}>สแกนคิวอาร์โค้ดเพื่อเช็คอินกิจกรรม</Text>
             <View style={{
                 height: 300,
                 width: '90%',
