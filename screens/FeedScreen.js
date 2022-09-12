@@ -185,17 +185,17 @@ const FeedScreen = ({route, navigation}) => {
             }}>ใกล้ฉัน</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.shortcutBtn}
-                              onPress={() => navigation.navigate('ListSelectedEvent', {name: "กำลังจะเริ่ม"})}>
-              <View style={styles.subShortcutBtn}>
-                <MaterialCommunityIcons color={"black"} name={"calendar-clock"} size={30}/>
-              </View>
-              <Text style={{
-                fontFamily: Fonts.primary,
-                fontSize: FontSize.small,
-                color: Colors.black
-              }}>กำลังจะเริ่ม</Text>
-            </TouchableOpacity>
+            {/*<TouchableOpacity style={styles.shortcutBtn}*/}
+            {/*                  onPress={() => navigation.navigate('ListSelectedEvent', {name: "กำลังจะเริ่ม"})}>*/}
+            {/*  <View style={styles.subShortcutBtn}>*/}
+            {/*    <MaterialCommunityIcons color={"black"} name={"calendar-clock"} size={30}/>*/}
+            {/*  </View>*/}
+            {/*  <Text style={{*/}
+            {/*    fontFamily: Fonts.primary,*/}
+            {/*    fontSize: FontSize.small,*/}
+            {/*    color: Colors.black*/}
+            {/*  }}>กำลังจะเริ่ม</Text>*/}
+            {/*</TouchableOpacity>*/}
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', {
               name: "ที่ลงทะเบียน",

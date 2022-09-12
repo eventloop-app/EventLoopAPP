@@ -7,13 +7,15 @@ import Fonts from "../constants/Fonts";
 import moment from "moment";
 import { toBuddhistYear } from "../constants/Buddhist-year";
 
+const listApp = ['discord', 'google', 'zoom', 'microsoft']
 const EventCard = ({ item, onPress }) => {
   // console.log(item?.location?.name)
+
   const eventName = item?.eventName ?? 'ไม่มีข้อมูล'
   const [isLoading, setIsLoading] = useState(false)
   const eventDate = toBuddhistYear(moment(item?.startDate), "DD/MM/YYYY")
   const eventTime = moment(item?.startDate).format("HH:mm") + " - " + moment(item.endDate).format("HH:mm") + " น."
-  const eventLocation = item?.location?.name ?? 'ไม่มีข้อมูล'
+  const eventLocation = item.type === 'ONSITE' ? item?.location?.name : (listApp.map(a => { return (item?.location?.name.includes(a) ? a : null)}))
   const ImageCover = item?.coverImageUrl
 
   return (

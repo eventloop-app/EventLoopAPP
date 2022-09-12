@@ -63,6 +63,7 @@ const ProfileScreen = (props, {navigation}) => {
 
   useEffect(() => {
     if ((user !== null || user !== undefined) && isEdit !== true) {
+      console.log(user)
       setUserData(JSON.parse(user))
     }
   }, [])

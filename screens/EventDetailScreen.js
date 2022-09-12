@@ -189,6 +189,7 @@ const EventDetailScreen = (props) => {
 
   const onRegisterEvent = async () => {
     await eventsService.registerEvent(userData.id, event.id).then(res => {
+      console.log(res)
       if (res.status === 200) {
         setIsRegister(true)
       }

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import eventsService from "../services/eventsService";
 import {useSelector} from "react-redux";
 import Colors from "../constants/Colors";
@@ -26,6 +26,7 @@ const ManageEventScreen = (props) => {
   const [event, setEvent] = useState(null)
   const [isLoad, setIsLoad] = useState(true)
   const [page, setPage] = useState(null)
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     if(props.route.params){
@@ -37,6 +38,11 @@ const ManageEventScreen = (props) => {
       }
     }
   }, [])
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getEventByOrganizer()
+  }, []);
 
   const getEventRegisted = () =>{
     if (user !== null) {
@@ -55,8 +61,10 @@ const ManageEventScreen = (props) => {
     if (user !== null) {
       eventsService.getEventByOrganizerId(userData.id).then(res => {
         if (res.status === 200) {
+          console.log('pull event')
           setEvent(res.data.content)
           setIsLoad(false)
+          setRefreshing(false)
         }
       })
     }
@@ -105,6 +113,8 @@ const ManageEventScreen = (props) => {
     <SafeAreaView style={{flex: 1, backgroundColor: Colors.white, }}>
       <View style={{flex: 1, margin: 20, marginTop: (Platform.OS === 'ios' ? 0 : 50)}}>
         <FlatList
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           contentContainerStyle={{ paddingBottom: 100 }}
           style={{padding: 1}}
           data={event}
