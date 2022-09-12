@@ -85,7 +85,8 @@ const EditEventScreen = (props) => {
     description: null,
     all: true
   })
-
+  const [isSuccessed, setIsSuccessed] = useState(false)
+  const [isDelete, setIsDelete] = useState(false)
   useEffect(() => {
     setIsLoad(true)
     if (props.route.params) {
@@ -93,7 +94,7 @@ const EditEventScreen = (props) => {
         ...eventDetail,
         location: null,
       })
-      if(props.route.params.data){
+      if (props.route.params.data) {
         setTimeout(() => {
           setEventDetail({
             ...eventDetail,
@@ -104,9 +105,9 @@ const EditEventScreen = (props) => {
           setError({...error, location: null})
         }, 100)
       }
-      if(props.route.params.eventId){
-        eventsService.getEventById(props.route.params.eventId).then( async res =>{
-          if(res.status === 200){
+      if (props.route.params.eventId) {
+        eventsService.getEventById(props.route.params.eventId).then(async res => {
+          if (res.status === 200) {
             console.log('=======================================================')
             await setEventDetail({
               type: res.data.type,
@@ -115,14 +116,14 @@ const EditEventScreen = (props) => {
               startDate: new Date(res.data.startDate),
               endDate: new Date(res.data.endDate),
               location: res.data.location.name,
-              latitude: parseFloat(res.data.location.latitude) ?? -1,
-              longitude: parseFloat(res.data.location.longitude)  ?? -1,
+              latitude: res.data.location.latitude ?parseFloat(res.data.location.latitude): -1,
+              longitude: res.data.location.longitude ?parseFloat(res.data.location.longitude) : -1,
               description: res.data.description,
               numberOfPeople: res.data.numberOfPeople,
               memberId: res.data.organizerId,
               eventId: res.data.id
             })
-            if(res.data.coverImageUrl){
+            if (res.data.coverImageUrl) {
               setCoverImage({uri: res.data.coverImageUrl})
             }
             setUpTag(res.data.tags)
@@ -170,13 +171,13 @@ const EditEventScreen = (props) => {
           case "tags":
             if (value.length === 0) {
               count += 1
-              setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก", all: true})
+              setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก", all: false})
             } else {
               count -= 1
               if (count === 0) {
                 setError({...error, all: false, tags: null})
               } else {
-                setError({...error, all: true, tags: null})
+                setError({...error, all: false, tags: null})
               }
             }
             break
@@ -240,11 +241,11 @@ const EditEventScreen = (props) => {
           default:
             let numError = 0
             for (const [key, value] of Object.entries(error)) {
-              if(value !== null && key !== 'all'){
+              if (value !== null && key !== 'all') {
                 numError += 1
                 console.log(key)
                 setError({...error, all: true})
-              }else{
+              } else {
                 setError({...error, all: false})
               }
             }
@@ -257,283 +258,297 @@ const EditEventScreen = (props) => {
     [eventDetail]
   )
 
-  const setUpTag = (Oldtags) =>{
-    let newTagee = []
-    tags.map( obj => {
-      if(Oldtags.find( tag => tag === obj.name)){
-        newTagee = [...newTagee, {...obj, isSelect: true}]
-      }else {
-        newTagee = [...newTagee, {...obj, isSelect: false}]
+  const onDelete = () => {
+    setIsDelete(true)
+    eventsService.removeEvent(userData.id, eventDetail.eventId).then(res => {
+      if(res.status === 200) {
+        setTimeout(()=>{
+          setIsDelete(false)
+          props.navigation.pop()
+        },1500)
       }
-    })
-    setTags(newTagee)
-  }
+    })}
 
-  const setUpType = (type) =>{
-    let newType = []
-    kinds.map( obj => {
-      if(type === obj.en_name){
-        newType = [...newType, {...obj, isSelect: true}]
-      }else {
-        newType = [...newType, {...obj, isSelect: false}]
-      }
-    })
-    setKinds(newType)
-  }
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-    if (!result.cancelled) {
-      setCoverImage(result)
-    }
-  };
-
-  const changeDateTime = (event, date) => {
-    setEventDetail({
-      ...eventDetail,
-      startDate: date,
-      endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))
-    })
-  }
-
-  const onSubmit = async () => {
-    let newEventDetail = {
-      ...eventDetail,
-      startDate: moment(eventDetail.startDate).unix() * 1000,
-      endDate: moment(eventDetail.endDate).unix() * 1000,
-    }
-    const filename = coverImage?.uri.toString().split('/').pop()
-    const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : `image`;
-    const data = new FormData();
-    data.append('coverImage', coverImage ? {uri: coverImage.uri, name: filename, type: type} : null);
-    data.append('eventInfo', JSON.stringify(newEventDetail));
-
-    console.log(data)
-    setWaitSub(true)
-    eventsService.upDateEvent(data).then(async res => {
-      if (res.status === 200) {
-        console.log('asdasd')
-        await setEventDetail({
-          type: "ONSITE",
-          tags: [],
-          eventName: 'ชื่อกิจกรรม',
-          startDate: new Date(),
-          endDate: new Date(),
-          location: null,
-          latitude: 0,
-          longitude: 0,
-          description: 'ใส่รายละเอียดกิจกรรม',
-          numberOfPeople: 0,
-          memberId: null
-        })
-        await setCoverImage(null)
-        await setKinds(kind)
-        await setTags(tagss)
-        await setWaitSub(false)
-        await setIsLoad(true)
-        await setError({
-          eventName: null,
-          startDate: null,
-          tags: null,
-          numberOfPeople: null,
-          location: null,
-          description: null,
-          all: true
-        })
-        await props.navigation.pop()
-
-      }
-    }).catch(error => {
-      props.navigation.navigate('Error')
-      console.log(error)
-    })
-  }
-
-  const renderUI = () => (
-    <View style={{flex: 1, backgroundColor: Colors.white}}>
-      {
-        (waitSub && <View style={{
-          position: "absolute",
-          flex: 1,
-          width: "100%",
-          height: (Platform.OS === 'ios' ? "100%" : '100%'),
-          top: 0,
-          left: 0,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: "rgba(0,0,0,0.25)",
-          zIndex: 50
-        }}>
-          <ActivityIndicator size={75} color={Colors.primary}/>
-        </View>)
-      }
-      <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
-        {
-          coverImage ?
-            <TouchableOpacity onPress={() => pickImage()}
-                              style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <Image style={{width: '100%', height: '100%'}}
-                     source={{
-                       uri: (coverImage.uri)
-                     }}
-              />
-            </TouchableOpacity>
-            : <TouchableOpacity onPress={() => pickImage()}
-                                style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <View style={{backgroundColor: 'rgba(255,255,255,0.7)', padding: 10, borderRadius: 100}}>
-                <Ionicons color={Colors.black} name={'image-outline'} size={40}/>
-              </View>
-            </TouchableOpacity>
+    const setUpTag = (Oldtags) => {
+      let newTagee = []
+      tags.map(obj => {
+        if (Oldtags.find(tag => tag === obj.name)) {
+          newTagee = [...newTagee, {...obj, isSelect: true}]
+        } else {
+          newTagee = [...newTagee, {...obj, isSelect: false}]
         }
-      </View>
+      })
+      setTags(newTagee)
+    }
 
-      <View style={{
-        height: '100%',
-        width: '100%',
-        backgroundColor: Colors.white,
-        borderTopRightRadius: 30,
-        borderTopLeftRadius: 30,
-        top: 150,
-        zIndex: 10,
-        padding: 15
-      }}>
+    const setUpType = (type) => {
+      let newType = []
+      kinds.map(obj => {
+        if (type === obj.en_name) {
+          newType = [...newType, {...obj, isSelect: true}]
+        } else {
+          newType = [...newType, {...obj, isSelect: false}]
+        }
+      })
+      setKinds(newType)
+    }
 
-        <KeyboardAwareScrollView
-          extraScrollHeight={200}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}>
-          <ScrollView showsVerticalScrollIndicator={false}
-                      contentContainerStyle={{paddingBottom: 100}}
-          >
-            <View style={{paddingBottom: 200}}>
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 30}}>
-                <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.lightgray}
-                           style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
-                           value={eventDetail?.eventName}
-                           onChange={(e) => {
-                             setEventDetail({...eventDetail, eventName: e.nativeEvent.text})
-                             if (e.nativeEvent.text === "" && Platform.OS === "ios") {
-                               setError({...error, eventName: "ชื่อกิจกรรมต้องไม่เป็นช่องว่าง"})
-                             } else {
-                               setError({...error, eventName: null})
-                             }
-                           }}/>
-              </View>
-              {(error.eventName &&
-                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small,
-                    color: Colors.red
-                  }}>{error.eventName}</Text>
-                </View>)}
+    const pickImage = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (!result.cancelled) {
+        setCoverImage(result)
+      }
+    };
 
-              <View style={{marginTop: 10}}>
-                <Text style={{
-                  fontFamily: Fonts.bold,
-                  fontSize: FontSize.medium
-                }}>แท็ก
-                </Text>
-                <View style={{
-                  flex: 1,
-                  height: 110,
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                  {
-                    tags.map((item, index) => (
-                      <TouchableOpacity key={index} onPress={async () => {
+    const changeDateTime = (event, date) => {
+      setEventDetail({
+        ...eventDetail,
+        startDate: date,
+        endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))
+      })
+    }
 
-                        await setTags([...tags.slice(0, index), {
-                          ...item,
-                          isSelect: !item.isSelect
-                        }, ...tags.slice(index + 1)])
+    const onSubmit = async () => {
+      const data = new FormData();
+      let newEventDetail = {
+        ...eventDetail,
+        startDate: moment(eventDetail.startDate).unix() * 1000,
+        endDate: moment(eventDetail.endDate).unix() * 1000,
+      }
+      if(!coverImage?.uri.includes('https')){
+        const filename = coverImage?.uri.toString().split('/').pop()
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
 
-                        let newTags = [...tags.slice(0, index), {
-                          ...item,
-                          isSelect: !item.isSelect
-                        }, ...tags.slice(index + 1)]
+        data.append('coverImage', coverImage ? {uri: coverImage.uri, name: filename, type: type} : null);
+      }
 
-                        newTags = newTags.map(tag => {
-                            if (tag.isSelect) {
-                              return tag.name
-                            }
-                          }
-                        ).filter(tag => tag !== undefined)
+      data.append('eventInfo', JSON.stringify(newEventDetail));
 
-                        if (newTags.length === 0 && Platform.OS === "ios") {
-                          setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก"})
-                        } else {
-                          setError({...error, tags: null})
-                        }
-                        setEventDetail({...eventDetail, tags: newTags})
-                      }}>
-                        <View style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          width: 80,
-                          height: 30,
-                          backgroundColor: (item.isSelect ? Colors.primary : Colors.lightgray),
-                          margin: 3,
-                          borderRadius: 8,
-                        }}>
-                          <Text style={{
-                            fontFamily: Fonts.primary,
-                            fontSize: FontSize.small,
-                            color: (item.isSelect ? Colors.white : Colors.black)
-                          }}>
-                            {item.name}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    ))
-                  }
+      console.log(data)
+      setWaitSub(true)
+      eventsService.upDateEvent(data).then(async res => {
+        if (res.status === 200) {
+          await setIsSuccessed(true)
+          setTimeout(async () => {
+            await setIsSuccessed(false)
+            await setEventDetail({
+              type: "ONSITE",
+              tags: [],
+              eventName: 'ชื่อกิจกรรม',
+              startDate: new Date(),
+              endDate: new Date(),
+              location: null,
+              latitude: 0,
+              longitude: 0,
+              description: 'ใส่รายละเอียดกิจกรรม',
+              numberOfPeople: 0,
+              memberId: null
+            })
+            await setCoverImage(null)
+            await setKinds(kind)
+            await setTags(tagss)
+            await setWaitSub(false)
+            await setIsLoad(true)
+            await setError({
+              eventName: null,
+              startDate: null,
+              tags: null,
+              numberOfPeople: null,
+              location: null,
+              description: null,
+              all: true
+            })
+            setIsLoad(false)
+            await props.navigation.pop()
+          }, 1500)
+        }
+      }).catch(error => {
+        props.navigation.navigate('Error')
+        console.log(error)
+      })
+    }
+
+    const renderUI = () => (
+      <View style={{flex: 1, backgroundColor: Colors.white}}>
+        {
+          (waitSub && <View style={{
+            position: "absolute",
+            flex: 1,
+            width: "100%",
+            height: (Platform.OS === 'ios' ? "100%" : '100%'),
+            top: 0,
+            left: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: "rgba(0,0,0,0.25)",
+            zIndex: 50
+          }}>
+            <ActivityIndicator size={75} color={Colors.primary}/>
+          </View>)
+        }
+        {
+          isSuccessed && <View style={{
+            position: "absolute",
+            flex: 1,
+            width: "100%",
+            height: (Platform.OS === 'ios' ? "100%" : '100%'),
+            top: 0,
+            left: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: "rgba(0,0,0,0.25)",
+            zIndex: 50
+          }}>
+            <View style={{
+              width: 300,
+              height: 250,
+              backgroundColor: Colors.white,
+              borderRadius: 10,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Ionicons name={'ios-checkmark-circle'}
+                        color={Colors.green} size={64}/>
+              <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}>อัปเดทกิจกรรมสำเร็จ</Text>
+            </View>
+          </View>
+        }
+        {
+          isDelete && <View style={{
+            position: "absolute",
+            flex: 1,
+            width: "100%",
+            height: (Platform.OS === 'ios' ? "100%" : '100%'),
+            top: 0,
+            left: 0,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: "rgba(0,0,0,0.25)",
+            zIndex: 50
+          }}>
+            <View style={{
+              width: 300,
+              height: 250,
+              backgroundColor: Colors.white,
+              borderRadius: 10,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Ionicons name={'ios-checkmark-circle'}
+                        color={Colors.green} size={64}/>
+              <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}>ยกเลิกกิจกรรมสำเร็จ</Text>
+            </View>
+          </View>
+        }
+        <View style={{height: 200, width: '100%', backgroundColor: Colors.gray, position: 'absolute', top: 0}}>
+          {
+            coverImage ?
+              <TouchableOpacity onPress={() => pickImage()}
+                                style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <Image style={{width: '100%', height: '100%'}}
+                       source={{
+                         uri: (coverImage.uri)
+                       }}
+                />
+              </TouchableOpacity>
+              : <TouchableOpacity onPress={() => pickImage()}
+                                  style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{backgroundColor: 'rgba(255,255,255,0.7)', padding: 10, borderRadius: 100}}>
+                  <Ionicons color={Colors.black} name={'image-outline'} size={40}/>
                 </View>
-              </View>
-              {(error.tags &&
-                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small,
-                    color: Colors.red
-                  }}>{error.tags}</Text>
-                </View>)}
+              </TouchableOpacity>
+          }
+        </View>
 
-              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <View style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Ionicons name={(eventDetail.type === "ONSITE" ? 'ios-home-outline' : 'ios-globe-outline')}
-                            color={Colors.primary} size={35}/>
+        <View style={{
+          height: '100%',
+          width: '100%',
+          backgroundColor: Colors.white,
+          borderTopRightRadius: 30,
+          borderTopLeftRadius: 30,
+          top: 150,
+          zIndex: 10,
+          padding: 15
+        }}>
+
+          <KeyboardAwareScrollView
+            extraScrollHeight={200}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{paddingBottom: 100}}
+            >
+              <View style={{paddingBottom: 200}}>
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 30}}>
+                  <TextInput placeholder={'ใส่ชื่อกิจกรรม'} placeholderTextColor={Colors.lightgray}
+                             style={{fontFamily: Fonts.bold, fontSize: FontSize.large}}
+                             value={eventDetail?.eventName}
+                             onChange={(e) => {
+                               setEventDetail({...eventDetail, eventName: e.nativeEvent.text})
+                               if (e.nativeEvent.text === "" && Platform.OS === "ios") {
+                                 setError({...error, eventName: "ชื่อกิจกรรมต้องไม่เป็นช่องว่าง"})
+                               } else {
+                                 setError({...error, eventName: null})
+                               }
+                             }}/>
                 </View>
-                <View style={{marginLeft: 20}}>
-                  <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                {(error.eventName &&
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small,
+                      color: Colors.red
+                    }}>{error.eventName}</Text>
+                  </View>)}
+
+                <View style={{marginTop: 10}}>
+                  <Text style={{
+                    fontFamily: Fonts.bold,
+                    fontSize: FontSize.medium
+                  }}>แท็ก
+                  </Text>
+                  <View style={{
+                    flex: 1,
+                    height: 110,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                  }}>
                     {
-                      kinds.map((item, index) => (
-                        item.isSelect &&
-                        <TouchableOpacity disabled={true} onPress={() => {
-                          if (index === 0) {
-                            setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
-                              {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}])
+                      tags.map((item, index) => (
+                        <TouchableOpacity key={index} onPress={async () => {
+
+                          await setTags([...tags.slice(0, index), {
+                            ...item,
+                            isSelect: !item.isSelect
+                          }, ...tags.slice(index + 1)])
+
+                          let newTags = [...tags.slice(0, index), {
+                            ...item,
+                            isSelect: !item.isSelect
+                          }, ...tags.slice(index + 1)]
+
+                          newTags = newTags.map(tag => {
+                              if (tag.isSelect) {
+                                return tag.name
+                              }
+                            }
+                          ).filter(tag => tag !== undefined)
+
+                          if (newTags.length === 0 && Platform.OS === "ios") {
+                            setError({...error, tags: "ต้องระบุแท็กอย่างน้อย 1 แท็ก"})
                           } else {
-                            setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: false},
-                              {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: true}])
+                            setError({...error, tags: null})
                           }
-                          setEventDetail({...eventDetail, type: item.en_name})
-                        }} key={index}>
+                          setEventDetail({...eventDetail, tags: newTags})
+                        }}>
                           <View style={{
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -556,335 +571,446 @@ const EditEventScreen = (props) => {
                     }
                   </View>
                 </View>
-              </View>
-
-              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <View style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  overflow: 'hidden'
-                }}>
-                  <Image style={{
-                    width: '100%',
-                    height: '100%'
-                  }}
-                         source={{
-                           uri: userData?.profileUrl
-                         }}
-                  />
-                </View>
-                <View style={{marginLeft: 20}}>
-                  <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
-                    <Text style={{
-                      fontFamily: Fonts.primary,
-                      fontSize: FontSize.small
-                    }}>{userData?.username}</Text>
-                  </View>
-                </View>
-              </View>
-
-              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <View style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Ionicons name={'mail-open-outline'} color={Colors.primary} size={35}/>
-                </View>
-                <View style={{marginLeft: 20}}>
-                  <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
-                    <Text style={{
-                      fontFamily: Fonts.primary,
-                      fontSize: FontSize.small
-                    }}>{userData?.email}</Text>
-                  </View>
-                </View>
-              </View>
-
-              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <TouchableOpacity onPress={() => {
-                  setIsEditTime(!isEditTime)
-                  setIsAnEditDate(!isAnEditDate)
-                }} style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                  <Ionicons name={'calendar-sharp'} color={Colors.primary} size={35}/>
-                </TouchableOpacity>
-                <View
-                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.primary
-                  }}>{moment(eventDetail.startDate).add(543, 'year').format('D MMMM YYYY')}</Text>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small
-                  }}>{weekdays[(moment(eventDetail.startDate).day())] + ', ' + moment(eventDetail.startDate).format("HH:mm A") + ' - ' + moment(eventDetail.endDate).format("HH:mm A")}</Text>
-                </View>
-              </View>
-
-              {(error.startDate &&
-                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small,
-                    color: Colors.red
-                  }}>{error.startDate}</Text>
-                </View>)}
-
-              <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <TouchableOpacity onPress={() => input_num.current.focus()} style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                  <Ionicons name={'people-sharp'} color={Colors.primary} size={35}/>
-                </TouchableOpacity>
-                <View
-                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.primary
-                  }}>จำนวนผู้เข้าร่วมสูงสุด</Text>
-
-                  <TextInput id={'number_people'} keyboardType={"number-pad"} maxLength={2}
-                             placeholder={"10"}
-                             value={eventDetail?.numberOfPeople.toString()}
-                             placeholderTextColor={Colors.lightgray}
-                             ref={input_num}
-                             onChange={(e) => {
-                               setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})
-                               if ((parseInt(e.nativeEvent.text) < 2 || e.nativeEvent.text === '')&& Platform.OS === "ios") {
-                                 setError({...error, numberOfPeople: "จำนวนผู้เข้าร่วมต้องมีอย่างน้อย 2 คน"})
-                               } else {
-                                 setError({...error, numberOfPeople: null})
-                               }
-                             }}
-                             style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
-                    // value={eventDetail.numberOfPeople.toString()}
-                  />
-                </View>
-              </View>
-              {(error.numberOfPeople &&
-                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small,
-                    color: Colors.red
-                  }}>{error.numberOfPeople}</Text>
-                </View>)}
-
-              <View style={{display: 'flex', width: '80%', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                <TouchableOpacity onPress={() => {
-                  (eventDetail.type === "ONSITE" ? props.navigation.navigate('GoogleMap') : input_loc.current.focus())
-                }} style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 10,
-                  backgroundColor: 'rgba(214, 234, 248, 0.5)',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Ionicons name={(eventDetail.type === "ONSITE" ? 'ios-location-outline' : 'laptop-outline')}
-                            size={35}
-                            color={Colors.primary}/>
-                </TouchableOpacity>
-                <View
-                  style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
-
-                  {
-                    (eventDetail.type !== "ONSITE" ?
-                      <View>
-                        <Text style={{
-                          fontFamily: Fonts.primary,
-                          fontSize: FontSize.primary
-                        }}>ลิงค์ในการเข้าร่วมกิจกรรม</Text>
-                        <TextInput id={'number_people'} keyboardType={"web-search"}
-                                   placeholder={"https://google.meet/acb/"}
-                                   value={eventDetail.location}
-                                   placeholderTextColor={Colors.lightgray}
-                                   ref={input_loc}
-                                   onChange={(e) => {
-                                     setEventDetail({
-                                       ...eventDetail, location: e.nativeEvent.text
-                                     })
-
-                                     // if (value !== '' && value !== undefined && value !== null && eventDetail.type === "ONLINE") {
-                                     //   const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-                                     //   console.log(http.test(value))
-                                     //   if(!http.test(value)){
-                                     //     count += 1
-                                     //     setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
-                                     //   }else{
-                                     //     count -= 1
-                                     //     if (count === 0) {
-                                     //       setError({...error, all: false, location: null})
-                                     //     } else {
-                                     //       setError({...error, all: true, location: null})
-                                     //     }
-                                     //   }
-                                     // }
-                                     if (e.nativeEvent.text === "" && Platform.OS === "ios") {
-                                       setError({
-                                         ...error,
-                                         location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง")
-                                       })
-                                     } else if (e.nativeEvent.text !== '' && e.nativeEvent.text !== undefined && e.nativeEvent.text !== null && eventDetail.type === "ONLINE" && Platform.OS === "ios") {
-                                       const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
-                                         if(!http.test(e.nativeEvent.text)){
-                                           setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
-                                         }else {
-                                           setError({...error, location: null})
-                                         }
-                                     }else if (e.nativeEvent.text !== "" || eventDetail.location !== null || eventDetail.location !== "") {
-                                       setError({...error, location: null})
-                                     }
-                                   }}
-
-
-                                   style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
-                        />
-                      </View>
-                      : <Text numberOfLines={1}
-                              style={{
-                                fontFamily: Fonts.primary,
-                                fontSize: FontSize.primary
-                              }}>{(eventDetail.location === null ? 'สถานที่จัดกิจกรรม' : eventDetail.location)}
-                      </Text>)
-                  }
-
-                </View>
-              </View>
-              {(error.location &&
-                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small,
-                    color: Colors.red
-                  }}>{error.location}</Text>
-                </View>)}
-
-              {
-                ((eventDetail?.location !== null && eventDetail?.latitude !== -1 && eventDetail.type === "ONSITE") &&
+                {(error.tags &&
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                    <MapView
-                      scrollDuringRotateOrZoomEnabled={false}
-                      zoomControlEnabled={false}
-                      zoomEnabled={false}
-                      rotateEnabled={false}
-                      showsTraffic={true}
-                      scrollEnabled={false}
-                      provider={"google"}
-                      followsUserLocation={true}
-                      ref={mapRef}
-                      initialRegion={{
-                        latitude: eventDetail.latitude,
-                        longitude: eventDetail.longitude,
-                        latitudeDelta: 0.0116193304764995,
-                        longitudeDelta: 0.01165230321884155
-                      }}
-                      style={{
-                        borderRadius: 15,
-                        width: Dimensions.get("window").width - 30,
-                        height: Dimensions.get("window").height / 5
-                      }}>
-                      <Marker
-                        image={Mappin}
-                        coordinate={{latitude: eventDetail.latitude, longitude: eventDetail.longitude}}/>
-                    </MapView>
-                  </View>)
-              }
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small,
+                      color: Colors.red
+                    }}>{error.tags}</Text>
+                  </View>)}
 
-              <View style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
-                <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.medium}}>
-                  รายระเอียดกิจกรรม
-                </Text>
-                <View style={{display: 'flex', width: '95%', marginTop: 5}}>
-                  <TextInput style={{fontFamily: Fonts.primary, fontSize: fontSize.small}} multiline={true}
-                    // value={eventDetail.description}
-                             placeholder={"ใส่รายละเอียดกิจกรรม"}
-                             value={eventDetail?.description}
-                             placeholderTextColor={Colors.lightgray}
-                             onChange={(e) => {
-                               setEventDetail({...eventDetail, description: e.nativeEvent.text})
-                               if (e.nativeEvent.text === "" && Platform.OS === "ios") {
-                                 setError({...error, description: "ต้องระบุรายละเอียดกิจกรรม"})
-                               } else {
-                                 setError({...error, description: null})
-                               }
-                             }}/>
-                </View>
-              </View>
-              {(error.description &&
                 <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
-                  <Text style={{
-                    fontFamily: Fonts.primary,
-                    fontSize: FontSize.small,
-                    color: Colors.red
-                  }}>{error.description}</Text>
-                </View>)}
-
-              <View style={{flex: 1, width: "100%", justifyContent: 'center', alignItems: 'center', marginTop: 50}}>
-                <TouchableOpacity activeOpacity={0.8}
-                                  disabled={error.all}
-                                  onPress={() => onSubmit()}>
                   <View style={{
-                    width: 340,
-                    height: 60,
-                    backgroundColor: (error.all ? Colors.gray : Colors.primary),
-                    borderRadius: 12,
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(214, 234, 248, 0.5)',
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
-                    <Text style={{
-                      fontFamily: Fonts.bold,
-                      fontSize: fontSize.primary,
-                      color: Colors.white
-                    }}>อัปเดตกิจกรรม</Text>
+                    <Ionicons name={(eventDetail.type === "ONSITE" ? 'ios-home-outline' : 'ios-globe-outline')}
+                              color={Colors.primary} size={35}/>
                   </View>
-                </TouchableOpacity>
+                  <View style={{marginLeft: 20}}>
+                    <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                      {
+                        kinds.map((item, index) => (
+                          item.isSelect &&
+                          <TouchableOpacity disabled={true} onPress={() => {
+                            if (index === 0) {
+                              setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: true},
+                                {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: false}])
+                            } else {
+                              setKinds([{name: 'ออนไซต์', en_name: 'ONSITE', isSelect: false},
+                                {name: 'ออนไลน์', en_name: 'ONLINE', isSelect: true}])
+                            }
+                            setEventDetail({...eventDetail, type: item.en_name})
+                          }} key={index}>
+                            <View style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              width: 80,
+                              height: 30,
+                              backgroundColor: (item.isSelect ? Colors.primary : Colors.lightgray),
+                              margin: 3,
+                              borderRadius: 8,
+                            }}>
+                              <Text style={{
+                                fontFamily: Fonts.primary,
+                                fontSize: FontSize.small,
+                                color: (item.isSelect ? Colors.white : Colors.black)
+                              }}>
+                                {item.name}
+                              </Text>
+                            </View>
+                          </TouchableOpacity>
+                        ))
+                      }
+                    </View>
+                  </View>
+                </View>
 
-                <TouchableOpacity activeOpacity={0.8}
-                                  onPress={() => eventsService.removeEvent(userData.id, eventDetail.eventId).then(res => console.log(res.status))}>
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
                   <View style={{
-                    width: 340,
-                    height: 60,
-                    backgroundColor: Colors.red,
-                    borderRadius: 12,
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(214, 234, 248, 0.5)',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginTop: 20,
+                    overflow: 'hidden'
                   }}>
-                    <Text style={{
-                      fontFamily: Fonts.bold,
-                      fontSize: fontSize.primary,
-                      color: Colors.white
-                    }}>ยกเลิกกิจกรรม</Text>
+                    <Image style={{
+                      width: '100%',
+                      height: '100%'
+                    }}
+                           source={{
+                             uri: userData?.profileUrl
+                           }}
+                    />
                   </View>
+                  <View style={{marginLeft: 20}}>
+                    <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                      <Text style={{
+                        fontFamily: Fonts.primary,
+                        fontSize: FontSize.small
+                      }}>{userData?.username}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <View style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Ionicons name={'mail-open-outline'} color={Colors.primary} size={35}/>
+                  </View>
+                  <View style={{marginLeft: 20}}>
+                    <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                      <Text style={{
+                        fontFamily: Fonts.primary,
+                        fontSize: FontSize.small
+                      }}>{userData?.email}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <TouchableOpacity onPress={() => {
+                    setIsEditTime(!isEditTime)
+                    setIsAnEditDate(!isAnEditDate)
+                  }} style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                    <Ionicons name={'calendar-sharp'} color={Colors.primary} size={35}/>
+                  </TouchableOpacity>
+                  <View
+                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.primary
+                    }}>{moment(eventDetail.startDate).add(543, 'year').format('D MMMM YYYY')}</Text>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small
+                    }}>{weekdays[(moment(eventDetail.startDate).day())] + ', ' + moment(eventDetail.startDate).format("HH:mm A") + ' - ' + moment(eventDetail.endDate).format("HH:mm A")}</Text>
+                  </View>
+                </View>
+
+                {(error.startDate &&
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small,
+                      color: Colors.red
+                    }}>{error.startDate}</Text>
+                  </View>)}
+
+                <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <TouchableOpacity onPress={() => input_num.current.focus()} style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                    <Ionicons name={'people-sharp'} color={Colors.primary} size={35}/>
+                  </TouchableOpacity>
+                  <View
+                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.primary
+                    }}>จำนวนผู้เข้าร่วมสูงสุด</Text>
+
+                    <TextInput id={'number_people'} keyboardType={"number-pad"} maxLength={2}
+                               placeholder={"10"}
+                               value={eventDetail?.numberOfPeople.toString()}
+                               placeholderTextColor={Colors.lightgray}
+                               ref={input_num}
+                               onChange={(e) => {
+                                 setEventDetail({...eventDetail, numberOfPeople: e.nativeEvent.text})
+                                 if ((parseInt(e.nativeEvent.text) < 2 || e.nativeEvent.text === '') && Platform.OS === "ios") {
+                                   setError({...error, numberOfPeople: "จำนวนผู้เข้าร่วมต้องมีอย่างน้อย 2 คน"})
+                                 } else {
+                                   setError({...error, numberOfPeople: null})
+                                 }
+                               }}
+                               style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
+                      // value={eventDetail.numberOfPeople.toString()}
+                    />
+                  </View>
+                </View>
+                {(error.numberOfPeople &&
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small,
+                      color: Colors.red
+                    }}>{error.numberOfPeople}</Text>
+                  </View>)}
+
+                <View style={{display: 'flex', width: '80%', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                  <TouchableOpacity onPress={() => {
+                    (eventDetail.type === "ONSITE" ? props.navigation.navigate('GoogleMap', {page: 'EditEvent'}) : input_loc.current.focus())
+                  }} style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                    backgroundColor: 'rgba(214, 234, 248, 0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Ionicons name={(eventDetail.type === "ONSITE" ? 'ios-location-outline' : 'laptop-outline')}
+                              size={35}
+                              color={Colors.primary}/>
+                  </TouchableOpacity>
+                  <View
+                    style={{display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 20}}>
+
+                    {
+                      (eventDetail.type !== "ONSITE" ?
+                        <View>
+                          <Text style={{
+                            fontFamily: Fonts.primary,
+                            fontSize: FontSize.primary
+                          }}>ลิงค์ในการเข้าร่วมกิจกรรม</Text>
+                          <TextInput id={'number_people'} keyboardType={"web-search"}
+                                     placeholder={"https://google.meet/acb/"}
+                                     value={eventDetail.location}
+                                     placeholderTextColor={Colors.lightgray}
+                                     ref={input_loc}
+                                     onChange={(e) => {
+                                       setEventDetail({
+                                         ...eventDetail, location: e.nativeEvent.text
+                                       })
+
+                                       // if (value !== '' && value !== undefined && value !== null && eventDetail.type === "ONLINE") {
+                                       //   const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+                                       //   console.log(http.test(value))
+                                       //   if(!http.test(value)){
+                                       //     count += 1
+                                       //     setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
+                                       //   }else{
+                                       //     count -= 1
+                                       //     if (count === 0) {
+                                       //       setError({...error, all: false, location: null})
+                                       //     } else {
+                                       //       setError({...error, all: true, location: null})
+                                       //     }
+                                       //   }
+                                       // }
+                                       if (e.nativeEvent.text === "" && Platform.OS === "ios") {
+                                         setError({
+                                           ...error,
+                                           location: (eventDetail.type === "ONSITE" ? "สถานที่กิจกรรมต้องไม่เป็นช่องว่าง" : "ลิงค์กิจกรรมต้องไม่เป็นช่องว่าง")
+                                         })
+                                       } else if (e.nativeEvent.text !== '' && e.nativeEvent.text !== undefined && e.nativeEvent.text !== null && eventDetail.type === "ONLINE" && Platform.OS === "ios") {
+                                         const http = /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
+                                         if (!http.test(e.nativeEvent.text)) {
+                                           setError({...error, location: ("ลิงค์กิจกรรมไม่ถูกต้อง")})
+                                         } else {
+                                           setError({...error, location: null})
+                                         }
+                                       } else if (e.nativeEvent.text !== "" || eventDetail.location !== null || eventDetail.location !== "") {
+                                         setError({...error, location: null})
+                                       }
+                                     }}
+
+
+                                     style={{fontFamily: Fonts.primary, fontSize: FontSize.primary}}
+                          />
+                        </View>
+                        : <Text numberOfLines={1}
+                                style={{
+                                  fontFamily: Fonts.primary,
+                                  fontSize: FontSize.primary
+                                }}>{(eventDetail.location === null ? 'สถานที่จัดกิจกรรม' : eventDetail.location)}
+                        </Text>)
+                    }
+
+                  </View>
+                </View>
+                {(error.location &&
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small,
+                      color: Colors.red
+                    }}>{error.location}</Text>
+                  </View>)}
+
+                {
+                  ((eventDetail?.location !== null && eventDetail?.latitude !== -1 && eventDetail.type === "ONSITE") &&
+                    <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                      <MapView
+                        scrollDuringRotateOrZoomEnabled={false}
+                        zoomControlEnabled={false}
+                        zoomEnabled={false}
+                        rotateEnabled={false}
+                        showsTraffic={true}
+                        scrollEnabled={false}
+                        provider={"google"}
+                        followsUserLocation={true}
+                        ref={mapRef}
+                        initialRegion={{
+                          latitude: eventDetail.latitude,
+                          longitude: eventDetail.longitude,
+                          latitudeDelta: 0.0116193304764995,
+                          longitudeDelta: 0.01165230321884155
+                        }}
+                        style={{
+                          borderRadius: 15,
+                          width: Dimensions.get("window").width - 30,
+                          height: Dimensions.get("window").height / 5
+                        }}>
+                        <Marker
+                          image={Mappin}
+                          coordinate={{latitude: eventDetail.latitude, longitude: eventDetail.longitude}}/>
+                      </MapView>
+                    </View>)
+                }
+
+                <View style={{display: 'flex', flexDirection: 'column', marginTop: 10}}>
+                  <Text style={{fontFamily: Fonts.bold, fontSize: FontSize.medium}}>
+                    รายระเอียดกิจกรรม
+                  </Text>
+                  <View style={{display: 'flex', width: '95%', marginTop: 5}}>
+                    <TextInput style={{fontFamily: Fonts.primary, fontSize: fontSize.small}} multiline={true}
+                      // value={eventDetail.description}
+                               placeholder={"ใส่รายละเอียดกิจกรรม"}
+                               value={eventDetail?.description}
+                               placeholderTextColor={Colors.lightgray}
+                               onChange={(e) => {
+                                 setEventDetail({...eventDetail, description: e.nativeEvent.text})
+                                 if (e.nativeEvent.text === "" && Platform.OS === "ios") {
+                                   setError({...error, description: "ต้องระบุรายละเอียดกิจกรรม"})
+                                 } else {
+                                   setError({...error, description: null})
+                                 }
+                               }}/>
+                  </View>
+                </View>
+                {(error.description &&
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 5}}>
+                    <Text style={{
+                      fontFamily: Fonts.primary,
+                      fontSize: FontSize.small,
+                      color: Colors.red
+                    }}>{error.description}</Text>
+                  </View>)}
+
+                <View style={{flex: 1, width: "100%", justifyContent: 'center', alignItems: 'center', marginTop: 50}}>
+                  <TouchableOpacity activeOpacity={0.8}
+                                    disabled={error.all}
+                                    onPress={() => onSubmit()}>
+                    <View style={{
+                      width: 340,
+                      height: 60,
+                      backgroundColor: (error.all ? Colors.gray : Colors.primary),
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}>
+                      <Text style={{
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.white
+                      }}>อัปเดตกิจกรรม</Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity activeOpacity={0.8}
+                                    onPress={() => onDelete()}>
+                    <View style={{
+                      width: 340,
+                      height: 60,
+                      backgroundColor: Colors.red,
+                      borderRadius: 12,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: 20,
+                    }}>
+                      <Text style={{
+                        fontFamily: Fonts.bold,
+                        fontSize: fontSize.primary,
+                        color: Colors.white
+                      }}>ยกเลิกกิจกรรม</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAwareScrollView>
+          {
+            ((isEditTime && !isEndTime && Platform.OS !== "android") &&
+              <View
+                style={{
+                  position: 'absolute',
+                  display: 'flex',
+                  width: '100%',
+                  height: 'auto',
+                  bottom: 170,
+                  left: 15,
+                  padding: 10,
+                  borderRadius: 15,
+                  backgroundColor: 'rgba(000,000,000,0.8)'
+                }}>
+                <Text style={{
+                  fontFamily: Fonts.primary,
+                  fontSize: FontSize.primary,
+                  textAlign: 'center',
+                  color: Colors.white
+                }}>กำหนดวันเวลาเริ่มกิจกรรม</Text>
+
+                <RNDateTimePicker
+                  minimumDate={new Date()}
+                  style={{height: 100, fontFamily: Fonts.primary}}
+                  textColor={Colors.primary}
+                  display="spinner" locale={'th'}
+                  mode="datetime"
+                  value={eventDetail.startDate}
+                  onChange={(event, date) => {
+                    changeDateTime(event, date)
+                    if (Platform.OS === "ios" && new Date(date).getDate() <= new Date().getDate() + 3) {
+                      setError({
+                        ...error,
+                        startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"
+                      })
+                    } else {
+                      setError({...error, startDate: null})
+                    }
+                  }}/>
+
+                <TouchableOpacity onPress={() => setIsEndTime(!isEndTime)} style={{marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.bold,
+                    fontSize: FontSize.primary,
+                    textAlign: 'center',
+                    color: Colors.primary
+                  }}>
+                    ต่อไป
+                  </Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </ScrollView>
-        </KeyboardAwareScrollView>
-        {
-          ((isEditTime && !isEndTime && Platform.OS !== "android") &&
-            <View
-              style={{
+            )
+          }
+
+          {
+            ((isEndTime && Platform.OS !== "android") &&
+              <View style={{
                 position: 'absolute',
                 display: 'flex',
                 width: '100%',
@@ -895,197 +1021,144 @@ const EditEventScreen = (props) => {
                 borderRadius: 15,
                 backgroundColor: 'rgba(000,000,000,0.8)'
               }}>
-              <Text style={{
-                fontFamily: Fonts.primary,
-                fontSize: FontSize.primary,
-                textAlign: 'center',
-                color: Colors.white
-              }}>กำหนดวันเวลาเริ่มกิจกรรม</Text>
-
-              <RNDateTimePicker
-                minimumDate={new Date()}
-                style={{height: 100, fontFamily: Fonts.primary}}
-                textColor={Colors.primary}
-                display="spinner" locale={'th'}
-                mode="datetime"
-                value={eventDetail.startDate}
-                onChange={(event, date) => {
-                  changeDateTime(event, date)
-                  if (Platform.OS === "ios" && new Date(date).getDate() <= new Date().getDate() + 3) {
-                    setError({
-                      ...error,
-                      startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"
-                    })
-                  } else {
-                    setError({...error, startDate: null})
-                  }
-                }}/>
-
-              <TouchableOpacity onPress={() => setIsEndTime(!isEndTime)} style={{marginTop: 5}}>
                 <Text style={{
-                  fontFamily: Fonts.bold,
+                  fontFamily: Fonts.primary,
                   fontSize: FontSize.primary,
-                  textAlign: 'center',
-                  color: Colors.primary
-                }}>
-                  ต่อไป
+                  color: Colors.white,
+                  textAlign: 'center'
+                }}>กำหนดเวลาสิ้นสุดกิจกรรม
                 </Text>
-              </TouchableOpacity>
-            </View>
-          )
-        }
+                <RNDateTimePicker style={{height: 100, fontFamily: Fonts.primary}} textColor={Colors.primary}
+                                  display="spinner"
+                                  locale={'th'}
+                                  mode="time"
+                                  value={eventDetail.endDate}
+                                  onChange={(event, date) => {
+                                    setEventDetail({...eventDetail, endDate: date})
 
-        {
-          ((isEndTime && Platform.OS !== "android") &&
-            <View style={{
-              position: 'absolute',
-              display: 'flex',
-              width: '100%',
-              height: 'auto',
-              bottom: 170,
-              left: 15,
-              padding: 10,
-              borderRadius: 15,
-              backgroundColor: 'rgba(000,000,000,0.8)'
-            }}>
-              <Text style={{
-                fontFamily: Fonts.primary,
-                fontSize: FontSize.primary,
-                color: Colors.white,
-                textAlign: 'center'
-              }}>กำหนดเวลาสิ้นสุดกิจกรรม
-              </Text>
-              <RNDateTimePicker style={{height: 100, fontFamily: Fonts.primary}} textColor={Colors.primary}
-                                display="spinner"
-                                locale={'th'}
-                                mode="time"
-                                value={eventDetail.endDate}
-                                onChange={(event, date) => {
-                                  setEventDetail({...eventDetail, endDate: date})
-
-                                  if (Platform.OS === "ios" && eventDetail.startDate.getDate() < new Date().getDate() + 3) {
-                                    setError({
-                                      ...error,
-                                      startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"
-                                    })
-                                  } else if (Platform.OS === "ios" && eventDetail.startDate.getHours() > date.getHours()) {
-                                    setError({
-                                      ...error,
-                                      startDate: "เวลาสิ้นสุดกิจกรรมต้องมากกว่าเวลาเริ่มต้นกิจกรรม"
-                                    })
-                                  } else {
-                                    setError({...error, startDate: null})
+                                    if (Platform.OS === "ios" && eventDetail.startDate.getDate() < new Date().getDate() + 3) {
+                                      setError({
+                                        ...error,
+                                        startDate: "วันเริ่มกิจกรรมต้องหากจากวันปัจจุบันอย่างน้อย 3 วัน"
+                                      })
+                                    } else if (Platform.OS === "ios" && eventDetail.startDate.getHours() > date.getHours()) {
+                                      setError({
+                                        ...error,
+                                        startDate: "เวลาสิ้นสุดกิจกรรมต้องมากกว่าเวลาเริ่มต้นกิจกรรม"
+                                      })
+                                    } else {
+                                      setError({...error, startDate: null})
+                                    }
                                   }
-                                }
-                                }/>
-              <TouchableOpacity onPress={() => {
-                setIsEditTime(!isEditTime)
-                setIsEndTime(!isEndTime)
-              }} style={{marginTop: 5}}>
+                                  }/>
+                <TouchableOpacity onPress={() => {
+                  setIsEditTime(!isEditTime)
+                  setIsEndTime(!isEndTime)
+                }} style={{marginTop: 5}}>
+                  <Text style={{
+                    fontFamily: Fonts.bold,
+                    fontSize: FontSize.primary,
+                    textAlign: 'center',
+                    color: Colors.primary
+                  }}>
+                    ยืนยัน
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )
+          }
+
+          {
+            ((isAnEditDate && !isAnEditTime && !isAnEndTime && Platform.OS === "android") &&
+              <View>
                 <Text style={{
-                  fontFamily: Fonts.bold,
+                  fontFamily: Fonts.primary,
                   fontSize: FontSize.primary,
+                  color: Colors.white,
                   textAlign: 'center',
-                  color: Colors.primary
-                }}>
-                  ยืนยัน
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  zIndex: 50
+                }}>กำหนดเวลาสิ้นสุดกิจกรรม
                 </Text>
-              </TouchableOpacity>
-            </View>
-          )
-        }
-
-        {
-          ((isAnEditDate && !isAnEditTime && !isAnEndTime && Platform.OS === "android") &&
-            <View>
-              <Text style={{
-                fontFamily: Fonts.primary,
-                fontSize: FontSize.primary,
-                color: Colors.white,
-                textAlign: 'center',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: 50
-              }}>กำหนดเวลาสิ้นสุดกิจกรรม
-              </Text>
-              <RNDateTimePicker
-                minimumDate={new Date()}
-                textColor={Colors.pink}
-                display="default"
-                style={{background: Colors.primary}}
-                locale={'th'}
-                mode="date"
-                value={eventDetail.startDate}
-                onChange={(event, date) => {
-                  if (event.type !== "dismissed") {
-                    changeDateTime(event, date)
-                    setIsAnEditTime(!isAnEditTime)
+                <RNDateTimePicker
+                  minimumDate={new Date()}
+                  textColor={Colors.pink}
+                  display="default"
+                  style={{background: Colors.primary}}
+                  locale={'th'}
+                  mode="date"
+                  value={eventDetail.startDate}
+                  onChange={(event, date) => {
+                    if (event.type !== "dismissed") {
+                      changeDateTime(event, date)
+                      setIsAnEditTime(!isAnEditTime)
+                    }
                   }
-                }
-                }
-              />
-            </View>
-          )
-        }
-
-        {
-          ((isAnEditDate && isAnEditTime && !isAnEndTime && Platform.OS === "android") &&
-            <View>
-              <RNDateTimePicker
-                positiveButtonLabel="ตกลง"
-                minimumDate={new Date()}
-                style={{height: 100, fontFamily: Fonts.primary}}
-                textColor={Colors.primary}
-                display="default"
-                locale={'th'}
-                mode="time"
-                value={eventDetail.startDate}
-                onChange={(event, date) => {
-                  if (event.type !== "dismissed") {
-                    setEventDetail({
-                      ...eventDetail,
-                      startDate: date,
-                      endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))
-                    })
-                    setIsAnEndTime(!isAnEndTime)
                   }
-                }}
-              />
-            </View>
-          )
-        }
+                />
+              </View>
+            )
+          }
 
-        {
-          ((isAnEditDate && isAnEditTime && isAnEndTime && Platform.OS === "android") &&
-            <View>
-              <RNDateTimePicker
-                minimumDate={new Date()}
-                display="default"
-                locale={'th'}
-                mode="time"
-                value={eventDetail.endDate}
-                onChange={(event, date) => {
-                  if (event.type !== "dismissed" && event.nativeEvent.timestamp !== null) {
-                    setEventDetail({...eventDetail, endDate: date})
-                    setIsAnEditTime(false)
-                    setIsAnEditDate(false)
-                    setIsAnEndTime(false)
-                  }
-                }}
-              />
-            </View>
-          )
-        }
+          {
+            ((isAnEditDate && isAnEditTime && !isAnEndTime && Platform.OS === "android") &&
+              <View>
+                <RNDateTimePicker
+                  positiveButtonLabel="ตกลง"
+                  minimumDate={new Date()}
+                  style={{height: 100, fontFamily: Fonts.primary}}
+                  textColor={Colors.primary}
+                  display="default"
+                  locale={'th'}
+                  mode="time"
+                  value={eventDetail.startDate}
+                  onChange={(event, date) => {
+                    if (event.type !== "dismissed") {
+                      setEventDetail({
+                        ...eventDetail,
+                        startDate: date,
+                        endDate: new Date(new Date(date).setHours(new Date(date).getHours() + 1))
+                      })
+                      setIsAnEndTime(!isAnEndTime)
+                    }
+                  }}
+                />
+              </View>
+            )
+          }
+
+          {
+            ((isAnEditDate && isAnEditTime && isAnEndTime && Platform.OS === "android") &&
+              <View>
+                <RNDateTimePicker
+                  minimumDate={new Date()}
+                  display="default"
+                  locale={'th'}
+                  mode="time"
+                  value={eventDetail.endDate}
+                  onChange={(event, date) => {
+                    if (event.type !== "dismissed" && event.nativeEvent.timestamp !== null) {
+                      setEventDetail({...eventDetail, endDate: date})
+                      setIsAnEditTime(false)
+                      setIsAnEditDate(false)
+                      setIsAnEndTime(false)
+                    }
+                  }}
+                />
+              </View>
+            )
+          }
+        </View>
       </View>
-    </View>
-  )
+    )
 
-  return (isLoad ?
-      <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size={'large'} color={Colors.primary}/>
-      </SafeAreaView> : (user ? renderUI() : <SafeAreaView></SafeAreaView>)
-  )
-};
+    return (isLoad ?
+        <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size={'large'} color={Colors.primary}/>
+        </SafeAreaView> : (user ? renderUI() : <SafeAreaView></SafeAreaView>)
+    )
+  };
 
-export default EditEventScreen;
+  export default EditEventScreen;

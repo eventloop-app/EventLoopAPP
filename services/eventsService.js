@@ -12,7 +12,7 @@ class eventsService {
 
   async getAllEvent() {
     try {
-      return api.get('events?pageSize=50')
+      return api.get('events?pageSize=200')
     } catch (e) {
       return new Promise(reject => reject(e))
     }
@@ -216,6 +216,15 @@ class eventsService {
       data: data,
       headers: { "Content-Type": "multipart/form-data" },
     })
+  }
+
+  async getEventByRange(item) {
+    console.log(item.latitude, item.longitude)
+    try {
+      return api.get(`events/range?latitude=${item.latitude}&longitude=${item.longitude}&range=5`)
+    } catch (e) {
+      return new Promise(reject => reject(e))
+    }
   }
 }
 

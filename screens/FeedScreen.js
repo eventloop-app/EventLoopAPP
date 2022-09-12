@@ -7,9 +7,9 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ActivityIndicator, Platform
+  ActivityIndicator, Platform, RefreshControl
 } from "react-native";
-import React, {useEffect, useState,} from "react";
+import React, {useCallback, useEffect, useState,} from "react";
 import EventCard from "../components/EventCard";
 import eventsService from "../services/eventsService";
 import Colors from "../constants/Colors";
@@ -34,6 +34,12 @@ const FeedScreen = ({route, navigation}) => {
   const {user} = useSelector(state => state.user)
   const [userData, setUserData] = useState(null)
   const isFocused = useIsFocused();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getEvent()
+  }, []);
 
   useEffect(() => {
     if (isFocused !== false) {
@@ -63,6 +69,7 @@ const FeedScreen = ({route, navigation}) => {
 
   // get Event
   const getEvent = async () => {
+    console.log('============ GetEvent =============')
     const timeout = setTimeout(() => {
       console.log("TimeOut !")
       navigation.navigate("Error")
@@ -71,6 +78,7 @@ const FeedScreen = ({route, navigation}) => {
       if (res.status === 200) {
         await clearTimeout(timeout);
         await setAllEvent(res.data.content)
+        await setRefreshing(false)
         if(user){
           await getEventByTag()
         }else{
@@ -177,17 +185,17 @@ const FeedScreen = ({route, navigation}) => {
             }}>ใกล้ฉัน</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.shortcutBtn}
-                              onPress={() => navigation.navigate('ListSelectedEvent', {name: "กำลังจะเริ่ม"})}>
-              <View style={styles.subShortcutBtn}>
-                <MaterialCommunityIcons color={"black"} name={"calendar-clock"} size={30}/>
-              </View>
-              <Text style={{
-                fontFamily: Fonts.primary,
-                fontSize: FontSize.small,
-                color: Colors.black
-              }}>กำลังจะเริ่ม</Text>
-            </TouchableOpacity>
+            {/*<TouchableOpacity style={styles.shortcutBtn}*/}
+            {/*                  onPress={() => navigation.navigate('ListSelectedEvent', {name: "กำลังจะเริ่ม"})}>*/}
+            {/*  <View style={styles.subShortcutBtn}>*/}
+            {/*    <MaterialCommunityIcons color={"black"} name={"calendar-clock"} size={30}/>*/}
+            {/*  </View>*/}
+            {/*  <Text style={{*/}
+            {/*    fontFamily: Fonts.primary,*/}
+            {/*    fontSize: FontSize.small,*/}
+            {/*    color: Colors.black*/}
+            {/*  }}>กำลังจะเริ่ม</Text>*/}
+            {/*</TouchableOpacity>*/}
 
             <TouchableOpacity style={styles.shortcutBtn} onPress={() => navigation.navigate('ListSelectedEvent', {
               name: "ที่ลงทะเบียน",
@@ -501,6 +509,10 @@ const FeedScreen = ({route, navigation}) => {
             )
           }
           <ScrollView
+            refreshControl = {<RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             style={{paddingTop: 110}}>
@@ -509,7 +521,7 @@ const FeedScreen = ({route, navigation}) => {
               {renderEventShortcutSection()}
               {renderAllEventSection()}
               { user && renderEventByTagSection()}
-              { user && renderRegisteredEventSection()}
+              {/*{ user && renderRegisteredEventSection()}*/}
               <View style={{display: hasFeedBack ? "flex" : "none"}}>
                 {renderRemindFeedback()}
               </View>

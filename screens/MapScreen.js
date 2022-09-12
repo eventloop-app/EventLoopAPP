@@ -162,7 +162,7 @@ const MapScreen = (props) => {
                 }}>{mapData?.name}</Text>
               <View style={{display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                 <TouchableOpacity
-                  onPress={() => props.navigation.navigate('CreateEvent', {data: mapData})}
+                  onPress={() => props.navigation.navigate(props.route.params?.page ?? 'CreateEvent', {data: mapData})}
                   style={{
                     borderRadius: 5,
                     height: 35,

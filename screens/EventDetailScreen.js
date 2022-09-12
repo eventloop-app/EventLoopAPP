@@ -189,6 +189,7 @@ const EventDetailScreen = (props) => {
 
   const onRegisterEvent = async () => {
     await eventsService.registerEvent(userData.id, event.id).then(res => {
+      console.log(res)
       if (res.status === 200) {
         setIsRegister(true)
       }
@@ -506,7 +507,7 @@ const EventDetailScreen = (props) => {
                   alignItems: 'center'
                 }}>
                   <TouchableOpacity activeOpacity={0.8}
-                                    disabled={!(new Date() >= new Date(event.startDate).setMinutes(new Date(event.startDate).getMinutes() - 30))}
+                                    // disabled={!(new Date() >= new Date(event.startDate).setMinutes(new Date(event.startDate).getMinutes() - 30))}
                                     onPress={() => props.navigation.navigate('Scanner', {event: event})}>
                     <View style={{
                       width: 160,
