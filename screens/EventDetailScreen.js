@@ -241,7 +241,7 @@ const EventDetailScreen = (props) => {
         </TouchableOpacity>
       )
     } else {
-      return (
+      return ( isLogin ?
         <TouchableOpacity activeOpacity={0.8} disabled={(isLogin && isReview)} onPress={() => setShowRegisterEvent(true)}>
           <View style={{
             width: 340,
@@ -257,7 +257,23 @@ const EventDetailScreen = (props) => {
               color: Colors.white
             }}>{(!(isLogin && isReview) ? 'เข้าร่วมกิจกรรม' : 'เข้าร่วมกิจกรรมเสร็จสมบูรณ์')}</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> :
+          <TouchableOpacity activeOpacity={0.8} disabled={true} onPress={() => setShowRegisterEvent(true)}>
+            <View style={{
+              width: 340,
+              height: 60,
+              backgroundColor:  Colors.gray,
+              borderRadius: 12,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{
+                fontFamily: Fonts.bold,
+                fontSize: fontSize.primary,
+                color: Colors.white
+              }}>{(!(isLogin && isReview) ? 'เข้าร่วมกิจกรรม' : 'เข้าร่วมกิจกรรมเสร็จสมบูรณ์')}</Text>
+            </View>
+          </TouchableOpacity>
       )
     }
   }
